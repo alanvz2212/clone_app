@@ -1,0 +1,73 @@
+import 'package:get_it/get_it.dart';
+import '../../services/api_service.dart';
+import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
+import '../../services/cache_service.dart';
+import '../../services/network_service.dart';
+import '../../features/auth/dealer/repositories/dealer_auth_repository.dart';
+import '../../features/auth/transporter/repositories/transporter_auth_repository.dart';
+import '../../features/auth/dealer/bloc/dealer_auth_bloc.dart';
+import '../../features/auth/transporter/bloc/transporter_auth_bloc.dart';
+import '../../features/Dashboard/Dealer/Cards/Place_Order/repositories/search_item_repository.dart';
+import '../../features/Dashboard/Dealer/Cards/Place_Order/bloc/search_item_bloc.dart';
+import '../../constants/api_endpoints.dart';
+
+final GetIt getIt = GetIt.instance;
+
+Future<void> setupDependencyInjection() async {
+  // Core Services
+  final storageService = StorageService();
+  await storageService.init();
+  getIt.registerSingleton<StorageService>(storageService);
+
+  final cacheService = CacheService();
+  await cacheService.init();
+  getIt.registerSingleton<CacheService>(cacheService);
+
+  final networkService = NetworkService();
+  networkService.initialize();
+  getIt.registerSingleton<NetworkService>(networkService);
+
+  // API Service with dependencies
+  getIt.registerLazySingleton<ApiService>(
+    () => ApiService(getIt<CacheService>(), getIt<NetworkService>()),
+  );
+
+  getIt.registerLazySingleton<AuthService>(
+    () => AuthService(getIt<ApiService>(), getIt<StorageService>()),
+  );
+
+  // Repositories
+  getIt.registerLazySingleton<DealerAuthRepository>(
+    () => DealerAuthRepository(baseUrl: ApiEndpoints.baseUrl),
+  );
+
+  getIt.registerLazySingleton<TransporterAuthRepository>(
+    () => TransporterAuthRepository(baseUrl: ApiEndpoints.baseUrl),
+  );
+
+  getIt.registerLazySingleton<SearchItemRepository>(
+    () => SearchItemRepository(),
+  );
+
+  // BLoCs
+  getIt.registerFactory<DealerAuthBloc>(
+    () => DealerAuthBloc(repository: getIt<DealerAuthRepository>()),
+  );
+
+  getIt.registerFactory<TransporterAuthBloc>(
+    () => TransporterAuthBloc(repository: getIt<TransporterAuthRepository>()),
+  );
+
+  getIt.registerFactory<SearchItemBloc>(
+    () => SearchItemBloc(repository: getIt<SearchItemRepository>()),
+  );
+}
+
+// Helper methods for easy access
+ApiService get apiService => getIt<ApiService>();
+AuthService get authService => getIt<AuthService>();
+StorageService get storageService => getIt<StorageService>();
+DealerAuthRepository get dealerAuthRepository => getIt<DealerAuthRepository>();
+TransporterAuthRepository get transporterAuthRepository =>
+    getIt<TransporterAuthRepository>();

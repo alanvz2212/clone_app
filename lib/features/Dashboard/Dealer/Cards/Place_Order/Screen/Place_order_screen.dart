@@ -3,10 +3,12 @@ import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/cart_sc
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import '../bloc/search_item_bloc.dart';
 import '../bloc/search_item_event.dart';
 import '../bloc/search_item_state.dart';
 import '../models/search_item_model.dart';
+import '../providers/cart_provider.dart';
 
 class PlaceOrderScreen extends StatefulWidget {
   const PlaceOrderScreen({super.key});
@@ -196,14 +198,50 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               ),
             ),
             const SizedBox(width: 90),
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CartScreen()),
+            Consumer<CartProvider>(
+              builder: (context, cartProvider, child) {
+                return Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CartScreen()),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.shopping_cart_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                    if (cartProvider.totalItems > 0)
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 16,
+                            minHeight: 16,
+                          ),
+                          child: Text(
+                            '${cartProvider.totalItems}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
                 );
               },
-              icon: Icon(Icons.shopping_cart_outlined),
             ),
           ],
         ),
@@ -361,7 +399,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                     item.name ?? 'Unknown Item',
                                     style: const TextStyle(
                                       // fontWeight: FontWeight.w600,
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Colors.black,
                                     ),
                                   ),
@@ -394,7 +432,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
 
                             // Quantity Input Field
                             Container(
-                              width: 80,
+                              width: 50,
                               margin: const EdgeInsets.only(right: 8),
                               child: TextField(
                                 controller: quantityController,
@@ -454,6 +492,63 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 onSubmitted: (value) {
                                   _updateQuantity(itemId, value, item);
                                 },
+                              ),
+                            ),
+
+                            // Add item to Cart button
+                            Container(
+                              width: 50,
+                              margin: const EdgeInsets.only(right: 8),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: currentQuantity > 0
+                                      ? Colors.blue[50]
+                                      : Colors.grey[100],
+                                  padding: const EdgeInsets.all(8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color: currentQuantity > 0
+                                          ? Colors.blue[200]!
+                                          : Colors.grey[300]!,
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  if (currentQuantity > 0) {
+                                    // Add item to cart
+                                    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                                    cartProvider.addItem(
+                                      itemId,
+                                      item.name ?? 'Unknown Item',
+                                      item.currentSalesPrice ?? 0.0,
+                                      currentQuantity,
+                                    );
+                                    
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('${item.name} added to cart!'),
+                                        backgroundColor: Colors.green,
+                                        duration: const Duration(milliseconds: 1000),
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Please enter a quantity first'),
+                                        backgroundColor: Colors.orange,
+                                        duration: Duration(milliseconds: 1000),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.check,
+                                  color: currentQuantity > 0
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                  size: 20,
+                                ),
                               ),
                             ),
 

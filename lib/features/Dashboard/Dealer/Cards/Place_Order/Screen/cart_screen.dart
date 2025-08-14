@@ -1,7 +1,8 @@
 import 'package:clone/constants/string_constants.dart';
+// import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/provider/cart_provider.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/cart_provider.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -11,6 +12,35 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final Map<String, TextEditingController> _controllers = {};
+
+  void _updateQuantity(
+    CartProvider cartProvider,
+    String itemId,
+    String value,
+    BuildContext context,
+  ) {
+    int? newQuantity = int.tryParse(value);
+    if (newQuantity != null && newQuantity > 0) {
+      cartProvider.updateQuantity(itemId, newQuantity);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Quantity updated to $newQuantity'),
+          backgroundColor: Colors.green,
+          duration: const Duration(milliseconds: 800),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid quantity'),
+          backgroundColor: Colors.red,
+          duration: Duration(milliseconds: 1000),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,24 +88,16 @@ class _CartScreenState extends State<CartScreen> {
                 children: [
                   Icon(
                     Icons.shopping_cart_outlined,
-                    size: 100,
+                    size: 70,
                     color: Colors.grey[400],
                   ),
                   const SizedBox(height: 20),
                   Text(
                     'Your cart is empty',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Add items from the Place Order screen',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[500],
                     ),
                   ),
                 ],
@@ -85,26 +107,31 @@ class _CartScreenState extends State<CartScreen> {
 
           return Column(
             children: [
-              // Cart Items List
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   itemCount: cartProvider.items.length,
                   itemBuilder: (context, index) {
                     final item = cartProvider.items[index];
+
+                    // Create a controller for each item to track text changes
+                    _controllers[item.itemId] ??= TextEditingController(
+                      text: '${item.quantity}',
+                    );
+
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.grey[200]!),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            color: Colors.black.withOpacity(0.05),
+                            spreadRadius: 0.5,
+                            blurRadius: 2,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),
@@ -118,146 +145,139 @@ class _CartScreenState extends State<CartScreen> {
                                 Text(
                                   item.name,
                                   style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
                                     color: Colors.black87,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '₹${item.price.toStringAsFixed(2)} per unit',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.green[600],
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
                                 const SizedBox(height: 4),
-                                Text(
-                                  'Quantity: ${item.quantity}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue[50],
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.blue[200]!),
-                                  ),
-                                  child: Text(
-                                    'Total: ₹${item.total.toStringAsFixed(2)}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.blue[700],
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Qty: ${item.quantity}',
+                                      style: const TextStyle(fontSize: 12),
                                     ),
-                                  ),
+                                    const SizedBox(width: 20),
+                                    Text(
+                                      '₹${item.total.toStringAsFixed(2)}',
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                          // Quantity Controls
-                          Column(
+                          // Quantity Input + Tick Button + Delete
+                          Row(
                             children: [
-                              // Increase quantity
-                              IconButton(
-                                onPressed: () {
-                                  cartProvider.updateQuantity(
-                                    item.itemId,
-                                    item.quantity + 1,
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.add_circle_outline,
-                                  color: Colors.green,
-                                  size: 28,
-                                ),
-                              ),
-                              // Current quantity
+                              // Quantity Input Field
                               Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '${item.quantity}',
+                                width: 60,
+                                height: 35,
+                                child: TextFormField(
+                                  controller: _controllers[item.itemId],
+                                  keyboardType: TextInputType.number,
+                                  textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
+                                  ),
+                                  decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 8,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                      borderSide: BorderSide(
+                                        color: Colors.grey[300]!,
+                                        width: 1,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                              // Decrease quantity
+                              const SizedBox(width: 6),
+
+                              // Tick Button
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                  size: 22,
+                                ),
+                                onPressed: () {
+                                  final value = _controllers[item.itemId]!.text
+                                      .trim();
+                                  _updateQuantity(
+                                    cartProvider,
+                                    item.itemId,
+                                    value,
+                                    context,
+                                  );
+                                },
+                              ),
+
+                              const SizedBox(width: 4),
+                              // Delete Button
                               IconButton(
                                 onPressed: () {
-                                  if (item.quantity > 1) {
-                                    cartProvider.updateQuantity(
-                                      item.itemId,
-                                      item.quantity - 1,
-                                    );
-                                  } else {
-                                    // Show confirmation dialog for removal
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Remove Item'),
-                                          content: Text(
-                                            'Remove ${item.name} from cart?',
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text('Remove Item'),
+                                        content: Text(
+                                          'Remove ${item.name} from cart?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text('Cancel'),
                                           ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                cartProvider.removeItem(item.itemId);
-                                                Navigator.of(context).pop();
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      '${item.name} removed from cart',
-                                                    ),
-                                                    backgroundColor: Colors.red,
-                                                    duration: const Duration(
-                                                      milliseconds: 1000,
-                                                    ),
+                                          TextButton(
+                                            onPressed: () {
+                                              cartProvider.removeItem(
+                                                item.itemId,
+                                              );
+                                              Navigator.of(context).pop();
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    '${item.name} removed from cart',
                                                   ),
-                                                );
-                                              },
-                                              child: const Text(
-                                                'Remove',
-                                                style: TextStyle(color: Colors.red),
+                                                  backgroundColor: Colors.red,
+                                                  duration: const Duration(
+                                                    milliseconds: 1000,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: const Text(
+                                              'Remove',
+                                              style: TextStyle(
+                                                color: Colors.red,
                                               ),
                                             ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
                                 },
-                                icon: Icon(
-                                  item.quantity > 1
-                                      ? Icons.remove_circle_outline
-                                      : Icons.delete_outline,
-                                  color: item.quantity > 1 ? Colors.orange : Colors.red,
-                                  size: 28,
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                  size: 20,
                                 ),
+                                constraints: const BoxConstraints(
+                                  minWidth: 32,
+                                  minHeight: 32,
+                                ),
+                                padding: EdgeInsets.zero,
                               ),
                             ],
                           ),
@@ -267,6 +287,7 @@ class _CartScreenState extends State<CartScreen> {
                   },
                 ),
               ),
+
               // Cart Summary
               Container(
                 padding: const EdgeInsets.all(20),
@@ -275,14 +296,6 @@ class _CartScreenState extends State<CartScreen> {
                   border: Border(
                     top: BorderSide(color: Colors.grey[200]!, width: 1),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
                 ),
                 child: Column(
                   children: [
@@ -291,17 +304,11 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         const Text(
                           'Total Items:',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: TextStyle(fontSize: 15),
                         ),
                         Text(
                           '${cartProvider.totalItems}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: const TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -311,18 +318,11 @@ class _CartScreenState extends State<CartScreen> {
                       children: [
                         const Text(
                           'Total Amount:',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontSize: 15),
                         ),
                         Text(
                           '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.green[600],
-                          ),
+                          style: const TextStyle(fontSize: 15),
                         ),
                       ],
                     ),
@@ -352,12 +352,15 @@ class _CartScreenState extends State<CartScreen> {
                                         onPressed: () {
                                           cartProvider.clearCart();
                                           Navigator.of(context).pop();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
                                             const SnackBar(
                                               content: Text('Cart cleared'),
-                                              backgroundColor: Colors.orange,
-                                              duration: Duration(milliseconds: 1000),
+                                              backgroundColor: Colors.black,
+                                              duration: Duration(
+                                                milliseconds: 1000,
+                                              ),
                                             ),
                                           );
                                         },
@@ -372,20 +375,16 @@ class _CartScreenState extends State<CartScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red[50],
-                              foregroundColor: Colors.red[700],
+                              backgroundColor: Colors.blue[600],
+                              foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: Colors.red[200]!),
                               ),
                             ),
                             child: const Text(
                               'Clear Cart',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: TextStyle(fontSize: 15),
                             ),
                           ),
                         ),
@@ -395,14 +394,7 @@ class _CartScreenState extends State<CartScreen> {
                           flex: 2,
                           child: ElevatedButton(
                             onPressed: () {
-                              // TODO: Implement checkout functionality
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Checkout functionality coming soon!'),
-                                  backgroundColor: Colors.blue,
-                                  duration: Duration(milliseconds: 1500),
-                                ),
-                              );
+                              // Checkout function here
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue[600],
@@ -416,7 +408,7 @@ class _CartScreenState extends State<CartScreen> {
                             child: const Text(
                               'Proceed to Checkout',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -427,6 +419,7 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
               ),
+
               // App Version
               Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 16, top: 8),

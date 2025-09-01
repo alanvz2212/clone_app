@@ -10,6 +10,9 @@ class ApiEndpoints {
   // Search Endpoints
   static const String itemSearch = '$baseUrl/General/Item/Search';
 
+  // Order Endpoints
+  static const String customerOrders = '$baseUrl/api/MobileOrder/CustomerOrder';
+
   // Other endpoints (for future use)
   static const String forgotPassword = '/auth/forgot-password';
   static const String logout = '/auth/logout';

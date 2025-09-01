@@ -1,5 +1,6 @@
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/Screen/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/screens/my_orders_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,9 +14,9 @@ class DashboardDealerScreen extends StatelessWidget {
   const DashboardDealerScreen({super.key});
 
   void _navigateToMyOrders(BuildContext context) {
-    ScaffoldMessenger.of(
+    Navigator.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Navigate to My Orders')));
+    ).push(MaterialPageRoute(builder: (context) => const MyOrdersScreen()));
   }
 
   void _navigateToNewArrivals(BuildContext context) {

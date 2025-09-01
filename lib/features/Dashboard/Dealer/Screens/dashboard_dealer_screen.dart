@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../constants/string_constants.dart';
+import '../../../../core/router/router_extensions.dart';
 import '../../../auth/dealer/bloc/dealer_auth_bloc.dart';
+import '../../../auth/dealer/bloc/dealer_auth_event.dart';
 import '../../../auth/dealer/bloc/dealer_auth_state.dart';
 
 class DashboardDealerScreen extends StatelessWidget {
@@ -33,6 +35,34 @@ class DashboardDealerScreen extends StatelessWidget {
     ).showSnackBar(const SnackBar(content: Text('Navigate to Promotions')));
   }
 
+  void _handleLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Trigger logout event
+                context.read<DealerAuthBloc>().add(DealerLogoutRequested());
+                // Navigate to auth screen
+                context.goToAuth();
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,6 +88,17 @@ class DashboardDealerScreen extends StatelessWidget {
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => _handleLogout(context),
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+              size: 24,
+            ),
+            tooltip: 'Logout',
+          ),
+        ],
       ),
       body: Column(
         children: [

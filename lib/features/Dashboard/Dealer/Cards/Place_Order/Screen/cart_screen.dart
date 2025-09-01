@@ -19,10 +19,10 @@ class _CartScreenState extends State<CartScreen> {
     String itemId,
     String value,
     BuildContext context,
-  ) {
+  ) async {
     int? newQuantity = int.tryParse(value);
     if (newQuantity != null && newQuantity > 0) {
-      cartProvider.updateQuantity(itemId, newQuantity);
+      await cartProvider.updateQuantity(itemId, newQuantity);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Quantity updated to $newQuantity'),

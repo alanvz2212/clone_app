@@ -1,8 +1,10 @@
 import 'package:clone/constants/string_constants.dart';
-// import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/provider/cart_provider.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -13,20 +15,143 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   final Map<String, TextEditingController> _controllers = {};
+  bool _isProcessingCheckout = false;
+
+  // API call method for checkout
+  Future<void> _proceedToCheckout(CartProvider cartProvider) async {
+    if (_isProcessingCheckout) return;
+    
+    setState(() {
+      _isProcessingCheckout = true;
+    });
+
+    try {
+      // Prepare the mobile order items from cart
+      List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((item) {
+        return {
+          "id": 0,
+          "referenceId": 0,
+          "referenceType": "string",
+          "companyId": 0,
+          "mobileOrderId": 0,
+          "itemId": int.tryParse(item.itemId) ?? 0,
+          "itemQuantity": item.quantity,
+          "completedQuantity": 0
+        };
+      }).toList();
+
+      // Prepare the request body
+      Map<String, dynamic> requestBody = {
+        "id": 0,
+        "referenceId": 0,
+        "referenceType": "string",
+        "companyId": 0,
+        "billTypeId": 0,
+        "increment": 0,
+        "invoice": "string",
+        "customerId": 38590,
+        "mobileOrderStatusId": 1,
+        "notes": "Notes",
+        "mobileOrderItem": mobileOrderItems
+      };
+
+      // Make the API call
+      final response = await http.post(
+        Uri.parse('http://devapi.abm4trades.com/api/MobileOrder/NewMobileOrder'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer 659476889604ib26is5ods8ah9l',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        
+        if (responseData['success'] == true) {
+          // Success - clear cart and show success message
+          cartProvider.clearCart();
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(responseData['message'] ?? 'Order placed successfully!'),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+            
+            // Navigate back or to order confirmation screen
+            Navigator.of(context).pop();
+          }
+        } else {
+          // API returned success: false
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(responseData['message'] ?? 'Failed to place order'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
+        }
+      } else {
+        // HTTP error
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to place order. Status: ${response.statusCode}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Network or other error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error placing order: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessingCheckout = false;
+        });
+      }
+    }
+  }
 
   void _updateQuantity(
     CartProvider cartProvider,
     String itemId,
     String value,
     BuildContext context,
-  ) async {
+  ) {
     int? newQuantity = int.tryParse(value);
     if (newQuantity != null && newQuantity > 0) {
-      await cartProvider.updateQuantity(itemId, newQuantity);
+      cartProvider.updateQuantity(itemId, newQuantity);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Quantity updated to $newQuantity'),
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.black,
+          duration: const Duration(milliseconds: 800),
+        ),
+      );
+    } else if (newQuantity == 0) {
+      // Remove item if quantity is set to 0
+      cartProvider.removeItem(itemId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Item removed from cart'),
+          backgroundColor: Colors.orange,
           duration: const Duration(milliseconds: 800),
         ),
       );
@@ -35,19 +160,29 @@ class _CartScreenState extends State<CartScreen> {
         const SnackBar(
           content: Text('Please enter a valid quantity'),
           backgroundColor: Colors.red,
-          duration: Duration(milliseconds: 1000),
+          duration: const Duration(milliseconds: 1000),
         ),
       );
     }
   }
 
   @override
+  void dispose() {
+    // Dispose all controllers
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.blue[700],
+        backgroundColor: Color(0xFFCEB007),
         elevation: 2,
-        shadowColor: Colors.blue.withOpacity(0.3),
+        shadowColor: Color(0xFFCEB007).withOpacity(0.3),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           onPressed: () {
@@ -57,7 +192,7 @@ class _CartScreenState extends State<CartScreen> {
         title: Row(
           children: [
             Image.asset(
-              'assets/logo.png',
+              'assets/logo1.png',
               width: 70,
               height: 35,
               fit: BoxFit.contain,
@@ -150,74 +285,159 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
+                                // Row(
+                                //   children: [
+                                //     Text(
+                                //       'Price: ₹${item.price.toStringAsFixed(2)}',
+                                //       style: TextStyle(
+                                //         color: Colors.black,
+                                //         // fontWeight: FontWeight.w500,
+                                //         fontSize: 12,
+                                //       ),
+                                //     ),
+                                //     const SizedBox(width: 15),
+                                //     Text(
+                                //       'Total: ₹${item.total.toStringAsFixed(2)}',
+                                //       style: TextStyle(
+                                //         color: Colors.black,
+                                //         // fontWeight: FontWeight.w600,
+                                //         fontSize: 12,
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
                                 Row(
                                   children: [
                                     Text(
-                                      'Qty: ${item.quantity}',
-                                      style: const TextStyle(fontSize: 12),
+                                      'Price: ₹${item.price.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                      ),
                                     ),
-                                    const SizedBox(width: 20),
-                                    Text(
-                                      '₹${item.total.toStringAsFixed(2)}',
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
+                                    // const SizedBox(width: 15),
+                                    // Text(
+                                    //   'Total: ₹${item.total.toStringAsFixed(2)}',
+                                    //   style: TextStyle(
+                                    //     color: Colors.black,
+                                    //     fontSize: 12,
+                                    //   ),
+                                    // ),
                                   ],
+                                ),
+                                // ADD THIS BELOW THE EXISTING ROW
+                                const SizedBox(height: 4), // Add some spacing
+                                Text(
+                                  'Total: ₹${item.total.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          // Quantity Input + Tick Button + Delete
+
+                          // Quantity Input + Tick Button + Delete - UPDATED TO MATCH PLACE ORDER SCREEN
                           Row(
                             children: [
-                              // Quantity Input Field
+                              // Quantity Input Field - UPDATED STYLE
                               Container(
-                                width: 60,
-                                height: 35,
+                                width: 50,
+                                margin: const EdgeInsets.only(right: 8),
                                 child: TextFormField(
                                   controller: _controllers[item.itemId],
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(4),
+                                  ],
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
+                                    fontSize: 14,
                                   ),
                                   decoration: InputDecoration(
+                                    hintText: 'Qty',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey[400],
+                                      fontSize: 12,
+                                    ),
+                                    filled: true,
+                                    fillColor: item.quantity > 0
+                                        ? Color(0xFFCEB007).withOpacity(0.1)
+                                        : Colors.grey[100],
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                        color: item.quantity > 0
+                                            ? Color(0xFFCEB007).withOpacity(0.5)
+                                            : Colors.grey[300]!,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFCEB007),
+                                        width: 2,
+                                      ),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      borderSide: BorderSide(
+                                        color: item.quantity > 0
+                                            ? Color(0xFFCEB007).withOpacity(0.5)
+                                            : Colors.grey[300]!,
+                                      ),
+                                    ),
                                     contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 8,
                                       vertical: 8,
                                     ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                      borderSide: BorderSide(
-                                        color: Colors.grey[300]!,
-                                        width: 1,
-                                      ),
-                                    ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 6),
 
-                              // Tick Button
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                  size: 22,
+                              // Tick Button - UPDATED STYLE
+                              Container(
+                                width: 50,
+                                margin: const EdgeInsets.only(right: 8),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: item.quantity > 0
+                                        ? Color(0xFFCEB007).withOpacity(0.1)
+                                        : Colors.grey[100],
+                                    padding: const EdgeInsets.all(8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: BorderSide(
+                                        color: item.quantity > 0
+                                            ? Color(0xFFCEB007).withOpacity(0.5)
+                                            : Colors.grey[300]!,
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    final value = _controllers[item.itemId]!
+                                        .text
+                                        .trim();
+                                    _updateQuantity(
+                                      cartProvider,
+                                      item.itemId,
+                                      value,
+                                      context,
+                                    );
+                                  },
+                                  child: Icon(
+                                    Icons.check,
+                                    color: item.quantity > 0
+                                        ? Color(0xFFCEB007)
+                                        : Colors.grey,
+                                    size: 20,
+                                  ),
                                 ),
-                                onPressed: () {
-                                  final value = _controllers[item.itemId]!.text
-                                      .trim();
-                                  _updateQuantity(
-                                    cartProvider,
-                                    item.itemId,
-                                    value,
-                                    context,
-                                  );
-                                },
                               ),
 
-                              const SizedBox(width: 4),
                               // Delete Button
                               IconButton(
                                 onPressed: () {
@@ -234,7 +454,12 @@ class _CartScreenState extends State<CartScreen> {
                                             onPressed: () {
                                               Navigator.of(context).pop();
                                             },
-                                            child: const Text('Cancel'),
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                              ),
+                                            ),
                                           ),
                                           TextButton(
                                             onPressed: () {
@@ -249,7 +474,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   content: Text(
                                                     '${item.name} removed from cart',
                                                   ),
-                                                  backgroundColor: Colors.red,
+                                                  backgroundColor: Colors.black,
                                                   duration: const Duration(
                                                     milliseconds: 1000,
                                                   ),
@@ -259,7 +484,7 @@ class _CartScreenState extends State<CartScreen> {
                                             child: const Text(
                                               'Remove',
                                               style: TextStyle(
-                                                color: Colors.red,
+                                                color: Colors.black,
                                               ),
                                             ),
                                           ),
@@ -375,7 +600,7 @@ class _CartScreenState extends State<CartScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue[600],
+                              backgroundColor: Color(0xFFCEB007),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -393,11 +618,13 @@ class _CartScreenState extends State<CartScreen> {
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Checkout function here
-                            },
+                            onPressed: _isProcessingCheckout 
+                              ? null 
+                              : () => _proceedToCheckout(cartProvider),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue[600],
+                              backgroundColor: _isProcessingCheckout 
+                                ? Colors.grey 
+                                : Color(0xFFCEB007),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -405,13 +632,35 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                               elevation: 2,
                             ),
-                            child: const Text(
-                              'Proceed to Checkout',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            child: _isProcessingCheckout
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      'Processing...',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const Text(
+                                  'Proceed to Checkout',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                           ),
                         ),
                       ],
@@ -428,7 +677,7 @@ class _CartScreenState extends State<CartScreen> {
                   child: Text(
                     'App Version - ${StringConstant.version}',
                     style: TextStyle(
-                      color: Colors.blue[700],
+                      color: Color(0xFFCEB007),
                       fontWeight: FontWeight.w500,
                     ),
                   ),

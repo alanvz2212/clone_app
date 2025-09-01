@@ -60,6 +60,11 @@ class _AuthScreenState extends State<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardVisible = keyboardHeight > 0;
+
     return MultiBlocListener(
       listeners: [
         BlocListener<DealerAuthBloc, DealerAuthState>(
@@ -94,7 +99,14 @@ class _AuthScreenState extends State<AuthScreen>
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    const SizedBox(height: 70),
+                    const SizedBox(height: 30),
+
+                    Image.asset(
+                      'assets/logo.png',
+                      // height: 120,
+                      width: 150,
+                    ),
+                    const SizedBox(height: 15),
                     Text(
                       'Welcome Back',
                       style: TextStyle(
@@ -126,10 +138,10 @@ class _AuthScreenState extends State<AuthScreen>
                   controller: _tabController,
                   indicator: BoxDecoration(
                     borderRadius: BorderRadius.circular(22),
-                    color: Colors.blue.shade600,
+                    color: Color(0xFFCEB007),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.shade200,
+                        color: Color(0xFFCEB007).withOpacity(0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -163,24 +175,81 @@ class _AuthScreenState extends State<AuthScreen>
               ),
 
               // Footer - Contact Support (only show when keyboard is not visible)
-              if (MediaQuery.of(context).viewInsets.bottom == 0)
+              // if (MediaQuery.of(context).viewInsets.bottom == 0)
+              //   SafeArea(
+              //     top: false,
+              //     child: Container(
+              //       padding: const EdgeInsets.all(20),
+              //       child: TextButton(
+              //         onPressed: () {
+              //           _showContactSupport(context);
+              //         },
+              //         child: Text(
+              //           'Contact Support',
+              //           style: TextStyle(
+              //             color: Color(0xFFCEB007),
+              //             fontSize: 16,
+              //             decoration: TextDecoration.underline,
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              if (!isKeyboardVisible)
                 SafeArea(
                   top: false,
-                  child: Container(
-                    padding: const EdgeInsets.all(20),
-                    child: TextButton(
-                      onPressed: () {
-                        _showContactSupport(context);
-                      },
-                      child: Text(
-                        'Contact Support',
-                        style: TextStyle(
-                          color: Colors.blue.shade600,
-                          fontSize: 16,
-                          decoration: TextDecoration.underline,
+                  child: Column(
+                    children: [
+                      // Contact Support Button
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            _showContactSupport(context);
+                          },
+                          child: Text(
+                            'Contact Support',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 206, 176, 7),
+                              fontSize: 16,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      // Logo/Image
+                      Container(
+                        height: screenHeight * 0.10, // Responsive height
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/33.png',
+                            width: screenWidth * 0.5, // Responsive width
+                            height: screenWidth * 0.5, // Keep aspect ratio
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: screenWidth * 0.3,
+                                height: screenWidth * 0.3,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  color: Colors.grey[600],
+                                  size: screenWidth * 0.1,
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
             ],
@@ -215,10 +284,7 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.blue.shade600,
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
                   ),
                 ),
               ),
@@ -253,10 +319,7 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.blue.shade600,
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
                   ),
                 ),
               ),
@@ -275,14 +338,14 @@ class _AuthScreenState extends State<AuthScreen>
                   child: Text(
                     'Forgot Password?',
                     style: TextStyle(
-                      color: Colors.blue.shade600,
+                      color: Color(0xFFCEB007),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // Login Button
               ElevatedButton(
@@ -292,7 +355,7 @@ class _AuthScreenState extends State<AuthScreen>
                         _handleDealerLogin();
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
+                  backgroundColor: Color(0xFFCEB007),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -354,10 +417,7 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.blue.shade600,
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
                   ),
                 ),
               ),
@@ -392,10 +452,7 @@ class _AuthScreenState extends State<AuthScreen>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.blue.shade600,
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
                   ),
                 ),
               ),
@@ -414,14 +471,14 @@ class _AuthScreenState extends State<AuthScreen>
                   child: Text(
                     'Forgot Password?',
                     style: TextStyle(
-                      color: Colors.blue.shade600,
+                      color: Color(0xFFCEB007),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
 
               // Login Button
               ElevatedButton(
@@ -431,7 +488,7 @@ class _AuthScreenState extends State<AuthScreen>
                         _handleTransporterLogin();
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
+                  backgroundColor: Color(0xFFCEB007),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -649,11 +706,11 @@ class _AuthScreenState extends State<AuthScreen>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Need help? Contact our support team:'),
+              // Text('Need help? Contact our support team:'),
               SizedBox(height: 10),
-              Text('📞 Phone: +91-7907452174'),
-              Text('📧 Email: support@company.com'),
-              Text('💬 Chat: Available 24/7'),
+              Text('Phone: +91-7907452174'),
+              Text('Email: support@company.com'),
+              // Text('Chat: Available 24/7'),
             ],
           ),
           actions: [

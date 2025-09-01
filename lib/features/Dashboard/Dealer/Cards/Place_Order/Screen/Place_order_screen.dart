@@ -25,8 +25,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   Map<String, TextEditingController> quantityControllers =
       {}; // Controllers for quantity inputs
 
-  List<Map<String, dynamic>> savedOrders = [];
-  Map<String, SearchItem> itemsMap = {}; // Store item details for saved orders
+  Map<String, SearchItem> itemsMap = {}; // Store item details for cart
 
   @override
   void dispose() {
@@ -82,7 +81,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                 ? '${item.name}: Removed from order'
                 : '${item.name}: Quantity $quantity',
           ),
-          backgroundColor: quantity == 0 ? Colors.orange : Colors.green,
+          backgroundColor: quantity == 0 ? Colors.orange : Colors.black,
           duration: const Duration(milliseconds: 800),
         ),
       );
@@ -96,74 +95,60 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     return quantityControllers[itemId]!;
   }
 
-  void _saveOrder() {
+  void _addAllItemsToCart() {
     if (itemQuantities.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No items to save'),
-          backgroundColor: Colors.black,
-          duration: Duration(milliseconds: 90),
+          content: Text('No items selected to add to cart'),
+          backgroundColor: Colors.orange,
+          duration: Duration(milliseconds: 1000),
         ),
       );
       return;
     }
-    // Create order data
-    List<Map<String, dynamic>> orderItems = [];
-    double totalAmount = 0.0;
-    int totalQuantity = 0;
-    itemQuantities.forEach((itemId, quantity) {
-      if (itemsMap.containsKey(itemId)) {
-        final item = itemsMap[itemId]!;
-        final itemTotal = (item.currentSalesPrice ?? 0.0) * quantity;
-        totalAmount += itemTotal;
-        totalQuantity += quantity;
-        orderItems.add({
-          'itemId': itemId,
-          'name': item.name,
-          'price': item.currentSalesPrice,
-          'quantity': quantity,
-          'total': itemTotal,
-        });
-      }
-    });
-    // Add to saved orders
-    setState(() {
-      savedOrders.add({
-        'orderId': DateTime.now().millisecondsSinceEpoch.toString(),
-        'timestamp': DateTime.now(),
-        'items': orderItems,
-        'totalAmount': totalAmount,
-        'totalQuantity': totalQuantity,
-        'totalItems': orderItems.length,
-      });
-      // Clear current order
-      itemQuantities.clear();
-      for (var controller in quantityControllers.values) {
-        controller.clear();
-      }
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Order saved successfully!${orderItems.length}items(Total:₹${totalAmount.toStringAsFixed(2)} )',
-        ),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
-  void _removeOrder(int index) {
-    setState(() {
-      savedOrders.removeAt(index);
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    int itemsAdded = 0;
+
+    // Add all items with quantities to cart
+    itemQuantities.forEach((itemId, quantity) {
+      if (itemsMap.containsKey(itemId) && quantity > 0) {
+        final item = itemsMap[itemId]!;
+        cartProvider.addItem(
+          itemId,
+          item.name ?? 'Unknown Item',
+          item.currentSalesPrice ?? 0.0,
+          quantity,
+        );
+        itemsAdded++;
+      }
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Order removed'),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 1),
-      ),
-    );
+
+    if (itemsAdded > 0) {
+      // Clear current selections after adding to cart
+      setState(() {
+        itemQuantities.clear();
+        for (var controller in quantityControllers.values) {
+          controller.clear();
+        }
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$itemsAdded items added to cart successfully!'),
+          backgroundColor: Colors.black,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No valid items to add to cart'),
+          backgroundColor: Colors.orange,
+          duration: Duration(milliseconds: 1000),
+        ),
+      );
+    }
   }
 
   @override
@@ -171,9 +156,9 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Colors.blue[700],
+        backgroundColor: Color(0xFFCEB007),
         elevation: 2,
-        shadowColor: Colors.blue.withOpacity(0.3),
+        shadowColor: Color(0xFFCEB007).withOpacity(0.3),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
           onPressed: () {
@@ -183,7 +168,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
         title: Row(
           children: [
             Image.asset(
-              'assets/logo.png',
+              'assets/logo1.png',
               width: 70,
               height: 35,
               fit: BoxFit.contain,
@@ -283,7 +268,10 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.blue, width: 2),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFCEB007),
+                    width: 2,
+                  ),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -408,8 +396,8 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                     Text(
                                       '₹${item.currentSalesPrice!.toStringAsFixed(2)}',
                                       style: TextStyle(
-                                        color: Colors.green[600],
-                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                        // fontWeight: FontWeight.w500,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -420,8 +408,8 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                       child: Text(
                                         'Total: ₹${(item.currentSalesPrice! * currentQuantity).toStringAsFixed(2)}',
                                         style: TextStyle(
-                                          color: Colors.blue[600],
-                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                          // fontWeight: FontWeight.w600,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -456,20 +444,20 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                   ),
                                   filled: true,
                                   fillColor: currentQuantity > 0
-                                      ? Colors.blue[50]
+                                      ? Color(0xFFCEB007).withOpacity(0.1)
                                       : Colors.grey[100],
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(
                                       color: currentQuantity > 0
-                                          ? Colors.blue[200]!
+                                          ? Color(0xFFCEB007).withOpacity(0.5)
                                           : Colors.grey[300]!,
                                     ),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
-                                      color: Colors.blue,
+                                      color: Color(0xFFCEB007),
                                       width: 2,
                                     ),
                                   ),
@@ -477,7 +465,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: BorderSide(
                                       color: currentQuantity > 0
-                                          ? Colors.blue[200]!
+                                          ? Color(0xFFCEB007).withOpacity(0.5)
                                           : Colors.grey[300]!,
                                     ),
                                   ),
@@ -495,21 +483,21 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                               ),
                             ),
 
-                            // Add item to Cart button
+                            // Add item to Cart button (Individual)
                             Container(
                               width: 50,
                               margin: const EdgeInsets.only(right: 8),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: currentQuantity > 0
-                                      ? Colors.blue[50]
+                                      ? Color(0xFFCEB007).withOpacity(0.1)
                                       : Colors.grey[100],
                                   padding: const EdgeInsets.all(8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(
                                       color: currentQuantity > 0
-                                          ? Colors.blue[200]!
+                                          ? Color(0xFFCEB007).withOpacity(0.5)
                                           : Colors.grey[300]!,
                                     ),
                                   ),
@@ -517,26 +505,36 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 onPressed: () {
                                   if (currentQuantity > 0) {
                                     // Add item to cart
-                                    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                                    final cartProvider =
+                                        Provider.of<CartProvider>(
+                                          context,
+                                          listen: false,
+                                        );
                                     cartProvider.addItem(
                                       itemId,
                                       item.name ?? 'Unknown Item',
                                       item.currentSalesPrice ?? 0.0,
                                       currentQuantity,
                                     );
-                                    
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('${item.name} added to cart!'),
-                                        backgroundColor: Colors.green,
-                                        duration: const Duration(milliseconds: 1000),
+                                        content: Text(
+                                          '${item.name} added to cart!',
+                                        ),
+                                        backgroundColor: Colors.black,
+                                        duration: const Duration(
+                                          milliseconds: 1000,
+                                        ),
                                       ),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Please enter a quantity first'),
-                                        backgroundColor: Colors.orange,
+                                        content: Text(
+                                          'Please enter a quantity first',
+                                        ),
+                                        backgroundColor: Colors.black,
                                         duration: Duration(milliseconds: 1000),
                                       ),
                                     );
@@ -545,39 +543,11 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 child: Icon(
                                   Icons.check,
                                   color: currentQuantity > 0
-                                      ? Colors.blue
+                                      ? Color(0xFFCEB007)
                                       : Colors.grey,
                                   size: 20,
                                 ),
                               ),
-                            ),
-
-                            // Remove Item Button
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                                size: 24,
-                              ),
-                              onPressed: () {
-                                // Remove item from the list and clear its quantity
-                                setState(() {
-                                  itemQuantities.remove(itemId);
-                                  quantityControllers[itemId]?.clear();
-                                });
-
-                                context.read<SearchItemBloc>().add(
-                                  SearchItemRemoved(item: item),
-                                );
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Removed: ${item.name}'),
-                                    backgroundColor: Colors.red,
-                                    duration: const Duration(milliseconds: 90),
-                                  ),
-                                );
-                              },
                             ),
                           ],
                         ),
@@ -604,15 +574,15 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
             ),
           ),
 
-          // Save Button
+          // Add All Items to Cart Button
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
             alignment: Alignment.centerRight,
             child: ElevatedButton(
-              onPressed: _saveOrder,
+              onPressed: _addAllItemsToCart,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Color(0xFFCEB007),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
@@ -624,172 +594,32 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                 elevation: 2,
               ),
               child: const Text(
-                'Add Item',
+                'Add Items to Cart',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
               ),
             ),
           ),
-          // Expanded(
-          //   flex: 1,
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       color: Colors.grey[100],
-          //       border: Border(
-          //         top: BorderSide(color: Colors.grey[300]!, width: 1),
-          //       ),
-          //     ),
-          //     child: Column(
-          //       children: [
-          //         Container(
-          //           width: double.infinity,
-          //           padding: EdgeInsets.all(16.0),
-          //           decoration: BoxDecoration(
-          //             color: Colors.white,
-          //             border: Border(
-          //               bottom: BorderSide(color: Colors.grey[200]!, width: 1),
-          //             ),
-          //           ),
-          //           child: Text(
-          //             savedOrders.isEmpty
-          //                 ? 'Saved Items'
-          //                 : 'Saved Items (${savedOrders.length})',
-          //             style: TextStyle(
-          //               fontSize: 18,
-          //               fontWeight: FontWeight.w400,
-          //               fontFamily: 'Poppins',
-          //               color: Colors.black87,
-          //             ),
-          //           ),
-          //         ),
-          //         // Orders List
-          //         Expanded(
-          //           child: savedOrders.isEmpty
-          //               ? Center(
-          //                   child: Column(
-          //                     mainAxisAlignment: MainAxisAlignment.center,
-          //                     children: [
-          //                       Icon(
-          //                         Icons.shopping_cart_outlined,
-          //                         size: 64,
-          //                         color: Colors.grey[400],
-          //                       ),
-          //                       const SizedBox(height: 16),
-          //                       Text(
-          //                         'No saved orders yet',
-          //                         style: TextStyle(
-          //                           color: Colors.grey[600],
-          //                           fontSize: 16,
-          //                         ),
-          //                       ),
-          //                       const SizedBox(height: 8),
-          //                       Text(
-          //                         'Add items and save to see them here',
-          //                         style: TextStyle(
-          //                           color: Colors.grey[500],
-          //                           fontSize: 14,
-          //                         ),
-          //                       ),
-          //                     ],
-          //                   ),
-          //                 )
-          //               : ListView.builder(
-          //                   padding: EdgeInsets.all(16.0),
-          //                   itemCount: savedOrders.length,
-          //                   itemBuilder: (BuildContext context, int index) {
-          //                     final order = savedOrders[index];
-          //                     final orderItems =
-          //                         order['items'] as List<Map<String, dynamic>>;
-          //                     final timestamp = order['timestamp'] as DateTime;
-          //                     return Container(
-          //                       margin: const EdgeInsets.only(bottom: 12),
-          //                       padding: const EdgeInsets.all(16),
-          //                       decoration: BoxDecoration(
-          //                         color: Colors.white,
-          //                         borderRadius: BorderRadius.circular(12),
-          //                         border: Border.all(color: Colors.grey[200]!),
-          //                         boxShadow: [
-          //                           BoxShadow(
-          //                             color: Colors.grey.withOpacity(0.1),
-          //                             spreadRadius: 1,
-          //                             blurRadius: 4,
-          //                             offset: const Offset(0, 2),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                       child: Column(
-          //                         crossAxisAlignment: CrossAxisAlignment.start,
-          //                         children: [
-          //                           Row(
-          //                             mainAxisAlignment:
-          //                                 MainAxisAlignment.spaceBetween,
-          //                             children: [
-          //                               Text(''),
-          //                               Row(
-          //                                 children: [
-          //                                   const SizedBox(width: 12),
-          //                                   IconButton(
-          //                                     icon: const Icon(
-          //                                       Icons.delete_outline,
-          //                                       color: Colors.red,
-          //                                       size: 24,
-          //                                     ),
-          //                                     onPressed: () =>
-          //                                         _removeOrder(index),
-          //                                     padding: EdgeInsets.zero,
-          //                                     constraints:
-          //                                         const BoxConstraints(),
-          //                                   ),
-          //                                 ],
-          //                               ),
-          //                             ],
-          //                           ),
-          //                           Container(
-          //                             padding: EdgeInsets.symmetric(
-          //                               horizontal: 12,
-          //                               vertical: 8,
-          //                             ),
-          //                             child: Text(
-          //                               'Total Qty: ${order['totalQuantity']}',
-          //                               style: TextStyle(fontSize: 14),
-          //                             ),
-          //                           ),
-          //                           Wrap(
-          //                             spacing: 6,
-          //                             runSpacing: 6,
-          //                             children: orderItems.map((item) {
-          //                               return Container(
-          //                                 padding: const EdgeInsets.symmetric(
-          //                                   horizontal: 10,
-          //                                   vertical: 6,
-          //                                 ),
-          //                                 child: Text(
-          //                                   '${item['name']}',
-          //                                   style: TextStyle(fontSize: 12),
-          //                                 ),
-          //                               );
-          //                             }).toList(),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                     );
-          //                   },
-          //                 ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
+
           Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 16, top: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'App Version - ${StringConstant.version}',
-                style: TextStyle(
-                  color: Colors.blue[700],
-                  fontWeight: FontWeight.w500,
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              top: 8,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'App Version - ${StringConstant.version}',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 95, 91, 91),
+
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
+                Image.asset('assets/33.png', width: 100, height: 50),
+              ],
             ),
           ),
         ],

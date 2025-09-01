@@ -1,5 +1,5 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/models/cart_model.dart';
 import 'package:hive/hive.dart';
+import '../models/cart_model.dart';
 import '../models/cart_item_hive.dart';
 
 class CartHiveService {
@@ -14,7 +14,9 @@ class CartHiveService {
   // Get the cart box
   static Box<CartItemHive> get cartBox {
     if (_cartBox == null || !_cartBox!.isOpen) {
-      throw Exception('Cart box is not initialized. Call CartHiveService.init() first.');
+      throw Exception(
+        'Cart box is not initialized. Call CartHiveService.init() first.',
+      );
     }
     return _cartBox!;
   }
@@ -37,14 +39,17 @@ class CartHiveService {
   }
 
   // Update cart item quantity
-  static Future<void> updateCartItemQuantity(String itemId, int quantity) async {
+  static Future<void> updateCartItemQuantity(
+    String itemId,
+    int quantity,
+  ) async {
     final hiveItem = cartBox.get(itemId);
     if (hiveItem != null) {
       if (quantity <= 0) {
         await removeCartItem(itemId);
       } else {
         hiveItem.quantity = quantity;
-        await hiveItem.save();
+        await cartBox.put(itemId, hiveItem);
       }
     }
   }
@@ -77,5 +82,29 @@ class CartHiveService {
   // Close the box (call this when app is closing)
   static Future<void> close() async {
     await _cartBox?.close();
+  }
+
+  // NEW: Save entire cart to Hive
+  static Future<void> saveCart(Cart cart) async {
+    // First clear existing items
+    await clearCart();
+
+    // Save all items from the cart
+    for (final item in cart.items) {
+      await saveCartItem(item);
+    }
+  }
+
+  // NEW: Load entire cart from Hive
+  static Cart loadCart() {
+    final cartItems = getAllCartItems();
+    final cart = Cart();
+
+    // Add all items to the cart
+    for (final item in cartItems) {
+      cart.addItem(item.itemId, item.name, item.price, item.quantity);
+    }
+
+    return cart;
   }
 }

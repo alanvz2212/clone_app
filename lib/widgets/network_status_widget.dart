@@ -90,7 +90,7 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget> {
             duration: const Duration(milliseconds: 300),
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-            color: Colors.green.shade600,
+            color: Colors.black,
             child: const Row(
               children: [
                 Icon(Icons.wifi, color: Colors.white, size: 18),
@@ -158,7 +158,7 @@ class _NetworkStatusIndicatorState extends State<NetworkStatusIndicator> {
     switch (_currentStatus) {
       case NetworkStatus.connected:
         icon = Icons.wifi;
-        color = widget.connectedColor ?? Colors.green;
+        color = widget.connectedColor ?? Colors.black;
         break;
       case NetworkStatus.disconnected:
         icon = Icons.wifi_off;

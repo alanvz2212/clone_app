@@ -1,40 +1,31 @@
 import 'package:flutter/foundation.dart';
 import '../models/cart_model.dart';
-import '../services/cart_hive_service.dart';
+import '../Services/cart_hive_service.dart';
 
-class CartProvider extends ChangeNotifier {
-  final Cart _cart = Cart();
+class CartProvider with ChangeNotifier {
+  Cart _cart = Cart();
 
-  // Initialize cart provider and load data from Hive
+  Cart get cart => _cart;
+  List<CartItem> get items => _cart.items;
+  int get totalItems => _cart.totalItems;
+  double get totalAmount => _cart.totalAmount;
+  bool get isEmpty => _cart.isEmpty();
+
   CartProvider() {
     _loadCartFromHive();
   }
 
-  Cart get cart => _cart;
-
-  List<CartItem> get items => _cart.items;
-
-  int get totalItems => _cart.totalItems;
-
-  double get totalAmount => _cart.totalAmount;
-
-  bool get isEmpty => _cart.isEmpty();
-
-  // Load cart items from Hive storage
-  void _loadCartFromHive() {
+  Future<void> _loadCartFromHive() async {
+    // Make sure Hive is initialized
     try {
-      final savedItems = CartHiveService.getAllCartItems();
-      _cart.clear();
-      for (final item in savedItems) {
-        _cart.addItem(item.itemId, item.name, item.price, item.quantity);
-      }
-      notifyListeners();
+      _cart = CartHiveService.loadCart();
     } catch (e) {
-      debugPrint('Error loading cart from Hive: $e');
+      // If Hive is not initialized, start with empty cart
+      _cart = Cart();
     }
+    notifyListeners();
   }
 
-  // Add item to cart and save to Hive
   Future<void> addItem(
     String itemId,
     String name,
@@ -42,75 +33,49 @@ class CartProvider extends ChangeNotifier {
     int quantity,
   ) async {
     _cart.addItem(itemId, name, price, quantity);
-
-    // Save to Hive
-    try {
-      final cartItem = CartItem(
-        itemId: itemId,
-        name: name,
-        price: price,
-        quantity: quantity,
-      );
-      await CartHiveService.saveCartItem(cartItem);
-    } catch (e) {
-      debugPrint('Error saving item to Hive: $e');
-    }
-
+    await CartHiveService.saveCart(_cart); // Use the new saveCart method
     notifyListeners();
   }
 
-  // Remove item from cart and Hive
-  Future<void> removeItem(String itemId) async {
-    _cart.removeItem(itemId);
-
-    // Remove from Hive
-    try {
-      await CartHiveService.removeCartItem(itemId);
-    } catch (e) {
-      debugPrint('Error removing item from Hive: $e');
-    }
-
-    notifyListeners();
-  }
-
-  // Update quantity in cart and Hive
   Future<void> updateQuantity(String itemId, int quantity) async {
     _cart.updateQuantity(itemId, quantity);
-
-    // Update in Hive
-    try {
-      await CartHiveService.updateCartItemQuantity(itemId, quantity);
-    } catch (e) {
-      debugPrint('Error updating quantity in Hive: $e');
-    }
-
+    await CartHiveService.saveCart(_cart); // Use the new saveCart method
     notifyListeners();
   }
 
-  // Clear cart and Hive storage
+  Future<void> removeItem(String itemId) async {
+    _cart.removeItem(itemId);
+    await CartHiveService.saveCart(_cart); // Use the new saveCart method
+    notifyListeners();
+  }
+
   Future<void> clearCart() async {
     _cart.clear();
-
-    // Clear Hive storage
-    try {
-      await CartHiveService.clearCart();
-    } catch (e) {
-      debugPrint('Error clearing cart in Hive: $e');
-    }
-
+    await CartHiveService.clearCart();
     notifyListeners();
   }
 
-  CartItem? getItem(String itemId) {
-    try {
-      return _cart.items.firstWhere((item) => item.itemId == itemId);
-    } catch (e) {
-      return null;
-    }
+  // Helper method to get quantity for a specific item
+  int getItemQuantity(String itemId) {
+    final item = _cart.items.firstWhere(
+      (item) => item.itemId == itemId,
+      orElse: () => CartItem(itemId: '', name: '', price: 0, quantity: 0),
+    );
+    return item.quantity;
   }
 
-  // Refresh cart from Hive (useful when app resumes)
-  void refreshFromHive() {
-    _loadCartFromHive();
+  // Check if item exists in cart
+  bool containsItem(String itemId) {
+    return _cart.items.any((item) => item.itemId == itemId);
+  }
+
+  // NEW: Initialize Hive service
+  static Future<void> initializeHive() async {
+    await CartHiveService.init();
+  }
+
+  // NEW: Close Hive service
+  static Future<void> closeHive() async {
+    await CartHiveService.close();
   }
 }

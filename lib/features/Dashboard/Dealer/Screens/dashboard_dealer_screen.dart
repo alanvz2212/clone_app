@@ -1,3 +1,4 @@
+import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/Screen/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,43 +25,37 @@ class DashboardDealerScreen extends StatelessWidget {
   }
 
   void _navigateToInventory(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Navigate to Inventory & Pricing')),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   const SnackBar(content: Text('Navigate to Inventory & Pricing')),
+    // );
   }
 
   void _navigateToPromotions(BuildContext context) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Navigate to Promotions')));
+    // ScaffoldMessenger.of(
+    //   context,
+    // ).showSnackBar(const SnackBar(content: Text('Navigate to Promotions')));
   }
-
-  void _handleLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Trigger logout event
-                context.read<DealerAuthBloc>().add(DealerLogoutRequested());
-                // Navigate to auth screen
-                context.goToAuth();
-              },
-              child: const Text('Logout'),
-            ),
-          ],
-        );
-      },
-    );
+  AlertDialog __handleLogout(BuildContext context) {
+    return (AlertDialog(
+      title: const Text('Logout'),
+      content: const Text('Are you sure you want to logout?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            // Trigger logout event
+            context.read<DealerAuthBloc>().add(DealerLogoutRequested());
+            // Navigate to auth screen
+            context.goToAuth();
+          },
+          child: const Text('Logout', style: TextStyle(color: Colors.black)),
+        ),
+      ],
+    ));
   }
 
   @override
@@ -72,7 +67,7 @@ class DashboardDealerScreen extends StatelessWidget {
             // Icon(CupertinoIcons.back),
             // const SizedBox(width: 8),
             Image.asset(
-              'assets/logo.png', // Replace with your image path
+              'assets/logo1.png', // Replace with your image path
               width: 70,
               height: 35,
               fit: BoxFit.contain,
@@ -83,20 +78,29 @@ class DashboardDealerScreen extends StatelessWidget {
               'Dealer Dashboard',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
+            // const SizedBox(width: 45),
+            // IconButton(
+            //   onPressed: () {
+            //     Navigator.of(context).push(
+            //       MaterialPageRoute(builder: (context) => const AuthScreen()),
+            //     );
+            //   },
+            //   icon: Icon(Icons.logout),
+            // ),
           ],
         ),
-        backgroundColor: Colors.blue[700],
+        backgroundColor: const Color(0xFFCEB007),
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () => _handleLogout(context),
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
-              size: 24,
-            ),
-            tooltip: 'Logout',
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => __handleLogout(context),
+              );
+            },
           ),
         ],
       ),
@@ -107,7 +111,7 @@ class DashboardDealerScreen extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
-              color: Colors.blue[700],
+              color: const Color.fromARGB(255, 255, 255, 255),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withValues(alpha: 0.3),
@@ -137,7 +141,8 @@ class DashboardDealerScreen extends StatelessWidget {
                         Text(
                           'Welcome back,\n$dealerName',
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: Color.fromARGB(255, 95, 91, 91),
+
                             fontWeight: FontWeight.w400,
                             fontSize: 17,
                           ),
@@ -161,7 +166,7 @@ class DashboardDealerScreen extends StatelessWidget {
                       },
                       icon: const Icon(
                         Icons.notifications_outlined,
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 95, 91, 91),
                         size: 28,
                       ),
                     ),
@@ -202,7 +207,7 @@ class DashboardDealerScreen extends StatelessWidget {
                         title: 'Place Order',
                         // subtitle: 'Create new orders',
                         icon: Icons.add_shopping_cart,
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const PlaceOrderScreen(),
@@ -214,28 +219,38 @@ class DashboardDealerScreen extends StatelessWidget {
                         title: 'My Orders',
                         // subtitle: 'Track orders',
                         icon: Icons.receipt_long,
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToMyOrders(context),
                       ),
                       QuickAccessTile(
                         title: 'New Arrivals',
 
                         icon: Icons.fiber_new,
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToNewArrivals(context),
                       ),
                       QuickAccessTile(
-                        title: 'Inventory & Pricing',
+                        title: 'Invoices',
                         icon: Icons.inventory_2,
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToInventory(context),
                       ),
                       QuickAccessTile(
-                        title: 'Promotions',
+                        title: 'Schemes',
                         // subtitle: '',
                         icon: Icons.local_offer,
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToPromotions(context),
+                      ),
+                      QuickAccessTile(
+                        title: 'Feedback',
+                        icon: Icons.feedback, // BEST CHOICE - most accurate
+                        color: Color.fromARGB(255, 95, 91, 91),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const FeedbackScreen(),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -253,16 +268,25 @@ class DashboardDealerScreen extends StatelessWidget {
 
           // App Version at the bottom
           Padding(
-            padding: const EdgeInsets.only(left: 16, bottom: 16, top: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'App Version - ${StringConstant.version}',
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              top: 8,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'App Version - ${StringConstant.version}',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 95, 91, 91),
+
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
+                Image.asset('assets/33.png', width: 100, height: 50),
+              ],
             ),
           ),
         ],

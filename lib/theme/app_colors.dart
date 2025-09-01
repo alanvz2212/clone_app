@@ -7,10 +7,10 @@ class AppColors {
   AppColors._();
 
   // Primary Colors
-  static const Color primary = Color(0xFF1976D2); // Blue shade 700
-  static const Color primaryLight = Color(0xFF42A5F5); // Blue shade 400
-  static const Color primaryDark = Color(0xFF0D47A1); // Blue shade 900
-  static const Color primarySwatch = Colors.blue;
+  static const Color primary = Color(0xFFCEB007); // Golden color
+  static const Color primaryLight = Color(0xFFCEB007); // Golden color
+  static const Color primaryDark = Color(0xFFCEB007); // Golden color
+  static const Color primarySwatch = Colors.orange;
 
   // Secondary Colors
   static const Color secondary = Color(0xFF03DAC6);
@@ -30,9 +30,9 @@ class AppColors {
   static const Color textOnSurface = Color(0xFF424242); // Grey shade 800
 
   // Status Colors
-  static const Color success = Color(0xFF4CAF50); // Green shade 600
-  static const Color successLight = Color(0xFF81C784); // Green shade 300
-  static const Color successDark = Color(0xFF2E7D32); // Green shade 800
+  static const Color success = Colors.black; // Black shade 600
+  static const Color successLight = Colors.black; // Black shade 300
+  static const Color successDark = Colors.black; // Black shade 800
 
   static const Color error = Color(0xFFE53935); // Red shade 600
   static const Color errorLight = Color(0xFFEF5350); // Red shade 400
@@ -42,9 +42,9 @@ class AppColors {
   static const Color warningLight = Color(0xFFFFB74D); // Orange shade 300
   static const Color warningDark = Color(0xFFF57C00); // Orange shade 700
 
-  static const Color info = Color(0xFF2196F3); // Blue shade 600
-  static const Color infoLight = Color(0xFF64B5F6); // Blue shade 300
-  static const Color infoDark = Color(0xFF1565C0); // Blue shade 800
+  static const Color info = Color(0xFFCEB007); // Golden color
+  static const Color infoLight = Color(0xFFCEB007); // Golden color
+  static const Color infoDark = Color(0xFFCEB007); // Golden color
 
   // UI Element Colors
   static const Color divider = Color(0xFFE0E0E0); // Grey shade 300
@@ -102,5 +102,5 @@ class AppColors {
       Colors.grey.withValues(alpha: opacity);
 
   // Material Color Swatches for ThemeData
-  static const MaterialColor primaryMaterialColor = Colors.blue;
+  static const MaterialColor primaryMaterialColor = Colors.orange;
 }

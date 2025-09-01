@@ -8,7 +8,7 @@ class DashboardTransporterScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transporter Dashboard'),
-        backgroundColor: Colors.blue[700],
+        backgroundColor: Color(0xFFCEB007),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -17,7 +17,7 @@ class DashboardTransporterScreen extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(color: Colors.blue[700]),
+            decoration: BoxDecoration(color: Color(0xFFCEB007)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -95,7 +95,7 @@ class DashboardTransporterScreen extends StatelessWidget {
                         title: 'Date-wise Delivery Schedule',
                         // subtitle: 'Create new orders',
                         icon: Icons.delivery_dining,
-                        color: Colors.blue,
+                        color: Color(0xFFCEB007),
                         onTap: () => (context),
                         // subtitle: '',
                       ),
@@ -103,7 +103,7 @@ class DashboardTransporterScreen extends StatelessWidget {
                         title: 'Delivery Button',
                         // subtitle: 'Track orders',
                         icon: Icons.smart_button_sharp,
-                        color: Colors.blue,
+                        color: Color(0xFFCEB007),
                         onTap: () => (context),
                       ),
                     ],

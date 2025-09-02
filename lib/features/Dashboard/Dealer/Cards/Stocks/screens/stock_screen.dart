@@ -22,7 +22,7 @@ class StockScreen extends StatefulWidget {
 }
 
 class _StockScreenState extends State<StockScreen> {
-  final TextEditingController _itemIdController = TextEditingController();
+  final TextEditingController _itemNameController = TextEditingController();
   late StockBloc _stockBloc;
   String searchQuery = '';
 
@@ -32,7 +32,7 @@ class _StockScreenState extends State<StockScreen> {
     _stockBloc = StockBloc();
 
     if (widget.itemId != null) {
-      _itemIdController.text = widget.itemId.toString();
+      _itemNameController.text = widget.itemId.toString();
       _stockBloc.add(FetchStockDetails(widget.itemId!));
     }
   }
@@ -43,38 +43,26 @@ class _StockScreenState extends State<StockScreen> {
     });
 
     if (value.trim().isNotEmpty) {
-      final itemId = int.tryParse(value.trim());
-      if (itemId != null) {
-        _stockBloc.add(FetchStockDetails(itemId));
-      }
+      // Search by item name instead of ID
+      _stockBloc.add(FetchStockByName(value.trim()));
     }
   }
 
   void _clearSearch() {
-    _itemIdController.clear();
+    _itemNameController.clear();
     setState(() {
       searchQuery = '';
     });
   }
 
   void _onSearchPressed() {
-    final itemIdText = _itemIdController.text.trim();
-    if (itemIdText.isNotEmpty) {
-      final itemId = int.tryParse(itemIdText);
-      if (itemId != null) {
-        _stockBloc.add(FetchStockDetails(itemId));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter a valid item ID'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    final itemNameText = _itemNameController.text.trim();
+    if (itemNameText.isNotEmpty) {
+      _stockBloc.add(FetchStockByName(itemNameText));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter an item ID'),
+          content: Text('Please enter an item name'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -127,11 +115,11 @@ class _StockScreenState extends State<StockScreen> {
                 ],
               ),
               child: TextField(
-                controller: _itemIdController,
+                controller: _itemNameController,
                 onChanged: _onSearchChanged,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                  hintText: 'Search by Item ID',
+                  hintText: 'Search by Item Name',
                   prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   suffixIcon: searchQuery.isNotEmpty
                       ? IconButton(
@@ -195,7 +183,7 @@ class _StockScreenState extends State<StockScreen> {
     }
 
     return const Center(
-      child: Text('Enter an item ID to search for stock details'),
+      child: Text('Enter an item name to search for stock details'),
     );
   }
 
@@ -294,7 +282,7 @@ class _StockScreenState extends State<StockScreen> {
 
   @override
   void dispose() {
-    _itemIdController.dispose();
+    _itemNameController.dispose();
     _stockBloc.close();
     super.dispose();
   }

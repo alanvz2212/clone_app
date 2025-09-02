@@ -19,3 +19,12 @@ class FetchStockDetails extends StockEvent {
 class ClearStockDetails extends StockEvent {
   const ClearStockDetails();
 }
+
+class FetchStockByName extends StockEvent {
+  final String itemName;
+
+  const FetchStockByName(this.itemName);
+
+  @override
+  List<Object> get props => [itemName];
+}

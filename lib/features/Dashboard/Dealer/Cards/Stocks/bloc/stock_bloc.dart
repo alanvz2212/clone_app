@@ -11,6 +11,7 @@ class StockBloc extends Bloc<StockEvent, StockState> {
         super(const StockInitial()) {
     on<FetchStockDetails>(_onFetchStockDetails);
     on<ClearStockDetails>(_onClearStockDetails);
+    on<FetchStockByName>(_onFetchStockByName);
   }
 
   Future<void> _onFetchStockDetails(
@@ -41,5 +42,28 @@ class StockBloc extends Bloc<StockEvent, StockState> {
     Emitter<StockState> emit,
   ) {
     emit(const StockInitial());
+  }
+
+  Future<void> _onFetchStockByName(
+    FetchStockByName event,
+    Emitter<StockState> emit,
+  ) async {
+    emit(const StockLoading());
+
+    try {
+      final stockResponse = await StockService.getItemStockDetailsByName(event.itemName);
+      
+      if (stockResponse != null) {
+        if (stockResponse.success && stockResponse.stockDetails.isNotEmpty) {
+          emit(StockLoaded(stockResponse));
+        } else {
+          emit(const StockEmpty());
+        }
+      } else {
+        emit(const StockError('No items found with that name'));
+      }
+    } catch (e) {
+      emit(StockError('Error: ${e.toString()}'));
+    }
   }
 }

@@ -15,14 +15,13 @@ class MyOrdersScreen extends StatefulWidget {
 
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   late OrdersBloc _ordersBloc;
-  static const int customerId = 38590; // Using the customer ID from the API example
+  static const int customerId =
+      38590; // Using the customer ID from the API example
 
   @override
   void initState() {
     super.initState();
-    _ordersBloc = OrdersBloc(
-      ordersService: OrdersService(getIt<ApiService>()),
-    );
+    _ordersBloc = OrdersBloc(ordersService: OrdersService(getIt<ApiService>()));
     _ordersBloc.add(const FetchOrders(customerId));
   }
 
@@ -32,6 +31,17 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       create: (context) => _ordersBloc,
       child: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+
           title: const Text(
             'My Orders',
             style: TextStyle(fontWeight: FontWeight.w500),
@@ -124,11 +134,21 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
 
     if (state is OrdersLoaded || state is OrdersRefreshing) {
-      final orders = state is OrdersLoaded ? state.orders : (state as OrdersRefreshing).orders;
-      final filteredOrders = state is OrdersLoaded ? state.filteredOrders : (state as OrdersRefreshing).filteredOrders;
-      final currentFilter = state is OrdersLoaded ? state.currentFilter : (state as OrdersRefreshing).currentFilter;
-      final customStartDate = state is OrdersLoaded ? state.customStartDate : (state as OrdersRefreshing).customStartDate;
-      final customEndDate = state is OrdersLoaded ? state.customEndDate : (state as OrdersRefreshing).customEndDate;
+      final orders = state is OrdersLoaded
+          ? state.orders
+          : (state as OrdersRefreshing).orders;
+      final filteredOrders = state is OrdersLoaded
+          ? state.filteredOrders
+          : (state as OrdersRefreshing).filteredOrders;
+      final currentFilter = state is OrdersLoaded
+          ? state.currentFilter
+          : (state as OrdersRefreshing).currentFilter;
+      final customStartDate = state is OrdersLoaded
+          ? state.customStartDate
+          : (state as OrdersRefreshing).customStartDate;
+      final customEndDate = state is OrdersLoaded
+          ? state.customEndDate
+          : (state as OrdersRefreshing).customEndDate;
       final isRefreshing = state is OrdersRefreshing;
 
       return Column(
@@ -149,11 +169,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.filter_list,
-                  color: Colors.grey[600],
-                  size: 20,
-                ),
+                Icon(Icons.filter_list, color: Colors.grey[600], size: 20),
                 const SizedBox(width: 8),
                 Text(
                   'Filter:',
@@ -169,17 +185,59 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip(context, 'All', DateFilter.all, currentFilter, customStartDate, customEndDate),
+                        _buildFilterChip(
+                          context,
+                          'All',
+                          DateFilter.all,
+                          currentFilter,
+                          customStartDate,
+                          customEndDate,
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip(context, 'Today', DateFilter.today, currentFilter, customStartDate, customEndDate),
+                        _buildFilterChip(
+                          context,
+                          'Today',
+                          DateFilter.today,
+                          currentFilter,
+                          customStartDate,
+                          customEndDate,
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip(context, 'This Week', DateFilter.thisWeek, currentFilter, customStartDate, customEndDate),
+                        _buildFilterChip(
+                          context,
+                          'This Week',
+                          DateFilter.thisWeek,
+                          currentFilter,
+                          customStartDate,
+                          customEndDate,
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip(context, 'This Month', DateFilter.thisMonth, currentFilter, customStartDate, customEndDate),
+                        _buildFilterChip(
+                          context,
+                          'This Month',
+                          DateFilter.thisMonth,
+                          currentFilter,
+                          customStartDate,
+                          customEndDate,
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip(context, 'Last 30 Days', DateFilter.last30Days, currentFilter, customStartDate, customEndDate),
+                        _buildFilterChip(
+                          context,
+                          'Last 30 Days',
+                          DateFilter.last30Days,
+                          currentFilter,
+                          customStartDate,
+                          customEndDate,
+                        ),
                         const SizedBox(width: 8),
-                        _buildFilterChip(context, 'Custom', DateFilter.custom, currentFilter, customStartDate, customEndDate),
+                        _buildFilterChip(
+                          context,
+                          'Custom',
+                          DateFilter.custom,
+                          currentFilter,
+                          customStartDate,
+                          customEndDate,
+                        ),
                       ],
                     ),
                   ),
@@ -187,7 +245,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               ],
             ),
           ),
-          
+
           // Results Count
           if (filteredOrders.isNotEmpty)
             Container(
@@ -195,13 +253,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 '${filteredOrders.length} ${filteredOrders.length == 1 ? 'order' : 'orders'} found',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ),
-          
+
           // Orders List
           Expanded(
             child: filteredOrders.isEmpty
@@ -313,10 +368,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       const SizedBox(width: 8),
                       Text(
                         'Invoice: ${order.invoice}',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.grey[700],
-                        ),
+                        style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                       ),
                     ],
                   ),
@@ -335,7 +387,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 ],
               ),
             ),
-            
+
             // Right side - View button
             InkWell(
               onTap: () => _showOrderDetails(orderData),
@@ -369,7 +421,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           ),
         ),
         child: Text(
-          filter == DateFilter.custom && customStartDate != null && customEndDate != null
+          filter == DateFilter.custom &&
+                  customStartDate != null &&
+                  customEndDate != null
               ? '${_formatDateShort(customStartDate)} - ${_formatDateShort(customEndDate)}'
               : label,
           style: TextStyle(
@@ -398,9 +452,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: const Color(0xFFCEB007),
-            ),
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: const Color(0xFFCEB007)),
           ),
           child: child!,
         );
@@ -408,11 +462,13 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
 
     if (picked != null) {
-      _ordersBloc.add(FilterOrders(
-        filter: DateFilter.custom,
-        startDate: picked.start,
-        endDate: picked.end,
-      ));
+      _ordersBloc.add(
+        FilterOrders(
+          filter: DateFilter.custom,
+          startDate: picked.start,
+          endDate: picked.end,
+        ),
+      );
     } else {
       // If user cancels, revert to "All" filter
       _ordersBloc.add(const FilterOrders(filter: DateFilter.all));

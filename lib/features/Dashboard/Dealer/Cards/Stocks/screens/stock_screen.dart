@@ -8,9 +8,9 @@ import '../bloc/stock_state.dart';
 
 class StockScreen extends StatefulWidget {
   final int? itemId;
-  
+
   const StockScreen({super.key, this.itemId});
-  
+
   void _navigateToStocks(BuildContext context) {
     Navigator.of(
       context,
@@ -24,16 +24,37 @@ class StockScreen extends StatefulWidget {
 class _StockScreenState extends State<StockScreen> {
   final TextEditingController _itemIdController = TextEditingController();
   late StockBloc _stockBloc;
+  String searchQuery = '';
 
   @override
   void initState() {
     super.initState();
     _stockBloc = StockBloc();
-    
+
     if (widget.itemId != null) {
       _itemIdController.text = widget.itemId.toString();
       _stockBloc.add(FetchStockDetails(widget.itemId!));
     }
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      searchQuery = value;
+    });
+
+    if (value.trim().isNotEmpty) {
+      final itemId = int.tryParse(value.trim());
+      if (itemId != null) {
+        _stockBloc.add(FetchStockDetails(itemId));
+      }
+    }
+  }
+
+  void _clearSearch() {
+    _itemIdController.clear();
+    setState(() {
+      searchQuery = '';
+    });
   }
 
   void _onSearchPressed() {
@@ -66,76 +87,91 @@ class _StockScreenState extends State<StockScreen> {
       create: (context) => _stockBloc,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Stock Details'),
-          backgroundColor: Colors.blue[600],
-          foregroundColor: Colors.white,
+          backgroundColor: Color(0xFFCEB007),
+          elevation: 2,
+          shadowColor: Color(0xFFCEB007).withOpacity(0.3),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title: const Text(
+            'Stock Details',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          titleSpacing: 0,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // Search Section
-              Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _itemIdController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Item ID',
-                            hintText: 'Enter item ID (e.g., 85208)',
-                            border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.search),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      BlocBuilder<StockBloc, StockState>(
-                        builder: (context, state) {
-                          final isLoading = state is StockLoading;
-                          return ElevatedButton(
-                            onPressed: isLoading ? null : _onSearchPressed,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue[600],
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 16,
-                              ),
-                            ),
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  )
-                                : const Text('Search'),
-                          );
-                        },
-                      ),
-                    ],
+        body: Column(
+          children: [
+            // Search Field Container
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: TextField(
+                controller: _itemIdController,
+                onChanged: _onSearchChanged,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: 'Search by Item ID',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  suffixIcon: searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, color: Colors.grey),
+                          onPressed: _clearSearch,
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: Colors.grey[50],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFCEB007),
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              
-              // Content Section
-              Expanded(
+            ),
+
+            // Content Section
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: BlocBuilder<StockBloc, StockState>(
                   builder: (context, state) {
                     return _buildContent(state);
                   },
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -143,125 +179,36 @@ class _StockScreenState extends State<StockScreen> {
 
   Widget _buildContent(StockState state) {
     if (state is StockLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading stock details...'),
-          ],
-        ),
-      );
+      return const Center(child: Text('Loading stock details...'));
     }
 
     if (state is StockError) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[400],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              state.message,
-              style: TextStyle(
-                color: Colors.red[600],
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                final itemIdText = _itemIdController.text.trim();
-                if (itemIdText.isNotEmpty) {
-                  final itemId = int.tryParse(itemIdText);
-                  if (itemId != null) {
-                    _stockBloc.add(FetchStockDetails(itemId));
-                  }
-                }
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
+      return Center(child: Text(state.message, textAlign: TextAlign.center));
     }
 
     if (state is StockEmpty) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.inventory_2_outlined,
-              size: 64,
-              color: Colors.grey,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'No stock details found',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 16,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Try searching with a different item ID',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      );
+      return const Center(child: Text('No stock details found'));
     }
 
     if (state is StockLoaded) {
       return _buildStockList(state.stockResponse);
     }
 
-    // Initial state
     return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.inventory_2_outlined,
-            size: 64,
-            color: Colors.grey,
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Enter an item ID to search for stock details',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 16,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+      child: Text('Enter an item ID to search for stock details'),
     );
   }
 
   Widget _buildStockList(StockResponse stockResponse) {
     final stockDetails = stockResponse.stockDetails;
-    final itemName = stockDetails.isNotEmpty ? stockDetails.first.item.name : 'Unknown Item';
+    final itemName = stockDetails.isNotEmpty
+        ? stockDetails.first.item.name
+        : 'Unknown Item';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Item Info Header
-        Card(
-          elevation: 4,
-          color: Colors.blue[50],
+        Container(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -269,45 +216,34 @@ class _StockScreenState extends State<StockScreen> {
               children: [
                 Text(
                   'Item Information',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue[800],
-                  ),
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  itemName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(itemName),
                 const SizedBox(height: 4),
-                Text(
-                  'Item ID: ${stockDetails.first.itemId}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
+                Text('Item ID: ${stockDetails.first.itemId}'),
               ],
             ),
           ),
         ),
+        // Card(
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(16.0),
+        //     child: Column(
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+        //         Text('Item Information'),
+        //         const SizedBox(height: 8),
+        //         Text(itemName),
+        //         const SizedBox(height: 4),
+        //         Text('Item ID: ${stockDetails.first.itemId}'),
+        //       ],
+        //     ),
+        //   ),
+        // ),
         const SizedBox(height: 16),
-        
-        // Stock Details List
-        Text(
-          'Stock Details by Warehouse (${stockDetails.length} locations)',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey[800],
-          ),
-        ),
+        Text('Stock Details (${stockDetails.length} locations)'),
         const SizedBox(height: 12),
-        
         Expanded(
           child: ListView.builder(
             itemCount: stockDetails.length,
@@ -322,171 +258,36 @@ class _StockScreenState extends State<StockScreen> {
   }
 
   Widget _buildStockCard(StockDetail stock) {
-    final currentStock = stock.currentStock;
-    final pendingQty = stock.pendingPackageQuantity;
-    
-    Color stockColor = Colors.grey;
-    if (currentStock > 0) {
-      stockColor = Colors.green;
-    } else if (currentStock < 0) {
-      stockColor = Colors.red;
-    }
-
     return Card(
-      elevation: 3,
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Warehouse Header
-            Row(
-              children: [
-                Icon(
-                  Icons.warehouse,
-                  color: Colors.blue[600],
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    stock.warehouse.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                if (stock.warehouse.code != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue[100],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      stock.warehouse.code!,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            
-            if (stock.warehouse.address != null || stock.warehouse.city != null) ...[
+            Text(stock.warehouse.name),
+            if (stock.warehouse.code != null)
+              Text('Code: ${stock.warehouse.code}'),
+
+            if (stock.warehouse.address != null ||
+                stock.warehouse.city != null) ...[
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.location_on,
-                    color: Colors.grey[600],
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      [
-                        stock.warehouse.address,
-                        stock.warehouse.address2,
-                        stock.warehouse.city,
-                      ].where((e) => e != null && e.isNotEmpty).join(', '),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ),
-                ],
+              Text(
+                [
+                  stock.warehouse.address,
+                  stock.warehouse.address2,
+                  stock.warehouse.city,
+                ].where((e) => e != null && e.isNotEmpty).join(', '),
               ),
             ],
-            
-            const Divider(height: 24),
-            
-            // Stock Information
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStockInfo(
-                    'Current Stock',
-                    currentStock.toString(),
-                    stockColor,
-                    Icons.inventory,
-                  ),
-                ),
-                Expanded(
-                  child: _buildStockInfo(
-                    'Pending Qty',
-                    pendingQty.toString(),
-                    Colors.orange,
-                    Icons.pending_actions,
-                  ),
-                ),
-              ],
-            ),
-            
-            if (stock.openingStock != 0) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStockInfo(
-                      'Opening Stock',
-                      stock.openingStock.toString(),
-                      Colors.blue,
-                      Icons.start,
-                    ),
-                  ),
-                  const Expanded(child: SizedBox()),
-                ],
-              ),
-            ],
+
+            const SizedBox(height: 12),
+            Text('Current Stock: ${stock.currentStock}'),
+            Text('Pending Qty: ${stock.pendingPackageQuantity}'),
+            if (stock.openingStock != 0)
+              Text('Opening Stock: ${stock.openingStock}'),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildStockInfo(String label, String value, Color color, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 20,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
       ),
     );
   }

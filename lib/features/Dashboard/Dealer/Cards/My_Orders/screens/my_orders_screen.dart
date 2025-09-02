@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../core/di/injection.dart';
 import '../../../../../../services/api_service.dart';
 import '../models/order_models.dart';
 import '../services/orders_service.dart';
+import '../bloc/bloc.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -11,222 +13,50 @@ class MyOrdersScreen extends StatefulWidget {
   State<MyOrdersScreen> createState() => _MyOrdersScreenState();
 }
 
-enum DateFilter {
-  all,
-  today,
-  thisWeek,
-  thisMonth,
-  last30Days,
-  custom,
-}
-
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
-  late OrdersService _ordersService;
-  List<OrderData> _orders = [];
-  List<OrderData> _filteredOrders = [];
-  bool _isLoading = true;
-  String? _errorMessage;
-  DateFilter _selectedFilter = DateFilter.all;
-  DateTime? _customStartDate;
-  DateTime? _customEndDate;
+  late OrdersBloc _ordersBloc;
+  static const int customerId = 38590; // Using the customer ID from the API example
 
   @override
   void initState() {
     super.initState();
-    _ordersService = OrdersService(getIt<ApiService>());
-    _fetchOrders();
-  }
-
-  Future<void> _fetchOrders() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-
-      // Using the customer ID from the API example (38590)
-      final response = await _ordersService.getCustomerOrders(38590);
-
-      setState(() {
-        _orders = response.orders;
-        _applyDateFilter();
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _applyDateFilter() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    switch (_selectedFilter) {
-      case DateFilter.all:
-        _filteredOrders = List.from(_orders);
-        break;
-      case DateFilter.today:
-        _filteredOrders = _orders.where((orderData) {
-          final orderDate = DateTime(
-            orderData.order.createdDate.year,
-            orderData.order.createdDate.month,
-            orderData.order.createdDate.day,
-          );
-          return orderDate.isAtSameMomentAs(today);
-        }).toList();
-        break;
-      case DateFilter.thisWeek:
-        final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-        final endOfWeek = startOfWeek.add(const Duration(days: 6));
-        _filteredOrders = _orders.where((orderData) {
-          final orderDate = DateTime(
-            orderData.order.createdDate.year,
-            orderData.order.createdDate.month,
-            orderData.order.createdDate.day,
-          );
-          return orderDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
-                 orderDate.isBefore(endOfWeek.add(const Duration(days: 1)));
-        }).toList();
-        break;
-      case DateFilter.thisMonth:
-        final startOfMonth = DateTime(now.year, now.month, 1);
-        final endOfMonth = DateTime(now.year, now.month + 1, 0);
-        _filteredOrders = _orders.where((orderData) {
-          final orderDate = DateTime(
-            orderData.order.createdDate.year,
-            orderData.order.createdDate.month,
-            orderData.order.createdDate.day,
-          );
-          return orderDate.isAfter(startOfMonth.subtract(const Duration(days: 1))) &&
-                 orderDate.isBefore(endOfMonth.add(const Duration(days: 1)));
-        }).toList();
-        break;
-      case DateFilter.last30Days:
-        final thirtyDaysAgo = today.subtract(const Duration(days: 30));
-        _filteredOrders = _orders.where((orderData) {
-          final orderDate = DateTime(
-            orderData.order.createdDate.year,
-            orderData.order.createdDate.month,
-            orderData.order.createdDate.day,
-          );
-          return orderDate.isAfter(thirtyDaysAgo.subtract(const Duration(days: 1)));
-        }).toList();
-        break;
-      case DateFilter.custom:
-        if (_customStartDate != null && _customEndDate != null) {
-          _filteredOrders = _orders.where((orderData) {
-            final orderDate = DateTime(
-              orderData.order.createdDate.year,
-              orderData.order.createdDate.month,
-              orderData.order.createdDate.day,
-            );
-            return orderDate.isAfter(_customStartDate!.subtract(const Duration(days: 1))) &&
-                   orderDate.isBefore(_customEndDate!.add(const Duration(days: 1)));
-          }).toList();
-        } else {
-          _filteredOrders = List.from(_orders);
-        }
-        break;
-    }
-  }
-
-  void _onFilterChanged(DateFilter filter) {
-    setState(() {
-      _selectedFilter = filter;
-      if (filter == DateFilter.custom) {
-        _showCustomDatePicker();
-      } else {
-        _applyDateFilter();
-      }
-    });
-  }
-
-  Future<void> _showCustomDatePicker() async {
-    final DateTimeRange? picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-      initialDateRange: _customStartDate != null && _customEndDate != null
-          ? DateTimeRange(start: _customStartDate!, end: _customEndDate!)
-          : null,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: const Color(0xFFCEB007),
-            ),
-          ),
-          child: child!,
-        );
-      },
+    _ordersBloc = OrdersBloc(
+      ordersService: OrdersService(getIt<ApiService>()),
     );
-
-    if (picked != null) {
-      setState(() {
-        _customStartDate = picked.start;
-        _customEndDate = picked.end;
-        _applyDateFilter();
-      });
-    } else {
-      // If user cancels, revert to "All" filter
-      setState(() {
-        _selectedFilter = DateFilter.all;
-        _applyDateFilter();
-      });
-    }
-  }
-
-  String _getFilterDisplayText() {
-    switch (_selectedFilter) {
-      case DateFilter.all:
-        return 'All Orders';
-      case DateFilter.today:
-        return 'Today';
-      case DateFilter.thisWeek:
-        return 'This Week';
-      case DateFilter.thisMonth:
-        return 'This Month';
-      case DateFilter.last30Days:
-        return 'Last 30 Days';
-      case DateFilter.custom:
-        if (_customStartDate != null && _customEndDate != null) {
-          return '${_formatDateShort(_customStartDate!)} - ${_formatDateShort(_customEndDate!)}';
-        }
-        return 'Custom Range';
-    }
-  }
-
-  String _formatDateShort(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
+    _ordersBloc.add(const FetchOrders(customerId));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'My Orders',
-          style: TextStyle(fontWeight: FontWeight.w500),
+    return BlocProvider(
+      create: (context) => _ordersBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'My Orders',
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          backgroundColor: const Color(0xFFCEB007),
+          foregroundColor: Colors.white,
+          elevation: 0,
         ),
-        backgroundColor: const Color(0xFFCEB007),
-        foregroundColor: Colors.white,
-        elevation: 0,
+        body: BlocBuilder<OrdersBloc, OrdersState>(
+          builder: (context, state) {
+            return _buildBody(context, state);
+          },
+        ),
       ),
-      body: _buildBody(),
     );
   }
 
-  Widget _buildBody() {
-    if (_isLoading) {
+  Widget _buildBody(BuildContext context, OrdersState state) {
+    if (state is OrdersLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFFCEB007)),
       );
     }
 
-    if (_errorMessage != null) {
+    if (state is OrdersError) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -245,14 +75,14 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Text(
-                _errorMessage!,
+                state.message,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.grey[500]),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _fetchOrders,
+              onPressed: () => _ordersBloc.add(const FetchOrders(customerId)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCEB007),
                 foregroundColor: Colors.white,
@@ -264,7 +94,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       );
     }
 
-    if (_orders.isEmpty) {
+    if (state is OrdersEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -293,124 +123,154 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       );
     }
 
-    return Column(
-      children: [
-        // Filter Section
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.filter_list,
-                color: Colors.grey[600],
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Filter:',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[700],
+    if (state is OrdersLoaded || state is OrdersRefreshing) {
+      final orders = state is OrdersLoaded ? state.orders : (state as OrdersRefreshing).orders;
+      final filteredOrders = state is OrdersLoaded ? state.filteredOrders : (state as OrdersRefreshing).filteredOrders;
+      final currentFilter = state is OrdersLoaded ? state.currentFilter : (state as OrdersRefreshing).currentFilter;
+      final customStartDate = state is OrdersLoaded ? state.customStartDate : (state as OrdersRefreshing).customStartDate;
+      final customEndDate = state is OrdersLoaded ? state.customEndDate : (state as OrdersRefreshing).customEndDate;
+      final isRefreshing = state is OrdersRefreshing;
+
+      return Column(
+        children: [
+          // Filter Section
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 2),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildFilterChip('All', DateFilter.all),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Today', DateFilter.today),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('This Week', DateFilter.thisWeek),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('This Month', DateFilter.thisMonth),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Last 30 Days', DateFilter.last30Days),
-                      const SizedBox(width: 8),
-                      _buildFilterChip('Custom', DateFilter.custom),
-                    ],
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.filter_list,
+                  color: Colors.grey[600],
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Filter:',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[700],
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        
-        // Results Count
-        if (_filteredOrders.isNotEmpty)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              '${_filteredOrders.length} ${_filteredOrders.length == 1 ? 'order' : 'orders'} found',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-              ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildFilterChip(context, 'All', DateFilter.all, currentFilter, customStartDate, customEndDate),
+                        const SizedBox(width: 8),
+                        _buildFilterChip(context, 'Today', DateFilter.today, currentFilter, customStartDate, customEndDate),
+                        const SizedBox(width: 8),
+                        _buildFilterChip(context, 'This Week', DateFilter.thisWeek, currentFilter, customStartDate, customEndDate),
+                        const SizedBox(width: 8),
+                        _buildFilterChip(context, 'This Month', DateFilter.thisMonth, currentFilter, customStartDate, customEndDate),
+                        const SizedBox(width: 8),
+                        _buildFilterChip(context, 'Last 30 Days', DateFilter.last30Days, currentFilter, customStartDate, customEndDate),
+                        const SizedBox(width: 8),
+                        _buildFilterChip(context, 'Custom', DateFilter.custom, currentFilter, customStartDate, customEndDate),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        
-        // Orders List
-        Expanded(
-          child: _filteredOrders.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.search_off,
-                        size: 64,
-                        color: Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'No orders found',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Try adjusting your filter criteria',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _fetchOrders,
-                  color: const Color(0xFFCEB007),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _filteredOrders.length,
-                    itemBuilder: (context, index) {
-                      final orderData = _filteredOrders[index];
-                      return _buildOrderCard(orderData);
-                    },
-                  ),
+          
+          // Results Count
+          if (filteredOrders.isNotEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                '${filteredOrders.length} ${filteredOrders.length == 1 ? 'order' : 'orders'} found',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
                 ),
-        ),
-      ],
-    );
+              ),
+            ),
+          
+          // Orders List
+          Expanded(
+            child: filteredOrders.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No orders found',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Try adjusting your filter criteria',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      _ordersBloc.add(const RefreshOrders(customerId));
+                    },
+                    color: const Color(0xFFCEB007),
+                    child: Stack(
+                      children: [
+                        ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: filteredOrders.length,
+                          itemBuilder: (context, index) {
+                            final orderData = filteredOrders[index];
+                            return _buildOrderCard(orderData);
+                          },
+                        ),
+                        if (isRefreshing)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              height: 4,
+                              child: const LinearProgressIndicator(
+                                color: Color(0xFFCEB007),
+                                backgroundColor: Colors.transparent,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildOrderCard(OrderData orderData) {
@@ -434,11 +294,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   // Date
                   Row(
                     children: [
-                      // Icon(
-                      //   Icons.calendar_today_outlined,
-                      //   size: 16,
-                      //   color: Colors.grey[600],
-                      // ),
                       const SizedBox(width: 8),
                       Text(
                         _formatDate(order.createdDate),
@@ -455,17 +310,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   // Invoice Number
                   Row(
                     children: [
-                      // Icon(
-                      //   Icons.receipt_outlined,
-                      //   size: 16,
-                      //   color: Colors.grey[600],
-                      // ),
                       const SizedBox(width: 8),
                       Text(
                         'Invoice: ${order.invoice}',
                         style: TextStyle(
                           fontSize: 15,
-                          // fontWeight: FontWeight.bold,
                           color: Colors.grey[700],
                         ),
                       ),
@@ -476,11 +325,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   // Number of Items
                   Row(
                     children: [
-                      // Icon(
-                      //   Icons.inventory_2_outlined,
-                      //   size: 16,
-                      //   color: Colors.grey[600],
-                      // ),
                       const SizedBox(width: 8),
                       Text(
                         '$totalItems ${totalItems == 1 ? 'Item' : 'Items'}',
@@ -491,44 +335,88 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 ],
               ),
             ),
-            // InkWell(
-            //   onTap: () => _showOrderDetails(orderData),
-            //   child: Container(
-            //     padding: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(border: Border.all(width: 1)),
-            //     child: const Icon(Icons.visibility_outlined, size: 20),
-            //   ),
-            // ),
+            
+            // Right side - View button
             InkWell(
               onTap: () => _showOrderDetails(orderData),
               child: const Icon(Icons.visibility_outlined, size: 20),
             ),
-
-            // Right side - View button
-            // InkWell(
-            //   onTap: () => _showOrderDetails(orderData),
-            //   borderRadius: BorderRadius.circular(20),
-            //   child: Container(
-            //     padding: const EdgeInsets.all(8),
-            //     decoration: BoxDecoration(
-            //       color: const Color(0xFFCEB007).withOpacity(0.1),
-            //       borderRadius: BorderRadius.circular(20),
-            //       border: Border.all(
-            //         color: const Color(0xFFCEB007),
-            //         width: 1,
-            //       ),
-            //     ),
-            //     child: const Icon(
-            //       Icons.visibility_outlined,
-            //       // color: Color(0xFFCEB007),
-            //       size: 20,
-            //     ),
-            //   ),
-            // ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildFilterChip(
+    BuildContext context,
+    String label,
+    DateFilter filter,
+    DateFilter currentFilter,
+    DateTime? customStartDate,
+    DateTime? customEndDate,
+  ) {
+    final isSelected = currentFilter == filter;
+    return GestureDetector(
+      onTap: () => _onFilterChanged(context, filter),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFCEB007) : Colors.grey[100],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? const Color(0xFFCEB007) : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          filter == DateFilter.custom && customStartDate != null && customEndDate != null
+              ? '${_formatDateShort(customStartDate)} - ${_formatDateShort(customEndDate)}'
+              : label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isSelected ? Colors.white : Colors.grey[700],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onFilterChanged(BuildContext context, DateFilter filter) {
+    if (filter == DateFilter.custom) {
+      _showCustomDatePicker(context);
+    } else {
+      _ordersBloc.add(FilterOrders(filter: filter));
+    }
+  }
+
+  Future<void> _showCustomDatePicker(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2020),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: const Color(0xFFCEB007),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      _ordersBloc.add(FilterOrders(
+        filter: DateFilter.custom,
+        startDate: picked.start,
+        endDate: picked.end,
+      ));
+    } else {
+      // If user cancels, revert to "All" filter
+      _ordersBloc.add(const FilterOrders(filter: DateFilter.all));
+    }
   }
 
   void _showOrderDetails(OrderData orderData) {
@@ -570,9 +458,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Order Details',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -610,19 +498,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
-                          // Item icon
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            // decoration: BoxDecoration(
-                            //   color: const Color(0xFFCEB007).withOpacity(0.1),
-                            //   borderRadius: BorderRadius.circular(8),
-                            // ),
-                            // child: const Icon(
-                            //   Icons.inventory_2_outlined,
-                            //   color: Color(0xFFCEB007),
-                            //   size: 20,
-                            // ),
-                          ),
                           const SizedBox(width: 12),
 
                           // Item details
@@ -647,14 +522,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                                         color: Colors.grey[600],
                                       ),
                                     ),
-                                    // const SizedBox(width: 16),
-                                    // Text(
-                                    //   'Completed: ${item.completedQuantity}',
-                                    //   style: TextStyle(
-                                    //     fontSize: 12,
-                                    //     color: Colors.grey[600],
-                                    //   ),
-                                    // ),
                                   ],
                                 ),
                               ],
@@ -669,8 +536,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: item.itemQuantity == item.completedQuantity
-                                  ? Colors.white
-                                  : Colors.black,
+                                  ? Colors.green
+                                  : Colors.orange,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -735,15 +602,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       ),
                     ],
                   ),
-                  // if (order.notes != null && order.notes!.isNotEmpty) ...[
-                  //   const SizedBox(height: 8),
-                  //   // Text(
-                  //   //   'Notes:',
-                  //   //   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  //   // ),
-                  //   const SizedBox(height: 4),
-                  //   Text(order.notes!, style: const TextStyle(fontSize: 12)),
-                  // ],
                 ],
               ),
             ),
@@ -753,39 +611,17 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  Color _getStatusColor(bool isCompleted) {
-    return isCompleted ? Colors.green : Colors.orange;
-  }
-
-  Widget _buildFilterChip(String label, DateFilter filter) {
-    final isSelected = _selectedFilter == filter;
-    return GestureDetector(
-      onTap: () => _onFilterChanged(filter),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFCEB007) : Colors.grey[100],
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFCEB007) : Colors.grey[300]!,
-            width: 1,
-          ),
-        ),
-        child: Text(
-          filter == DateFilter.custom && _customStartDate != null && _customEndDate != null
-              ? '${_formatDateShort(_customStartDate!)} - ${_formatDateShort(_customEndDate!)}'
-              : label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : Colors.grey[700],
-          ),
-        ),
-      ),
-    );
-  }
-
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _formatDateShort(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  @override
+  void dispose() {
+    _ordersBloc.close();
+    super.dispose();
   }
 }

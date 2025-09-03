@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../services/auth_service.dart';
 import '../../core/di/injection.dart';
 import '../../core/router/app_router.dart';
+import '../auth/models/user.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -44,11 +45,28 @@ class _SplashScreenState extends State<SplashScreen>
         final isAuthenticated = await authService.isLoggedIn();
 
         if (isAuthenticated) {
-          _navigateToAuthScreen();
+          // User is already logged in, determine which dashboard to show
+          final currentUser = await authService.getCurrentUser();
+          if (currentUser != null) {
+            // Navigate based on user type
+            if (currentUser.userType == UserType.dealer) {
+              context.go(AppRouter.dealerDashboard);
+            } else if (currentUser.userType == UserType.transporter) {
+              context.go(AppRouter.transporterDashboard);
+            } else {
+              // Fallback to auth screen if user type is unknown
+              _navigateToAuthScreen();
+            }
+          } else {
+            // Token exists but no user data, go to auth screen
+            _navigateToAuthScreen();
+          }
         } else {
+          // User is not authenticated, go to auth screen
           _navigateToAuthScreen();
         }
       } catch (e) {
+        // Error occurred, go to auth screen
         _navigateToAuthScreen();
       }
     }

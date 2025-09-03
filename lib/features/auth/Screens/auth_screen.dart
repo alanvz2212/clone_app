@@ -10,6 +10,10 @@ import '../transporter/bloc/transporter_auth_event.dart';
 import '../../../utils/helpers.dart';
 import '../../../utils/validators.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/di/injection.dart';
+import '../../../services/auth_service.dart';
+import '../../../services/storage_service.dart';
+import '../models/user.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -525,13 +529,15 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  void _handleDealerLogin() {
+  void _handleDealerLogin() async {
     final mobileOrId = _dealerMobileController.text.trim();
     final password = _dealerPasswordController.text.trim();
 
     // Check for hardcoded credentials first
     if (mobileOrId == hardcodedDealerId &&
         password == hardcodedDealerPassword) {
+      // Store hardcoded dealer authentication state
+      await _storeHardcodedDealerAuth(mobileOrId);
       Helpers.showSuccessSnackBar(context, 'Login successful! ');
       context.go(AppRouter.dealerDashboard);
       return;
@@ -556,13 +562,15 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  void _handleTransporterLogin() {
+  void _handleTransporterLogin() async {
     final mobileOrId = _transporterMobileController.text.trim();
     final password = _transporterPasswordController.text.trim();
 
     // Check for hardcoded credentials first
     if (mobileOrId == hardcodedTransporterId &&
         password == hardcodedTransporterPassword) {
+      // Store hardcoded transporter authentication state
+      await _storeHardcodedTransporterAuth(mobileOrId);
       Helpers.showSuccessSnackBar(context, 'Login successful! ');
       context.go(AppRouter.transporterDashboard);
       return;
@@ -722,5 +730,59 @@ class _AuthScreenState extends State<AuthScreen>
         );
       },
     );
+  }
+
+  Future<void> _storeHardcodedDealerAuth(String mobileOrId) async {
+    try {
+      final authService = getIt<AuthService>();
+      final storageService = getIt<StorageService>();
+      
+      // Create a dummy user for hardcoded dealer
+      final user = User(
+        id: '1',
+        name: 'Demo Dealer',
+        email: 'dealer@demo.com',
+        mobileNumber: mobileOrId,
+        userType: UserType.dealer,
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+      
+      // Store user and token
+      await storageService.setUser(user);
+      await storageService.setToken('hardcoded_dealer_token');
+      
+      // Set in auth service
+      authService.useHardcodedToken();
+    } catch (e) {
+      print('Error storing hardcoded dealer auth: $e');
+    }
+  }
+
+  Future<void> _storeHardcodedTransporterAuth(String mobileOrId) async {
+    try {
+      final authService = getIt<AuthService>();
+      final storageService = getIt<StorageService>();
+      
+      // Create a dummy user for hardcoded transporter
+      final user = User(
+        id: '2',
+        name: 'Demo Transporter',
+        email: 'transporter@demo.com',
+        mobileNumber: mobileOrId,
+        userType: UserType.transporter,
+        isActive: true,
+        createdAt: DateTime.now(),
+      );
+      
+      // Store user and token
+      await storageService.setUser(user);
+      await storageService.setToken('hardcoded_transporter_token');
+      
+      // Set in auth service
+      authService.useHardcodedToken();
+    } catch (e) {
+      print('Error storing hardcoded transporter auth: $e');
+    }
   }
 }

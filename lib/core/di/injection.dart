@@ -52,11 +52,17 @@ Future<void> setupDependencyInjection() async {
 
   // BLoCs
   getIt.registerFactory<DealerAuthBloc>(
-    () => DealerAuthBloc(repository: getIt<DealerAuthRepository>()),
+    () => DealerAuthBloc(
+      repository: getIt<DealerAuthRepository>(),
+      authService: getIt<AuthService>(),
+    ),
   );
 
   getIt.registerFactory<TransporterAuthBloc>(
-    () => TransporterAuthBloc(repository: getIt<TransporterAuthRepository>()),
+    () => TransporterAuthBloc(
+      repository: getIt<TransporterAuthRepository>(),
+      authService: getIt<AuthService>(),
+    ),
   );
 
   getIt.registerFactory<SearchItemBloc>(

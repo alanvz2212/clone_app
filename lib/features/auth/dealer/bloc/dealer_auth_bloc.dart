@@ -3,13 +3,18 @@ import '../models/dealer_auth_model.dart';
 import '../repositories/dealer_auth_repository.dart';
 import 'dealer_auth_event.dart';
 import 'dealer_auth_state.dart';
+import '../../../../services/auth_service.dart';
 
 class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
   final DealerAuthRepository _repository;
+  final AuthService _authService;
 
-  DealerAuthBloc({required DealerAuthRepository repository})
-    : _repository = repository,
-      super(const DealerAuthState()) {
+  DealerAuthBloc({
+    required DealerAuthRepository repository,
+    required AuthService authService,
+  })  : _repository = repository,
+        _authService = authService,
+        super(const DealerAuthState()) {
     on<DealerLoginRequested>(_onLoginRequested);
     on<DealerLogoutRequested>(_onLogoutRequested);
     on<DealerForgotPasswordRequested>(_onForgotPasswordRequested);
@@ -63,11 +68,16 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
     DealerLogoutRequested event,
     Emitter<DealerAuthState> emit,
   ) async {
-    if (state.token != null) {
-      await _repository.logout(state.token!);
+    try {
+      // Use AuthService to properly clear all authentication data
+      await _authService.logout();
+      
+      // Clear bloc state
+      emit(const DealerAuthState());
+    } catch (e) {
+      // Even if logout API fails, clear local state
+      emit(const DealerAuthState());
     }
-
-    emit(const DealerAuthState());
   }
 
   Future<void> _onForgotPasswordRequested(

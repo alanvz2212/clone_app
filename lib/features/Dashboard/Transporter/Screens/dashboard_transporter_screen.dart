@@ -1,7 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/router/router_extensions.dart';
+import '../../../auth/transporter/bloc/transporter_auth_bloc.dart';
+import '../../../auth/transporter/bloc/transporter_auth_event.dart';
+import '../../../auth/transporter/bloc/transporter_auth_state.dart';
 
 class DashboardTransporterScreen extends StatelessWidget {
   const DashboardTransporterScreen({super.key});
+
+  AlertDialog _handleLogout(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Logout'),
+      content: const Text('Are you sure you want to logout?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            // Trigger logout event
+            context.read<TransporterAuthBloc>().add(TransporterLogoutRequested());
+            // Navigate to auth screen
+            context.goToAuth();
+          },
+          child: const Text('Logout', style: TextStyle(color: Colors.black)),
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +39,17 @@ class DashboardTransporterScreen extends StatelessWidget {
         backgroundColor: Color(0xFFCEB007),
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => _handleLogout(context),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -22,22 +61,27 @@ class DashboardTransporterScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Welcome Text
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome back,',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                    Text(
-                      'Hey, Transporter', // Replace with actual dealer name
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                BlocBuilder<TransporterAuthBloc, TransporterAuthState>(
+                  builder: (context, state) {
+                    final transporterName = state.transporter?.name ?? 'Transporter';
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Welcome back,',
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        Text(
+                          transporterName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 // Notification Icon
                 Stack(

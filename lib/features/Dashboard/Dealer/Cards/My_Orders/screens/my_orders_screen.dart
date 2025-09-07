@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../../core/di/injection.dart';
-import '../../../../../../services/api_service.dart';
+import '../../../../../../../core/di/injection.dart';
+import '../../../../../../../services/api_service.dart';
 import '../models/order_models.dart';
 import '../services/orders_service.dart';
 import '../bloc/bloc.dart';
+import '../../../../../../../constants/string_constants.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -50,10 +51,38 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        body: BlocBuilder<OrdersBloc, OrdersState>(
-          builder: (context, state) {
-            return _buildBody(context, state);
-          },
+        body: Column(
+          children: [
+            Expanded(
+              child: BlocBuilder<OrdersBloc, OrdersState>(
+                builder: (context, state) {
+                  return _buildBody(context, state);
+                },
+              ),
+            ),
+            // App Version at the bottom
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                top: 8,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'App Version - ${StringConstant.version}',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 95, 91, 91),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Image.asset('assets/33.png', width: 100, height: 50),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -593,7 +622,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                             decoration: BoxDecoration(
                               color: item.itemQuantity == item.completedQuantity
                                   ? Colors.green
-                                  : Colors.orange,
+                                  : Color(0xFFCEB007),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(

@@ -70,7 +70,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.message),
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.black,
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -310,17 +310,17 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                   ),
                                 ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 70),
 
                         // Optional: Contact Info
-                        Text(
-                          'Prefer to contact us directly?\nEmail: support@abm.com\nPhone: +91-XXXXX-XXXXX',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                        // Text(
+                        //   'Prefer to contact us directly?\nEmail: support@abm.com\nPhone: +91-XXXXX-XXXXX',
+                        //   style: TextStyle(
+                        //     fontSize: 12,
+                        //     color: Colors.grey[600],
+                        //   ),
+                        //   textAlign: TextAlign.center,
+                        // ),
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 16,

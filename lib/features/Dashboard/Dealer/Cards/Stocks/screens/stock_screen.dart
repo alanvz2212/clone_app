@@ -5,6 +5,12 @@ import '../models/stock_model.dart';
 import '../bloc/stock_bloc.dart';
 import '../bloc/stock_event.dart';
 import '../bloc/stock_state.dart';
+import '../../../../../../constants/string_constants.dart';
+import '../../Place_Order/models/search_item_model.dart';
+import '../../Place_Order/bloc/search_item_bloc.dart';
+import '../../Place_Order/bloc/search_item_event.dart';
+import '../../Place_Order/bloc/search_item_state.dart';
+import '../../../../../../core/di/injection.dart';
 
 class StockScreen extends StatefulWidget {
   final int? itemId;
@@ -24,12 +30,17 @@ class StockScreen extends StatefulWidget {
 class _StockScreenState extends State<StockScreen> {
   final TextEditingController _itemNameController = TextEditingController();
   late StockBloc _stockBloc;
+  late SearchItemBloc _searchItemBloc;
   String searchQuery = '';
+  bool _showSuggestions = false;
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
     super.initState();
     _stockBloc = StockBloc();
+    _searchItemBloc = getIt<SearchItemBloc>();
 
     if (widget.itemId != null) {
       _itemNameController.text = widget.itemId.toString();
@@ -43,8 +54,13 @@ class _StockScreenState extends State<StockScreen> {
     });
 
     if (value.trim().isNotEmpty) {
-      // Search by item name instead of ID
-      _stockBloc.add(FetchStockByName(value.trim()));
+      // Trigger search for autocomplete suggestions
+      _searchItemBloc.add(SearchItemRequested(searchQuery: value.trim()));
+      _showSuggestions = true;
+      _showOverlay();
+    } else {
+      _searchItemBloc.add(const SearchItemCleared());
+      _hideOverlay();
     }
   }
 
@@ -53,12 +69,15 @@ class _StockScreenState extends State<StockScreen> {
     setState(() {
       searchQuery = '';
     });
+    _searchItemBloc.add(const SearchItemCleared());
+    _hideOverlay();
   }
 
   void _onSearchPressed() {
     final itemNameText = _itemNameController.text.trim();
     if (itemNameText.isNotEmpty) {
       _stockBloc.add(FetchStockByName(itemNameText));
+      _hideOverlay();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -69,10 +88,108 @@ class _StockScreenState extends State<StockScreen> {
     }
   }
 
+  void _onItemSelected(SearchItem item) {
+    _itemNameController.text = item.name ?? '';
+    setState(() {
+      searchQuery = item.name ?? '';
+    });
+    _hideOverlay();
+    
+    // Fetch stock details for selected item
+    if (item.id != null) {
+      _stockBloc.add(FetchStockDetails(item.id!));
+    }
+  }
+
+  void _showOverlay() {
+    if (_overlayEntry != null) return;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        width: MediaQuery.of(context).size.width - 32,
+        child: CompositedTransformFollower(
+          link: _layerLink,
+          showWhenUnlinked: false,
+          offset: const Offset(0, 60),
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              constraints: const BoxConstraints(maxHeight: 200),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: BlocBuilder<SearchItemBloc, SearchItemState>(
+                bloc: _searchItemBloc,
+                builder: (context, state) {
+                  if (state.isLoading) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  if (state.items.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text('No items found'),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: state.items.length > 5 ? 5 : state.items.length,
+                    itemBuilder: (context, index) {
+                      final item = state.items[index];
+                      return ListTile(
+                        dense: true,
+                        title: Text(
+                          item.name ?? 'Unknown Item',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        subtitle: item.description != null
+                            ? Text(
+                                item.description!,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : null,
+                        onTap: () => _onItemSelected(item),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  void _hideOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() {
+      _showSuggestions = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => _stockBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => _stockBloc),
+        BlocProvider(create: (context) => _searchItemBloc),
+      ],
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color(0xFFCEB007),
@@ -88,13 +205,24 @@ class _StockScreenState extends State<StockScreen> {
               Navigator.of(context).pop();
             },
           ),
-          title: const Text(
-            'Stock Details',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-            ),
+          title: Row(
+            children: [
+              Image.asset(
+                'assets/logo1.png',
+                width: 70,
+                height: 35,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 25),
+              const Text(
+                'Stock Details',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           titleSpacing: 0,
         ),
@@ -114,35 +242,43 @@ class _StockScreenState extends State<StockScreen> {
                   ),
                 ],
               ),
-              child: TextField(
-                controller: _itemNameController,
-                onChanged: _onSearchChanged,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  hintText: 'Search by Item Name',
-                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                  suffixIcon: searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.grey),
-                          onPressed: _clearSearch,
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: Colors.grey[50],
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Color(0xFFCEB007),
-                      width: 2,
+              child: CompositedTransformTarget(
+                link: _layerLink,
+                child: TextField(
+                  controller: _itemNameController,
+                  onChanged: _onSearchChanged,
+                  keyboardType: TextInputType.text,
+                  onTap: () {
+                    if (searchQuery.isNotEmpty) {
+                      _showOverlay();
+                    }
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search by Item Name',
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    suffixIcon: searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, color: Colors.grey),
+                            onPressed: _clearSearch,
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFCEB007),
+                        width: 2,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ),
@@ -157,6 +293,29 @@ class _StockScreenState extends State<StockScreen> {
                     return _buildContent(state);
                   },
                 ),
+              ),
+            ),
+
+            // App Version at the bottom
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                top: 8,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'App Version - ${StringConstant.version}',
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 95, 91, 91),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Image.asset('assets/33.png', width: 100, height: 50),
+                ],
               ),
             ),
           ],
@@ -182,8 +341,18 @@ class _StockScreenState extends State<StockScreen> {
       return _buildStockList(state.stockResponse);
     }
 
-    return const Center(
-      child: Text('Enter an item name to search for stock details'),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.search, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            'Enter an item name to search for stock details',
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
+          ),
+        ],
+      ),
     );
   }
 
@@ -192,56 +361,180 @@ class _StockScreenState extends State<StockScreen> {
     final itemName = stockDetails.isNotEmpty
         ? stockDetails.first.item.name
         : 'Unknown Item';
+    
+    // Calculate total pending quantity
+    final totalPendingQty = stockDetails.fold<int>(
+      0, 
+      (sum, stock) => sum + (stock.pendingPackageQuantity ?? 0)
+    );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          child: Padding(
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Item Name
+          Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Item Information',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 8),
-                Text(itemName),
-                const SizedBox(height: 4),
-                Text('Item ID: ${stockDetails.first.itemId}'),
-              ],
+            child: Text(
+              itemName,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        // Card(
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(16.0),
-        //     child: Column(
-        //       crossAxisAlignment: CrossAxisAlignment.start,
-        //       children: [
-        //         Text('Item Information'),
-        //         const SizedBox(height: 8),
-        //         Text(itemName),
-        //         const SizedBox(height: 4),
-        //         Text('Item ID: ${stockDetails.first.itemId}'),
-        //       ],
-        //     ),
-        //   ),
-        // ),
-        const SizedBox(height: 16),
-        Text('Stock Details (${stockDetails.length} locations)'),
-        const SizedBox(height: 12),
-        Expanded(
-          child: ListView.builder(
-            itemCount: stockDetails.length,
-            itemBuilder: (context, index) {
-              final stock = stockDetails[index];
-              return _buildStockCard(stock);
-            },
+          
+          // Stock Table
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Table(
+                border: TableBorder(
+                  horizontalInside: BorderSide(color: Colors.grey[300]!),
+                  verticalInside: BorderSide(color: Colors.grey[300]!),
+                ),
+                columnWidths: {
+                  0: FixedColumnWidth(50),
+                  1: FlexColumnWidth(2),
+                  2: FlexColumnWidth(1),
+                },
+                children: [
+                  // Table Header
+                  TableRow(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey[300]!, width: 2),
+                      ),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'S.No.',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Warehouse Name',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Stock',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  // Table Rows
+                  ...stockDetails.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final stock = entry.value;
+                    
+                    return TableRow(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(fontSize: 12),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                stock.warehouse.name ?? 'Unknown Warehouse',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              if (stock.warehouse.code != null)
+                                Text(
+                                  'Code: ${stock.warehouse.code}',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            '${stock.currentStock ?? 0}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
+          
+          // Pending Order Quantity
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Pending Order Quantity:',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '$totalPendingQty',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -282,8 +575,10 @@ class _StockScreenState extends State<StockScreen> {
 
   @override
   void dispose() {
+    _hideOverlay();
     _itemNameController.dispose();
     _stockBloc.close();
+    _searchItemBloc.close();
     super.dispose();
   }
 }

@@ -4,6 +4,7 @@ import '../../../../core/router/router_extensions.dart';
 import '../../../auth/transporter/bloc/transporter_auth_bloc.dart';
 import '../../../auth/transporter/bloc/transporter_auth_event.dart';
 import '../../../auth/transporter/bloc/transporter_auth_state.dart';
+import '../../../../constants/string_constants.dart';
 
 class DashboardTransporterScreen extends StatelessWidget {
   const DashboardTransporterScreen({super.key});
@@ -161,6 +162,29 @@ class DashboardTransporterScreen extends StatelessWidget {
                   // - Quick Stats
                 ],
               ),
+            ),
+          ),
+
+          // App Version at the bottom
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              top: 8,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'App Version - ${StringConstant.version}',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 95, 91, 91),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Image.asset('assets/33.png', width: 100, height: 50),
+              ],
             ),
           ),
         ],

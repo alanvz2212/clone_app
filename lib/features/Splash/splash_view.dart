@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../../core/di/injection.dart';
 import '../../core/router/app_router.dart';
 import '../auth/models/user.dart';
+import '../../constants/string_constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -166,7 +167,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
 
-                    // Bottom section with footer image
+                    // Bottom section with footer image and app version
                     Container(
                       height: availableHeight * 0.3, // bigger footer space
                       child: Center(
@@ -190,6 +191,18 @@ class _SplashScreenState extends State<SplashScreen>
                                     ),
                                   );
                                 },
+                              ),
+                            ),
+                            // App Version
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Text(
+                                'App Version - ${StringConstant.version}',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 95, 91, 91),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                ),
                               ),
                             ),
                           ],

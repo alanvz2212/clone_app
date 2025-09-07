@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import '../../../../../../constants/api_endpoints.dart';
-import '../../../../../../services/api_service.dart';
+import '../../../../../../../constants/api_endpoints.dart';
+import '../../../../../../../services/api_service.dart';
 import '../models/order_models.dart';
 
 class OrdersService {

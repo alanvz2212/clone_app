@@ -14,6 +14,7 @@ import '../../../core/di/injection.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/storage_service.dart';
 import '../models/user.dart';
+import '../../../constants/string_constants.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -249,6 +250,20 @@ class _AuthScreenState extends State<AuthScreen>
                                 ),
                               );
                             },
+                          ),
+                        ),
+                      ),
+                      // App Version
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Center(
+                          child: Text(
+                            'App Version - ${StringConstant.version}',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 95, 91, 91),
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ),
@@ -736,7 +751,7 @@ class _AuthScreenState extends State<AuthScreen>
     try {
       final authService = getIt<AuthService>();
       final storageService = getIt<StorageService>();
-      
+
       // Create a dummy user for hardcoded dealer
       final user = User(
         id: '1',
@@ -747,11 +762,11 @@ class _AuthScreenState extends State<AuthScreen>
         isActive: true,
         createdAt: DateTime.now(),
       );
-      
+
       // Store user and token
       await storageService.setUser(user);
       await storageService.setToken('hardcoded_dealer_token');
-      
+
       // Set in auth service
       authService.useHardcodedToken();
     } catch (e) {
@@ -763,7 +778,7 @@ class _AuthScreenState extends State<AuthScreen>
     try {
       final authService = getIt<AuthService>();
       final storageService = getIt<StorageService>();
-      
+
       // Create a dummy user for hardcoded transporter
       final user = User(
         id: '2',
@@ -774,11 +789,11 @@ class _AuthScreenState extends State<AuthScreen>
         isActive: true,
         createdAt: DateTime.now(),
       );
-      
+
       // Store user and token
       await storageService.setUser(user);
       await storageService.setToken('hardcoded_transporter_token');
-      
+
       // Set in auth service
       authService.useHardcodedToken();
     } catch (e) {

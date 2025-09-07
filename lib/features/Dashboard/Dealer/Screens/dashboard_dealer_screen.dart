@@ -1,8 +1,8 @@
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../constants/string_constants.dart';
@@ -26,16 +26,19 @@ class DashboardDealerScreen extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
 
+  void _navigateToInvoices(BuildContext context) {
+    // For now, using a default customerId. In a real app, you'd either:
+    // 1. Let the user select a customer first, or
+    // 2. Get the customerId from the current context/state
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => InvoiceScreen(customerId: 38595)),
+    );
+  }
+
   void _navigateToNewArrivals(BuildContext context) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Navigate to New Arrivals')));
-  }
-
-  void _navigateToInventory(BuildContext context) {
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   const SnackBar(content: Text('Navigate to Inventory & Pricing')),
-    // );
   }
 
   void _navigateToPromotions(BuildContext context) {
@@ -241,7 +244,7 @@ class DashboardDealerScreen extends StatelessWidget {
                         title: 'Invoices',
                         icon: Icons.inventory_2,
                         color: Color.fromARGB(255, 95, 91, 91),
-                        onTap: () => _navigateToInventory(context),
+                        onTap: () => _navigateToInvoices(context),
                       ),
                       QuickAccessTile(
                         title: 'Schemes',

@@ -3,6 +3,8 @@ import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_s
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
+import 'package:clone/core/di/injection.dart';
+import 'package:clone/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../constants/string_constants.dart';
@@ -26,12 +28,13 @@ class DashboardDealerScreen extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
 
-  void _navigateToInvoices(BuildContext context) {
-    // For now, using a default customerId. In a real app, you'd either:
-    // 1. Let the user select a customer first, or
-    // 2. Get the customerId from the current context/state
+  Future<void> _navigateToInvoices(BuildContext context) async {
+    // Get current user's customer ID dynamically
+    final userService = getIt<UserService>();
+    final customerId = await userService.getCurrentCustomerIdWithFallback();
+    
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => InvoiceScreen(customerId: 38595)),
+      MaterialPageRoute(builder: (context) => InvoiceScreen(customerId: customerId)),
     );
   }
 

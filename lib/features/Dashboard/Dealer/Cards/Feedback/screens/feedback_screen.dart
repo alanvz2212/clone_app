@@ -1,4 +1,6 @@
 import 'package:clone/constants/string_constants.dart';
+import 'package:clone/core/di/injection.dart';
+import 'package:clone/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/feedback_bloc.dart';
@@ -20,6 +22,13 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _feedbackController = TextEditingController();
   int _rating = 0;
+  late UserService _userService;
+
+  @override
+  void initState() {
+    super.initState();
+    _userService = getIt<UserService>();
+  }
 
   @override
   void dispose() {
@@ -29,7 +38,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     super.dispose();
   }
 
-  void _submitFeedback(BuildContext context) {
+  Future<void> _submitFeedback(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       if (_rating == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -41,6 +50,10 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         return;
       }
 
+      // Get current user's customer ID
+      final customerId = widget.customerId ?? 
+          await _userService.getCurrentCustomerIdWithFallback();
+
       // Submit feedback via BLoC
       context.read<FeedbackBloc>().add(
         SubmitFeedbackEvent(
@@ -48,8 +61,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
           referenceType: "mobile_app",
           companyId: 19,
           name: _nameController.text,
-          customerId:
-              widget.customerId ?? 38590, // Use provided customerId or default
+          customerId: customerId, // Use dynamic customer ID
           email: _emailController.text,
           customerFeedBack: _feedbackController.text,
           rating: _rating,

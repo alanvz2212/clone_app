@@ -190,16 +190,16 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                             'Date',
                             formatDate(invoice.invoiceDate),
                           ),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            'Customer Name',
-                            invoice.customer.name,
-                          ),
-                          const SizedBox(height: 8),
-                          _buildInfoRow(
-                            'Salesman Name',
-                            invoice.salesman.name,
-                          ),
+                          // const SizedBox(height: 8),
+                          // _buildInfoRow(
+                          //   'Customer Name',
+                          //   invoice.customer.name,
+                          // ),
+                          // const SizedBox(height: 8),
+                          // _buildInfoRow(
+                          //   'Salesman Name',
+                          //   invoice.salesman.name,
+                          // ),
                           const SizedBox(height: 8),
                           _buildInfoRow(
                             'Total Amount',

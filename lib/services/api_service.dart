@@ -20,8 +20,6 @@ class ApiService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          // Automatically set the hardcoded token for ALL API calls
-          'Authorization': 'Bearer $token',
         },
       ),
     );

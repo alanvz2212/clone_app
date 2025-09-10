@@ -4,6 +4,7 @@ class Dealer extends Equatable {
   final String name;
   final String email;
   final String mobile;
+  final int customerId; // Added customerId field
   final String? contactPerson;
   final String? contactNumber;
   final int? stateId;
@@ -42,6 +43,7 @@ class Dealer extends Equatable {
     required this.name,
     required this.email,
     required this.mobile,
+    required this.customerId, // Added customerId parameter
     this.contactPerson,
     this.contactNumber,
     this.stateId,
@@ -108,10 +110,18 @@ class Dealer extends Equatable {
         json['phone_number'] as String? ??
         '';
 
+    // Handle different possible field names for customerId
+    int customerId =
+        json['customerId'] as int? ??
+        json['customer_id'] as int? ??
+        json['id'] as int? ??
+        0; // Default fallback
+
     return Dealer(
       name: name,
       email: email,
       mobile: mobile,
+      customerId: customerId,
       contactPerson: json['contactPerson'] as String?,
       contactNumber: json['contactNumber'] as String?,
       stateId: json['stateId'] as int?,
@@ -153,6 +163,7 @@ class Dealer extends Equatable {
       'name': name,
       'email': email,
       'mobile': mobile,
+      'customerId': customerId, // Added customerId to JSON
       'contactPerson': contactPerson,
       'contactNumber': contactNumber,
       'stateId': stateId,
@@ -193,6 +204,7 @@ class Dealer extends Equatable {
     String? name,
     String? email,
     String? mobile,
+    int? customerId,
     String? contactPerson,
     String? contactNumber,
     int? stateId,
@@ -231,6 +243,7 @@ class Dealer extends Equatable {
       name: name ?? this.name,
       email: email ?? this.email,
       mobile: mobile ?? this.mobile,
+      customerId: customerId ?? this.customerId,
       contactPerson: contactPerson ?? this.contactPerson,
       contactNumber: contactNumber ?? this.contactNumber,
       stateId: stateId ?? this.stateId,
@@ -272,6 +285,7 @@ class Dealer extends Equatable {
     name,
     email,
     mobile,
+    customerId,
     contactPerson,
     contactNumber,
     stateId,

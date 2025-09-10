@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import '../../services/api_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
 import '../../services/storage_service.dart';
 import '../../services/cache_service.dart';
 import '../../services/network_service.dart';
@@ -28,13 +29,17 @@ Future<void> setupDependencyInjection() async {
   networkService.initialize();
   getIt.registerSingleton<NetworkService>(networkService);
 
-  // API Service with dependencies
-  getIt.registerLazySingleton<ApiService>(
-    () => ApiService(getIt<CacheService>(), getIt<NetworkService>()),
-  );
+  // API Service with dependencies - create as singleton so it's available immediately
+  final apiService = ApiService(getIt<CacheService>(), getIt<NetworkService>());
+  getIt.registerSingleton<ApiService>(apiService);
 
-  getIt.registerLazySingleton<AuthService>(
-    () => AuthService(getIt<ApiService>(), getIt<StorageService>()),
+  // Create AuthService and initialize it
+  final authService = AuthService(apiService, getIt<StorageService>());
+  await authService.initializeAuth();
+  getIt.registerSingleton<AuthService>(authService);
+
+  getIt.registerLazySingleton<UserService>(
+    () => UserService(getIt<AuthService>()),
   );
 
   // Repositories
@@ -73,6 +78,7 @@ Future<void> setupDependencyInjection() async {
 // Helper methods for easy access
 ApiService get apiService => getIt<ApiService>();
 AuthService get authService => getIt<AuthService>();
+UserService get userService => getIt<UserService>();
 StorageService get storageService => getIt<StorageService>();
 DealerAuthRepository get dealerAuthRepository => getIt<DealerAuthRepository>();
 TransporterAuthRepository get transporterAuthRepository =>

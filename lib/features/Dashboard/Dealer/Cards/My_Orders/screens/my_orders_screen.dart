@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../../core/di/injection.dart';
 import '../../../../../../../services/api_service.dart';
+import '../../../../../../../services/user_service.dart';
 import '../models/order_models.dart';
 import '../services/orders_service.dart';
 import '../bloc/bloc.dart';
@@ -16,14 +17,20 @@ class MyOrdersScreen extends StatefulWidget {
 
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   late OrdersBloc _ordersBloc;
-  static const int customerId =
-      38590; // Using the customer ID from the API example
+  late UserService _userService;
+  int? _currentCustomerId;
 
   @override
   void initState() {
     super.initState();
+    _userService = getIt<UserService>();
     _ordersBloc = OrdersBloc(ordersService: OrdersService(getIt<ApiService>()));
-    _ordersBloc.add(const FetchOrders(customerId));
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    _currentCustomerId = await _userService.getCurrentCustomerIdWithFallback();
+    _ordersBloc.add(FetchOrders(_currentCustomerId!));
   }
 
   @override
@@ -121,7 +128,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => _ordersBloc.add(const FetchOrders(customerId)),
+              onPressed: () => _ordersBloc.add(FetchOrders(_currentCustomerId ?? 38590)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCEB007),
                 foregroundColor: Colors.white,
@@ -320,7 +327,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   )
                 : RefreshIndicator(
                     onRefresh: () async {
-                      _ordersBloc.add(const RefreshOrders(customerId));
+                      _ordersBloc.add(RefreshOrders(_currentCustomerId ?? 38590));
                     },
                     color: const Color(0xFFCEB007),
                     child: Stack(

@@ -1,5 +1,7 @@
 import 'package:clone/constants/string_constants.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
+import 'package:clone/core/di/injection.dart';
+import 'package:clone/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,13 @@ class CartScreen extends StatefulWidget {
 class _CartScreenState extends State<CartScreen> {
   final Map<String, TextEditingController> _controllers = {};
   bool _isProcessingCheckout = false;
+  late UserService _userService;
+
+  @override
+  void initState() {
+    super.initState();
+    _userService = getIt<UserService>();
+  }
 
   // API call method for checkout
   Future<void> _proceedToCheckout(CartProvider cartProvider) async {
@@ -26,6 +35,9 @@ class _CartScreenState extends State<CartScreen> {
     });
 
     try {
+      // Get current user's customer ID
+      final customerId = await _userService.getCurrentCustomerIdWithFallback();
+
       // Prepare the mobile order items from cart
       List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((item) {
         return {
@@ -49,7 +61,7 @@ class _CartScreenState extends State<CartScreen> {
         "billTypeId": 0,
         "increment": 0,
         "invoice": "string",
-        "customerId": 38590,
+        "customerId": customerId, // Use dynamic customer ID
         "mobileOrderStatusId": 1,
         "notes": "Notes",
         "mobileOrderItem": mobileOrderItems

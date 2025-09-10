@@ -37,6 +37,10 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
       if (response.success &&
           response.dealer != null &&
           response.token != null) {
+        
+        // Set the JWT token in the API service for future requests
+        await _authService.setToken(response.token!);
+        
         emit(
           state.copyWith(
             isAuthenticated: true,

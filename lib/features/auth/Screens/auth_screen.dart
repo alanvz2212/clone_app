@@ -754,11 +754,12 @@ class _AuthScreenState extends State<AuthScreen>
 
       // Create a dummy user for hardcoded dealer
       final user = User(
-        id: '1',
+        id: mobileOrId,
         name: 'Demo Dealer',
         email: 'dealer@demo.com',
         mobileNumber: mobileOrId,
         userType: UserType.dealer,
+        customerId: int.tryParse(mobileOrId) ?? mobileOrId.hashCode,
         isActive: true,
         createdAt: DateTime.now(),
       );
@@ -781,11 +782,12 @@ class _AuthScreenState extends State<AuthScreen>
 
       // Create a dummy user for hardcoded transporter
       final user = User(
-        id: '2',
+        id: mobileOrId,
         name: 'Demo Transporter',
         email: 'transporter@demo.com',
         mobileNumber: mobileOrId,
         userType: UserType.transporter,
+        customerId: int.tryParse(mobileOrId) ?? mobileOrId.hashCode,
         isActive: true,
         createdAt: DateTime.now(),
       );

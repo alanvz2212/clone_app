@@ -222,4 +222,11 @@ class AuthService {
   bool isUsingHardcodedToken() {
     return _currentToken == null && token.isNotEmpty;
   }
+
+  /// Set token manually (for external login flows)
+  Future<void> setToken(String token) async {
+    _currentToken = token;
+    await _storageService.setToken(token);
+    _apiService.setAuthToken(token);
+  }
 }

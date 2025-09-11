@@ -211,64 +211,123 @@ class DashboardDealerScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Grid Layout for Tiles
+                  // GridView.count(
+                  //   crossAxisCount: 2,
+                  //   shrinkWrap: true,
+                  //   physics: const NeverScrollableScrollPhysics(),
+                  //   crossAxisSpacing: 12,
+                  //   mainAxisSpacing: 12,
+                  //   childAspectRatio: 1.0, // Square tiles
+                  //   children: [
+                  //     QuickAccessTile(
+                  //       title: 'Place Order',
+                  //       // subtitle: 'Create new orders',
+                  //       // icon: Icons.add_shopping_cart,
+                  //       // color: Color.fromARGB(255, 95, 91, 91),
+                  //       onTap: () => Navigator.of(context).push(
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const PlaceOrderScreen(),
+                  //         ),
+                  //       ),
+                  //       // subtitle: '',
+                  //     ),
+                  //     QuickAccessTile(
+                  //       title: 'My Cart',
+                  //       // subtitle: 'Track orders',
+                  //       // icon: Icons.receipt_long,
+                  //       // color: Color.fromARGB(255, 95, 91, 91),
+                  //       onTap: () => _navigateToMyOrders(context),
+                  //     ),
+                  // QuickAccessTile(
+                  //   title: 'New Arrivals',
+
+                  //   icon: Icons.fiber_new,
+                  //   color: Color.fromARGB(255, 95, 91, 91),
+                  //   onTap: () => _navigateToNewArrivals(context),
+                  // ),
+                  //     QuickAccessTile(
+                  //       title: 'Invoices',
+                  //       // icon: Icons.inventory_2,
+                  //       // color: Color.fromARGB(255, 95, 91, 91),
+                  //       onTap: () => _navigateToInvoices(context),
+                  //     ),
+                  // QuickAccessTile(
+                  //   title: 'Schemes',
+                  //   // subtitle: '',
+                  //   icon: Icons.local_offer,
+                  //   color: Color.fromARGB(255, 95, 91, 91),
+                  //   onTap: () => _navigateToPromotions(context),
+                  // ),
+                  //     QuickAccessTile(
+                  //       title: 'Stocks',
+                  //       // subtitle: '',
+                  //       // icon: Icons.local_offer,
+                  //       // color: Color.fromARGB(255, 95, 91, 91),
+                  //       onTap: () => _navigateToStocks(context),
+                  //     ),
+                  //     QuickAccessTile(
+                  //       title: 'Feedback',
+                  //       // icon: Icons.feedback, // BEST CHOICE - most accurate
+                  //       // color: Color.fromARGB(255, 95, 91, 91),
+                  //       onTap: () => Navigator.of(context).push(
+                  //         MaterialPageRoute(
+                  //           builder: (context) => const FeedbackScreen(),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.0, // Square tiles
+                    childAspectRatio: 1.0,
                     children: [
                       QuickAccessTile(
                         title: 'Place Order',
-                        // subtitle: 'Create new orders',
-                        // icon: Icons.add_shopping_cart,
-                        // color: Color.fromARGB(255, 95, 91, 91),
+                        imagePath:
+                            'assets/dashboard/place_order.png', // Add your image path
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const PlaceOrderScreen(),
                           ),
                         ),
-                        // subtitle: '',
                       ),
                       QuickAccessTile(
-                        title: 'My Orders',
-                        // subtitle: 'Track orders',
-                        // icon: Icons.receipt_long,
-                        // color: Color.fromARGB(255, 95, 91, 91),
+                        title: 'My Cart',
+                        imagePath:
+                            'assets/dashboard/my_cart.png', // Add your image path
                         onTap: () => _navigateToMyOrders(context),
                       ),
+
                       // QuickAccessTile(
                       //   title: 'New Arrivals',
-
-                      //   icon: Icons.fiber_new,
-                      //   color: Color.fromARGB(255, 95, 91, 91),
+                      //   imagePath: 'assets/dashboard/invoices.png',
                       //   onTap: () => _navigateToNewArrivals(context),
                       // ),
                       QuickAccessTile(
                         title: 'Invoices',
-                        // icon: Icons.inventory_2,
-                        // color: Color.fromARGB(255, 95, 91, 91),
+                        imagePath:
+                            'assets/dashboard/invoices.png', // Add your image path
                         onTap: () => _navigateToInvoices(context),
                       ),
                       // QuickAccessTile(
                       //   title: 'Schemes',
-                      //   // subtitle: '',
-                      //   icon: Icons.local_offer,
-                      //   color: Color.fromARGB(255, 95, 91, 91),
+                      //   imagePath: 'assets/dashboard/scheme.png',
                       //   onTap: () => _navigateToPromotions(context),
                       // ),
                       QuickAccessTile(
                         title: 'Stocks',
-                        // subtitle: '',
-                        // icon: Icons.local_offer,
-                        // color: Color.fromARGB(255, 95, 91, 91),
+                        imagePath:
+                            'assets/dashboard/stock.png', // Add your image path
                         onTap: () => _navigateToStocks(context),
                       ),
                       QuickAccessTile(
                         title: 'Feedback',
-                        // icon: Icons.feedback, // BEST CHOICE - most accurate
-                        // color: Color.fromARGB(255, 95, 91, 91),
+                        imagePath:
+                            'assets/dashboard/feedback.png', // Add your image path
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const FeedbackScreen(),
@@ -277,7 +336,6 @@ class DashboardDealerScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   // Optional: Add more sections below
                   const SizedBox(height: 24),
                   // You can add more widgets here like:
@@ -320,6 +378,7 @@ class DashboardDealerScreen extends StatelessWidget {
 
 class QuickAccessTile extends StatelessWidget {
   final String title;
+  final String imagePath;
   // final IconData icon;
   // final Color color;
   final String? badge;
@@ -328,12 +387,12 @@ class QuickAccessTile extends StatelessWidget {
   const QuickAccessTile({
     super.key,
     required this.title,
+    required this.imagePath,
     // required this.icon,
     // required this.color,
     this.badge,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -347,18 +406,24 @@ class QuickAccessTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Icon and Badge Row
+              // Image and Badge Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Container(
-                  //   padding: const EdgeInsets.all(12),
-                  //   decoration: BoxDecoration(
-                  //     color: color.withValues(alpha: 0.1),
-                  //     borderRadius: BorderRadius.circular(12),
-                  //   ),
-                  //   child: Icon(icon, color: color, size: 28),
-                  // ),
+                  // Image container (replaces the icon)
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      // color: Colors.grey.withOpacity(0.1), // Optional background
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Image.asset(
+                      imagePath, // Use the imagePath parameter
+                      width: 40, // Adjust size as needed
+                      height: 40,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                   if (badge != null)
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -412,4 +477,82 @@ class QuickAccessTile extends StatelessWidget {
       ),
     );
   }
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Card(
+  //     elevation: 3,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //     child: InkWell(
+  //       onTap: onTap,
+  //       borderRadius: BorderRadius.circular(16),
+  //       child: Container(
+  //         padding: const EdgeInsets.all(16),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             // Icon and Badge Row
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //               children: [
+  //                 // Container(
+  //                 //   padding: const EdgeInsets.all(12),
+  //                 //   decoration: BoxDecoration(
+  //                 //     color: color.withValues(alpha: 0.1),
+  //                 //     borderRadius: BorderRadius.circular(12),
+  //                 //   ),
+  //                 //   child: Icon(icon, color: color, size: 28),
+  //                 // ),
+  //                 if (badge != null)
+  //                   Container(
+  //                     padding: const EdgeInsets.symmetric(
+  //                       horizontal: 8,
+  //                       vertical: 4,
+  //                     ),
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.red,
+  //                       borderRadius: BorderRadius.circular(10),
+  //                     ),
+  //                     child: Text(
+  //                       badge!,
+  //                       style: const TextStyle(
+  //                         color: Colors.white,
+  //                         fontSize: 12,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                   ),
+  //               ],
+  //             ),
+  //             const SizedBox(height: 12),
+
+  //             // Title
+  //             Text(
+  //               title,
+  //               style: const TextStyle(
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.w500,
+  //                 color: Colors.black87,
+  //               ),
+  //               maxLines: 2,
+  //               overflow: TextOverflow.ellipsis,
+  //             ),
+  //             const SizedBox(height: 4),
+
+  //             const Spacer(),
+
+  //             // Arrow Icon
+  //             Align(
+  //               alignment: Alignment.centerRight,
+  //               child: Icon(
+  //                 Icons.arrow_forward_ios,
+  //                 size: 16,
+  //                 color: Colors.grey[400],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

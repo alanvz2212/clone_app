@@ -32,9 +32,11 @@ class DashboardDealerScreen extends StatelessWidget {
     // Get current user's customer ID dynamically
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
-    
+
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => InvoiceScreen(customerId: customerId)),
+      MaterialPageRoute(
+        builder: (context) => InvoiceScreen(customerId: customerId),
+      ),
     );
   }
 
@@ -220,8 +222,8 @@ class DashboardDealerScreen extends StatelessWidget {
                       QuickAccessTile(
                         title: 'Place Order',
                         // subtitle: 'Create new orders',
-                        icon: Icons.add_shopping_cart,
-                        color: Color.fromARGB(255, 95, 91, 91),
+                        // icon: Icons.add_shopping_cart,
+                        // color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const PlaceOrderScreen(),
@@ -232,41 +234,41 @@ class DashboardDealerScreen extends StatelessWidget {
                       QuickAccessTile(
                         title: 'My Orders',
                         // subtitle: 'Track orders',
-                        icon: Icons.receipt_long,
-                        color: Color.fromARGB(255, 95, 91, 91),
+                        // icon: Icons.receipt_long,
+                        // color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToMyOrders(context),
                       ),
-                      QuickAccessTile(
-                        title: 'New Arrivals',
+                      // QuickAccessTile(
+                      //   title: 'New Arrivals',
 
-                        icon: Icons.fiber_new,
-                        color: Color.fromARGB(255, 95, 91, 91),
-                        onTap: () => _navigateToNewArrivals(context),
-                      ),
+                      //   icon: Icons.fiber_new,
+                      //   color: Color.fromARGB(255, 95, 91, 91),
+                      //   onTap: () => _navigateToNewArrivals(context),
+                      // ),
                       QuickAccessTile(
                         title: 'Invoices',
-                        icon: Icons.inventory_2,
-                        color: Color.fromARGB(255, 95, 91, 91),
+                        // icon: Icons.inventory_2,
+                        // color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToInvoices(context),
                       ),
-                      QuickAccessTile(
-                        title: 'Schemes',
-                        // subtitle: '',
-                        icon: Icons.local_offer,
-                        color: Color.fromARGB(255, 95, 91, 91),
-                        onTap: () => _navigateToPromotions(context),
-                      ),
+                      // QuickAccessTile(
+                      //   title: 'Schemes',
+                      //   // subtitle: '',
+                      //   icon: Icons.local_offer,
+                      //   color: Color.fromARGB(255, 95, 91, 91),
+                      //   onTap: () => _navigateToPromotions(context),
+                      // ),
                       QuickAccessTile(
                         title: 'Stocks',
                         // subtitle: '',
-                        icon: Icons.local_offer,
-                        color: Color.fromARGB(255, 95, 91, 91),
+                        // icon: Icons.local_offer,
+                        // color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => _navigateToStocks(context),
                       ),
                       QuickAccessTile(
                         title: 'Feedback',
-                        icon: Icons.feedback, // BEST CHOICE - most accurate
-                        color: Color.fromARGB(255, 95, 91, 91),
+                        // icon: Icons.feedback, // BEST CHOICE - most accurate
+                        // color: Color.fromARGB(255, 95, 91, 91),
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const FeedbackScreen(),
@@ -318,16 +320,16 @@ class DashboardDealerScreen extends StatelessWidget {
 
 class QuickAccessTile extends StatelessWidget {
   final String title;
-  final IconData icon;
-  final Color color;
+  // final IconData icon;
+  // final Color color;
   final String? badge;
   final VoidCallback onTap;
 
   const QuickAccessTile({
     super.key,
     required this.title,
-    required this.icon,
-    required this.color,
+    // required this.icon,
+    // required this.color,
     this.badge,
     required this.onTap,
   });
@@ -349,14 +351,14 @@ class QuickAccessTile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(icon, color: color, size: 28),
-                  ),
+                  // Container(
+                  //   padding: const EdgeInsets.all(12),
+                  //   decoration: BoxDecoration(
+                  //     color: color.withValues(alpha: 0.1),
+                  //     borderRadius: BorderRadius.circular(12),
+                  //   ),
+                  //   child: Icon(icon, color: color, size: 28),
+                  // ),
                   if (badge != null)
                     Container(
                       padding: const EdgeInsets.symmetric(

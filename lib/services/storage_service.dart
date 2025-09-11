@@ -7,6 +7,7 @@ class StorageService {
   static const String _userKey = 'user_data';
   static const String _userTypeKey = 'user_type';
   static const String _isFirstLaunchKey = 'is_first_launch';
+  static const String _stayLoggedInKey = 'stay_logged_in';
 
   late final SharedPreferences _prefs;
 
@@ -72,6 +73,19 @@ class StorageService {
 
   Future<bool> isFirstLaunch() async {
     return _prefs.getBool(_isFirstLaunchKey) ?? true;
+  }
+
+  // Persistent login management
+  Future<void> setStayLoggedIn(bool stayLoggedIn) async {
+    await _prefs.setBool(_stayLoggedInKey, stayLoggedIn);
+  }
+
+  Future<bool> getStayLoggedIn() async {
+    return _prefs.getBool(_stayLoggedInKey) ?? true; // Default to true for better UX
+  }
+
+  Future<void> clearStayLoggedIn() async {
+    await _prefs.remove(_stayLoggedInKey);
   }
 
   // Generic storage methods

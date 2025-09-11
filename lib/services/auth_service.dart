@@ -44,6 +44,9 @@ class AuthService {
             await _storageService.setUser(loginResponse.user!);
           }
 
+          // Set persistent login preference to true on successful login
+          await _storageService.setStayLoggedIn(true);
+
           // Set auth token for future requests
           _apiService.setAuthToken(loginResponse.token!);
         }
@@ -87,6 +90,7 @@ class AuthService {
       // Clear persistent storage
       await _storageService.clearToken();
       await _storageService.clearUser();
+      await _storageService.clearStayLoggedIn();
 
       // Remove auth token from API service
       _apiService.removeAuthToken();
@@ -94,6 +98,12 @@ class AuthService {
   }
 
   Future<bool> isLoggedIn() async {
+    // Check if user wants to stay logged in
+    final stayLoggedIn = await _storageService.getStayLoggedIn();
+    if (!stayLoggedIn) {
+      return false;
+    }
+
     // Check memory first, then storage
     if (_currentToken != null && _currentToken!.isNotEmpty) {
       return true;
@@ -228,5 +238,15 @@ class AuthService {
     _currentToken = token;
     await _storageService.setToken(token);
     _apiService.setAuthToken(token);
+  }
+
+  /// Set persistent login preference
+  Future<void> setStayLoggedIn(bool stayLoggedIn) async {
+    await _storageService.setStayLoggedIn(stayLoggedIn);
+  }
+
+  /// Get persistent login preference
+  Future<bool> getStayLoggedIn() async {
+    return await _storageService.getStayLoggedIn();
   }
 }

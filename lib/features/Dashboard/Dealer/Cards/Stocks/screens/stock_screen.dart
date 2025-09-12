@@ -94,7 +94,7 @@ class _StockScreenState extends State<StockScreen> {
       searchQuery = item.name ?? '';
     });
     _hideOverlay();
-    
+
     // Fetch stock details for selected item
     if (item.id != null) {
       _stockBloc.add(FetchStockDetails(item.id!));
@@ -361,19 +361,19 @@ class _StockScreenState extends State<StockScreen> {
     final itemName = stockDetails.isNotEmpty
         ? stockDetails.first.item.name
         : 'Unknown Item';
-    
+
     // Calculate total pending quantity
     final totalPendingQty = stockDetails.fold<int>(
-      0, 
-      (sum, stock) => sum + (stock.pendingPackageQuantity ?? 0)
+      0,
+      (sum, stock) => sum + (stock.pendingPackageQuantity ?? 0),
     );
-    
+
     // Calculate total stock quantity
     final totalStockQty = stockDetails.fold<int>(
-      0, 
-      (sum, stock) => sum + (stock.currentStock ?? 0)
+      0,
+      (sum, stock) => sum + (stock.currentStock ?? 0),
     );
-    
+
     // Calculate net available quantity (Total Stock - Pending Orders)
     final netAvailableQty = totalStockQty - totalPendingQty;
 
@@ -386,13 +386,10 @@ class _StockScreenState extends State<StockScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               itemName,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
-          
+
           // Stock Table
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -454,12 +451,12 @@ class _StockScreenState extends State<StockScreen> {
                       ),
                     ],
                   ),
-                  
+
                   // Table Rows
                   ...stockDetails.asMap().entries.map((entry) {
                     final index = entry.key;
                     final stock = entry.value;
-                    
+
                     return TableRow(
                       children: [
                         Container(
@@ -485,9 +482,7 @@ class _StockScreenState extends State<StockScreen> {
                               if (stock.warehouse.code != null)
                                 Text(
                                   'Code: ${stock.warehouse.code}',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                  ),
+                                  style: TextStyle(fontSize: 10),
                                 ),
                             ],
                           ),
@@ -510,7 +505,7 @@ class _StockScreenState extends State<StockScreen> {
               ),
             ),
           ),
-          
+
           // Pending Order Quantity
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -526,52 +521,42 @@ class _StockScreenState extends State<StockScreen> {
                 children: [
                   Text(
                     'Pending Order Quantity:',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     '$totalPendingQty',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
           ),
-          
+
           // Net Available Quantity
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              bottom: 16.0,
+            ),
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.green[300]!),
+                border: Border.all(color: Colors.grey[300]!),
                 borderRadius: BorderRadius.circular(8),
-                color: Colors.green[50],
+                // color: Colors.green[50],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Net Available Quantity:',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.green[700],
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   Text(
                     '$netAvailableQty',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green[700],
-                    ),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),

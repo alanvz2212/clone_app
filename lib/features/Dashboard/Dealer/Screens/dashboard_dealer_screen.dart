@@ -1,8 +1,9 @@
+import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/new_myorders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/dues_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/screens/my_orders_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Old_My_Orders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
 import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
@@ -27,6 +28,12 @@ class DashboardDealerScreen extends StatelessWidget {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
+  }
+
+  void _navigateToNewMyOrders(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const NewMyOrdersScreen()));
   }
 
   // Future<void> _navigateToInvoices(BuildContext context) async {
@@ -340,6 +347,12 @@ class DashboardDealerScreen extends StatelessWidget {
                         imagePath:
                             'assets/dashboard/stock.png', // Add your image path
                         onTap: () => _navigateToStocks(context),
+                      ),
+                      QuickAccessTile(
+                        title: 'My Orders',
+                        imagePath:
+                            'assets/dashboard/place_order.png', // Add your image path
+                        onTap: () => _navigateToNewMyOrders(context),
                       ),
                       QuickAccessTile(
                         title: 'Feedback',

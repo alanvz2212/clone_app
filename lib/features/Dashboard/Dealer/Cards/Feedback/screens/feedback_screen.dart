@@ -51,7 +51,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       }
 
       // Get current user's customer ID
-      final customerId = widget.customerId ?? 
+      final customerId =
+          widget.customerId ??
           await _userService.getCurrentCustomerIdWithFallback();
 
       // Submit feedback via BLoC
@@ -340,10 +341,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                             bottom: 16,
                             top: 8,
                           ),
-
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                             children: [
                               Text(
                                 'App Version - ${StringConstant.version}',

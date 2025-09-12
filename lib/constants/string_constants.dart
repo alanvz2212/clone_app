@@ -1,6 +1,6 @@
 class StringConstant {
   static const String appName = 'ERP';
-  static const String version = '2.0.0';
+  static const String version = '3.0.0';
 }
 
 const String token = '659476889604ib26is5ods8ah9l';

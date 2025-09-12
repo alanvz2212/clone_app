@@ -8,6 +8,7 @@ import '../models/dues_model.dart';
 import '../services/dues_service.dart';
 import '../../../../../auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../../../../../auth/dealer/bloc/dealer_auth_state.dart';
+import 'package:clone/constants/string_constants.dart'; // Add this import
 
 class DuesScreen extends StatelessWidget {
   const DuesScreen({super.key});
@@ -282,6 +283,33 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                   child: Text('Pull to refresh or search to load data'),
                 );
               },
+            ),
+          ),
+          
+          // Add version display at the bottom (same format as FeedbackScreen)
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              // bottom: 16,
+              top: 8,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'App Version - ${StringConstant.version}',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 95, 91, 91),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Image.asset(
+                  'assets/33.png',
+                  width: 100,
+                  height: 100,
+                ),
+              ],
             ),
           ),
         ],

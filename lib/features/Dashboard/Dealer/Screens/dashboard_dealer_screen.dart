@@ -46,11 +46,9 @@ class DashboardDealerScreen extends StatelessWidget {
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
 
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DuesScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => DuesScreen()));
   }
 
   void _navigateToNewArrivals(BuildContext context) {
@@ -326,8 +324,8 @@ class DashboardDealerScreen extends StatelessWidget {
                       //       'assets/dashboard/invoices.png', // Add your image path
                       //   onTap: () => _navigateToInvoices(context),
                       // ),
-                       QuickAccessTile(
-                        title: 'Dues',
+                      QuickAccessTile(
+                        title: 'Pending Invoices',
                         imagePath:
                             'assets/dashboard/invoices.png', // Add your image path
                         onTap: () => _navigateToDues(context),

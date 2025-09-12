@@ -367,6 +367,15 @@ class _StockScreenState extends State<StockScreen> {
       0, 
       (sum, stock) => sum + (stock.pendingPackageQuantity ?? 0)
     );
+    
+    // Calculate total stock quantity
+    final totalStockQty = stockDetails.fold<int>(
+      0, 
+      (sum, stock) => sum + (stock.currentStock ?? 0)
+    );
+    
+    // Calculate net available quantity (Total Stock - Pending Orders)
+    final netAvailableQty = totalStockQty - totalPendingQty;
 
     return SingleChildScrollView(
       child: Column(
@@ -527,6 +536,41 @@ class _StockScreenState extends State<StockScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Net Available Quantity
+          Padding(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.green[300]!),
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.green[50],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Net Available Quantity:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green[700],
+                    ),
+                  ),
+                  Text(
+                    '$netAvailableQty',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green[700],
                     ),
                   ),
                 ],

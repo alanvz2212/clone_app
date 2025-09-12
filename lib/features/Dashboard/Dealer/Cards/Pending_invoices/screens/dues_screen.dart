@@ -41,7 +41,7 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
     _dateToController = TextEditingController(
       text: DateFormat('yyyy-MM-dd').format(DateTime.now()),
     );
-    
+
     // Load initial data after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDues();
@@ -71,7 +71,7 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
       dateTo: _dateToController.text,
       customerId: customerId,
     );
-    
+
     context.read<DuesBloc>().add(LoadDues(request));
   }
 
@@ -82,7 +82,7 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
       dateTo: _dateToController.text,
       customerId: customerId,
     );
-    
+
     context.read<DuesBloc>().add(RefreshDues(request));
   }
 
@@ -103,44 +103,40 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Color(0xFFCEB007),
-                  elevation: 2,
-                  shadowColor: Color(0xFFCEB007).withOpacity(0.3),
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  title: Row(
-                    children: [
-                      Image.asset(
-                        'assets/logo1.png',
-                        width: 70,
-                        height: 35,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 50),
-                      const Text(
-                        'Dues',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  titleSpacing: 0,
-                ),
+      appBar: AppBar(
+        backgroundColor: Color(0xFFCEB007),
+        elevation: 2,
+        shadowColor: Color(0xFFCEB007).withOpacity(0.3),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 20),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/logo1.png',
+              width: 70,
+              height: 35,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 15),
+            const Text(
+              'Pending Invoices',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        titleSpacing: 0,
+      ),
       body: Column(
         children: [
-          SizedBox(height: 20,),
+          SizedBox(height: 20),
           // Filter Section
           // Container(
           //   padding: const EdgeInsets.all(16.0),
@@ -263,15 +259,12 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                         children: [
                           Icon(Icons.inbox, size: 64),
                           SizedBox(height: 16),
-                          Text(
-                            'No dues found',
-                            style: TextStyle(fontSize: 18),
-                          ),
+                          Text('No dues found', style: TextStyle(fontSize: 18)),
                         ],
                       ),
                     );
                   }
-                  
+
                   return RefreshIndicator(
                     onRefresh: () async => _refreshDues(),
                     child: ListView.builder(
@@ -284,7 +277,7 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                     ),
                   );
                 }
-                
+
                 return const Center(
                   child: Text('Pull to refresh or search to load data'),
                 );
@@ -322,7 +315,10 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.grey[400]!),
@@ -338,7 +334,7 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
               ],
             ),
             const SizedBox(height: 8),
-            
+
             // Date Information
             Row(
               children: [
@@ -387,7 +383,7 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
               ],
             ),
             const SizedBox(height: 8),
-            
+
             // Amount Information
             Row(
               children: [

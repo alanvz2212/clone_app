@@ -1,3 +1,5 @@
+import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/bloc/orders_bloc.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../../../core/di/injection.dart';
@@ -38,41 +40,58 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     return BlocProvider(
       create: (context) => _ordersBloc,
       child: Scaffold(
-                appBar: AppBar(
-                  backgroundColor: Color(0xFFCEB007),
-                  elevation: 2,
-                  shadowColor: Color(0xFFCEB007).withOpacity(0.3),
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  title: Row(
-                    children: [
-                      Image.asset(
-                        'assets/logo1.png',
-                        width: 70,
-                        height: 35,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 33),
-                      const Text(
-                        'My Orders',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  titleSpacing: 0,
+        appBar: AppBar(
+          backgroundColor: Color(0xFFCEB007),
+          elevation: 2,
+          shadowColor: Color(0xFFCEB007).withOpacity(0.3),
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 20,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          title: Row(
+            children: [
+              Image.asset(
+                'assets/logo1.png',
+                width: 70,
+                height: 35,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 33),
+              const Text(
+                'My Cart',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
                 ),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.add, // Using the 'add' icon as you specified
+                color: Colors.white,
+              ),
+              onPressed: () {
+                // Replace this with navigation to your 'Alan' page
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        PlaceOrderScreen(), // Replace 'AlanPage' with your actual page/widget name
+                  ),
+                );
+              },
+            ),
+          ],
+          titleSpacing: 0,
+        ),
         body: Column(
           children: [
             Expanded(
@@ -143,7 +162,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () => _ordersBloc.add(FetchOrders(_currentCustomerId ?? 38590)),
+              onPressed: () =>
+                  _ordersBloc.add(FetchOrders(_currentCustomerId ?? 38590)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCEB007),
                 foregroundColor: Colors.white,
@@ -342,7 +362,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   )
                 : RefreshIndicator(
                     onRefresh: () async {
-                      _ordersBloc.add(RefreshOrders(_currentCustomerId ?? 38590));
+                      _ordersBloc.add(
+                        RefreshOrders(_currentCustomerId ?? 38590),
+                      );
                     },
                     color: const Color(0xFFCEB007),
                     child: Stack(

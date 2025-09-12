@@ -1,3 +1,4 @@
+import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/dues_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
@@ -28,14 +29,26 @@ class DashboardDealerScreen extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
 
-  Future<void> _navigateToInvoices(BuildContext context) async {
+  // Future<void> _navigateToInvoices(BuildContext context) async {
+  //   // Get current user's customer ID dynamically
+  //   final userService = getIt<UserService>();
+  //   final customerId = await userService.getCurrentCustomerIdWithFallback();
+
+  //   Navigator.of(context).push(
+  //     MaterialPageRoute(
+  //       builder: (context) => InvoiceScreen(customerId: customerId),
+  //     ),
+  //   );
+  // }
+
+  Future<void> _navigateToDues(BuildContext context) async {
     // Get current user's customer ID dynamically
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
 
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => InvoiceScreen(customerId: customerId),
+        builder: (context) => DuesScreen(),
       ),
     );
   }
@@ -285,16 +298,16 @@ class DashboardDealerScreen extends StatelessWidget {
                     mainAxisSpacing: 12,
                     childAspectRatio: 1.0,
                     children: [
-                      QuickAccessTile(
-                        title: 'Place Order',
-                        imagePath:
-                            'assets/dashboard/place_order.png', // Add your image path
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const PlaceOrderScreen(),
-                          ),
-                        ),
-                      ),
+                      // QuickAccessTile(
+                      //   title: 'Place Order',
+                      //   imagePath:
+                      //       'assets/dashboard/place_order.png', // Add your image path
+                      //   onTap: () => Navigator.of(context).push(
+                      //     MaterialPageRoute(
+                      //       builder: (context) => const PlaceOrderScreen(),
+                      //     ),
+                      //   ),
+                      // ),
                       QuickAccessTile(
                         title: 'My Cart',
                         imagePath:
@@ -307,11 +320,17 @@ class DashboardDealerScreen extends StatelessWidget {
                       //   imagePath: 'assets/dashboard/invoices.png',
                       //   onTap: () => _navigateToNewArrivals(context),
                       // ),
-                      QuickAccessTile(
-                        title: 'Invoices',
+                      // QuickAccessTile(
+                      //   title: 'Dues',
+                      //   imagePath:
+                      //       'assets/dashboard/invoices.png', // Add your image path
+                      //   onTap: () => _navigateToInvoices(context),
+                      // ),
+                       QuickAccessTile(
+                        title: 'Dues',
                         imagePath:
                             'assets/dashboard/invoices.png', // Add your image path
-                        onTap: () => _navigateToInvoices(context),
+                        onTap: () => _navigateToDues(context),
                       ),
                       // QuickAccessTile(
                       //   title: 'Schemes',

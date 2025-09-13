@@ -91,6 +91,9 @@ class AuthService {
       await _storageService.clearToken();
       await _storageService.clearUser();
       await _storageService.clearStayLoggedIn();
+      
+      // Clear saved credentials
+      await _storageService.clearAllCredentials();
 
       // Remove auth token from API service
       _apiService.removeAuthToken();

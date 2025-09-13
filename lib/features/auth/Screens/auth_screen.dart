@@ -46,11 +46,39 @@ class _AuthScreenState extends State<AuthScreen>
 
   bool _isDealerPasswordVisible = false;
   bool _isTransporterPasswordVisible = false;
+  bool _dealerStayLoggedIn = true;
+  bool _transporterStayLoggedIn = true;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    try {
+      final storageService = getIt<StorageService>();
+      final stayLoggedIn = await storageService.getStayLoggedIn();
+      
+      if (stayLoggedIn) {
+        // Load dealer credentials
+        final dealerCredentials = await storageService.getDealerCredentials();
+        if (dealerCredentials['id'] != null && dealerCredentials['password'] != null) {
+          _dealerMobileController.text = dealerCredentials['id']!;
+          _dealerPasswordController.text = dealerCredentials['password']!;
+        }
+        
+        // Load transporter credentials
+        final transporterCredentials = await storageService.getTransporterCredentials();
+        if (transporterCredentials['id'] != null && transporterCredentials['password'] != null) {
+          _transporterMobileController.text = transporterCredentials['id']!;
+          _transporterPasswordController.text = transporterCredentials['password']!;
+        }
+      }
+    } catch (e) {
+      print('Error loading saved credentials: $e');
+    }
   }
 
   @override
@@ -353,24 +381,45 @@ class _AuthScreenState extends State<AuthScreen>
 
                 const SizedBox(height: 15),
 
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            _showDealerForgotPassword(context);
-                          },
-                    child: Text(
-                      'Forgot Password?',
+                // Stay logged in checkbox
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _dealerStayLoggedIn,
+                      onChanged: isLoading
+                          ? null
+                          : (value) {
+                              setState(() {
+                                _dealerStayLoggedIn = value ?? false;
+                              });
+                            },
+                      activeColor: Color(0xFFCEB007),
+                    ),
+                    Text(
+                      'Stay logged in',
                       style: TextStyle(
-                        color: Color(0xFFCEB007),
-                        fontWeight: FontWeight.w500,
+                        color: Colors.grey.shade700,
                         fontSize: 14,
                       ),
                     ),
-                  ),
+                    const Spacer(),
+                    // Forgot Password
+                    TextButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              _showDealerForgotPassword(context);
+                            },
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: Color(0xFFCEB007),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
 
                 const SizedBox(height: 20),
@@ -565,8 +614,9 @@ class _AuthScreenState extends State<AuthScreen>
     // Check for hardcoded credentials first
     if (mobileOrId == hardcodedDealerId &&
         password == hardcodedDealerPassword) {
-      // Store hardcoded dealer authentication state
+      // Store hardcoded dealer authentication state and credentials
       await _storeHardcodedDealerAuth(mobileOrId);
+      await _saveDealerCredentials(mobileOrId, password);
       Helpers.showSuccessSnackBar(context, 'Login successful! ');
       context.go(AppRouter.dealerDashboard);
       return;
@@ -585,9 +635,16 @@ class _AuthScreenState extends State<AuthScreen>
       return;
     }
 
+    // Save credentials for successful login
+    await _saveDealerCredentials(mobileOrId, password);
+
     // If not hardcoded credentials, proceed with normal authentication
     context.read<DealerAuthBloc>().add(
-      DealerLoginRequested(mobileNumberOrId: mobileOrId, password: password),
+      DealerLoginRequested(
+        mobileNumberOrId: mobileOrId, 
+        password: password,
+        stayLoggedIn: _dealerStayLoggedIn,
+      ),
     );
   }
 
@@ -598,8 +655,9 @@ class _AuthScreenState extends State<AuthScreen>
     // Check for hardcoded credentials first
     if (mobileOrId == hardcodedTransporterId &&
         password == hardcodedTransporterPassword) {
-      // Store hardcoded transporter authentication state
+      // Store hardcoded transporter authentication state and credentials
       await _storeHardcodedTransporterAuth(mobileOrId);
+      await _saveTransporterCredentials(mobileOrId, password);
       Helpers.showSuccessSnackBar(context, 'Login successful! ');
       context.go(AppRouter.transporterDashboard);
       return;
@@ -618,6 +676,9 @@ class _AuthScreenState extends State<AuthScreen>
       return;
     }
 
+    // Save credentials for successful login
+    await _saveTransporterCredentials(mobileOrId, password);
+
     // If not hardcoded credentials, proceed with normal authentication
     context.read<TransporterAuthBloc>().add(
       TransporterLoginRequested(
@@ -625,6 +686,26 @@ class _AuthScreenState extends State<AuthScreen>
         password: password,
       ),
     );
+  }
+
+  Future<void> _saveDealerCredentials(String id, String password) async {
+    try {
+      final storageService = getIt<StorageService>();
+      await storageService.saveDealerCredentials(id, password);
+      await storageService.setStayLoggedIn(true);
+    } catch (e) {
+      print('Error saving dealer credentials: $e');
+    }
+  }
+
+  Future<void> _saveTransporterCredentials(String id, String password) async {
+    try {
+      final storageService = getIt<StorageService>();
+      await storageService.saveTransporterCredentials(id, password);
+      await storageService.setStayLoggedIn(true);
+    } catch (e) {
+      print('Error saving transporter credentials: $e');
+    }
   }
 
   void _showDealerForgotPassword(BuildContext context) {

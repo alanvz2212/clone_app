@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/dealer_auth_model.dart';
 import '../repositories/dealer_auth_repository.dart';
+import '../services/dealer_auth_hive_service.dart';
 import 'dealer_auth_event.dart';
 import 'dealer_auth_state.dart';
 import '../../../../services/auth_service.dart';
@@ -17,6 +18,7 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
         super(const DealerAuthState()) {
     on<DealerLoginRequested>(_onLoginRequested);
     on<DealerLogoutRequested>(_onLogoutRequested);
+    on<DealerAuthRestoreRequested>(_onAuthRestoreRequested);
     on<DealerForgotPasswordRequested>(_onForgotPasswordRequested);
   }
 
@@ -40,6 +42,15 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
         
         // Set the JWT token in the API service for future requests
         await _authService.setToken(response.token!);
+        
+        // Save authentication data to Hive
+        await DealerAuthHiveService.saveAuthData(
+          token: response.token!,
+          dealer: response.dealer!,
+          mobileNumber: event.mobileNumberOrId,
+          password: event.password,
+          stayLoggedIn: event.stayLoggedIn,
+        );
         
         emit(
           state.copyWith(
@@ -76,10 +87,57 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
       // Use AuthService to properly clear all authentication data
       await _authService.logout();
       
+      // Clear Hive authentication data
+      await DealerAuthHiveService.clearAuthData();
+      
       // Clear bloc state
       emit(const DealerAuthState());
     } catch (e) {
       // Even if logout API fails, clear local state
+      await DealerAuthHiveService.clearAuthData();
+      emit(const DealerAuthState());
+    }
+  }
+
+  Future<void> _onAuthRestoreRequested(
+    DealerAuthRestoreRequested event,
+    Emitter<DealerAuthState> emit,
+  ) async {
+    try {
+      // Check if user should stay logged in and has valid auth data
+      if (DealerAuthHiveService.shouldStayLoggedIn() && 
+          DealerAuthHiveService.isAuthenticated()) {
+        
+        final authData = DealerAuthHiveService.getAuthData();
+        if (authData != null && 
+            authData.token != null && 
+            authData.dealer != null) {
+          
+          // Set the token in the API service
+          await _authService.setToken(authData.token!);
+          
+          // Restore the authentication state
+          emit(
+            state.copyWith(
+              isAuthenticated: true,
+              dealer: authData.dealer!.toDealer(),
+              token: authData.token,
+              isLoading: false,
+              error: null,
+            ),
+          );
+          
+          print('=== Authentication restored from Hive ===');
+          print('Dealer: ${authData.dealer!.name}');
+          print('Customer ID: ${authData.dealer!.customerId}');
+          return;
+        }
+      }
+      
+      // If no valid auth data, ensure we're in logged out state
+      emit(const DealerAuthState());
+    } catch (e) {
+      print('=== Error restoring authentication: $e ===');
       emit(const DealerAuthState());
     }
   }

@@ -335,44 +335,48 @@ class _CartScreenState extends State<CartScreen> {
                                 //     ),
                                 //   ],
                                 // ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Price: ₹${item.price.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    // const SizedBox(width: 15),
-                                    // Text(
-                                    //   'Total: ₹${item.total.toStringAsFixed(2)}',
-                                    //   style: TextStyle(
-                                    //     color: Colors.black,
-                                    //     fontSize: 12,
-                                    //   ),
-                                    // ),
-                                  ],
-                                ),
-                                // ADD THIS BELOW THE EXISTING ROW
-                                const SizedBox(height: 4), // Add some spacing
-                                // Show Total + Tax only for UAE users, otherwise show regular Total
-                                isUAEUser
-                                    ? Text(
-                                        'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          // fontWeight: FontWeight.w700,
-                                          fontSize: 13,
-                                        ),
-                                      )
-                                    : Text(
-                                        'Total: ₹${item.total.toStringAsFixed(2)}',
+                                // Only show price information if item has a price (not 0.0)
+                                if (item.price > 0.0) ...[
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Price: ₹${item.price.toStringAsFixed(2)}',
                                         style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 12,
                                         ),
                                       ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4), // Add some spacing
+                                  // Show Total + Tax only for UAE users, otherwise show regular Total
+                                  isUAEUser
+                                      ? Text(
+                                          'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            // fontWeight: FontWeight.w700,
+                                            fontSize: 13,
+                                          ),
+                                        )
+                                      : Text(
+                                          'Total: ₹${item.total.toStringAsFixed(2)}',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                ] else ...[
+                                  // For items without price, show a message
+                                  Text(
+                                    'Price not available',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),
@@ -577,27 +581,47 @@ class _CartScreenState extends State<CartScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          isUAEUser ? 'Total Amount + Tax:' : 'Total Amount:',
-                          style: TextStyle(fontSize: 15),
-                        ),
-                        Text(
-                          isUAEUser
-                              ? '₹${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
-                              : '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: isUAEUser ? Colors.green[700] : Colors.black,
-                            fontWeight: isUAEUser
-                                ? FontWeight.w700
-                                : FontWeight.normal,
+                    // Only show total amount if there are items with prices
+                    if (cartProvider.totalAmount > 0.0) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isUAEUser ? 'Total Amount + Tax:' : 'Total Amount:',
+                            style: TextStyle(fontSize: 15),
                           ),
-                        ),
-                      ],
-                    ),
+                          Text(
+                            isUAEUser
+                                ? '₹${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
+                                : '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: isUAEUser
+                                  ? Colors.green[700]
+                                  : Colors.black,
+                              fontWeight: isUAEUser
+                                  ? FontWeight.w700
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total Amount:', style: TextStyle(fontSize: 15)),
+                          Text(
+                            'Prices not available',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     Row(
                       children: [

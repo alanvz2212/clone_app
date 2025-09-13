@@ -19,10 +19,11 @@ class _CartScreenState extends State<CartScreen> {
   final Map<String, TextEditingController> _controllers = {};
   bool _isProcessingCheckout = false;
   late UserService _userService;
-  
+
   // Check if user is in UAE (you can modify this logic based on your app's user location detection)
-  bool get isUAEUser => true; // For now, set to true for testing. Replace with actual UAE detection logic
-  
+  bool get isUAEUser =>
+      true; // For now, set to true for testing. Replace with actual UAE detection logic
+
   // Tax rate (18% GST)
   static const double taxRate = 0.18;
 
@@ -35,7 +36,7 @@ class _CartScreenState extends State<CartScreen> {
   // API call method for checkout
   Future<void> _proceedToCheckout(CartProvider cartProvider) async {
     if (_isProcessingCheckout) return;
-    
+
     setState(() {
       _isProcessingCheckout = true;
     });
@@ -45,7 +46,9 @@ class _CartScreenState extends State<CartScreen> {
       final customerId = await _userService.getCurrentCustomerIdWithFallback();
 
       // Prepare the mobile order items from cart
-      List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((item) {
+      List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((
+        item,
+      ) {
         return {
           "id": 0,
           "referenceId": 0,
@@ -54,7 +57,7 @@ class _CartScreenState extends State<CartScreen> {
           "mobileOrderId": 0,
           "itemId": int.tryParse(item.itemId) ?? 0,
           "itemQuantity": item.quantity,
-          "completedQuantity": 0
+          "completedQuantity": 0,
         };
       }).toList();
 
@@ -70,12 +73,14 @@ class _CartScreenState extends State<CartScreen> {
         "customerId": customerId, // Use dynamic customer ID
         "mobileOrderStatusId": 1,
         "notes": "Notes",
-        "mobileOrderItem": mobileOrderItems
+        "mobileOrderItem": mobileOrderItems,
       };
 
       // Make the API call
       final response = await http.post(
-        Uri.parse('http://devapi.abm4trades.com/api/MobileOrder/NewMobileOrder'),
+        Uri.parse(
+          'http://devapi.abm4trades.com/api/MobileOrder/NewMobileOrder',
+        ),
         headers: {
           'accept': '*/*',
           'Authorization': 'Bearer 659476889604ib26is5ods8ah9l',
@@ -86,20 +91,22 @@ class _CartScreenState extends State<CartScreen> {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        
+
         if (responseData['success'] == true) {
           // Success - clear cart and show success message
           cartProvider.clearCart();
-          
+
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(responseData['message'] ?? 'Order send successfully!'),
-                backgroundColor: Colors.green,
+                content: Text(
+                  responseData['message'] ?? 'Order send successfully!',
+                ),
+                backgroundColor: Colors.black,
                 duration: const Duration(seconds: 3),
               ),
             );
-            
+
             // Navigate back or to order confirmation screen
             Navigator.of(context).pop();
           }
@@ -108,7 +115,9 @@ class _CartScreenState extends State<CartScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(responseData['message'] ?? 'Failed to place order'),
+                content: Text(
+                  responseData['message'] ?? 'Failed to place order',
+                ),
                 backgroundColor: Colors.red,
                 duration: const Duration(seconds: 3),
               ),
@@ -120,7 +129,9 @@ class _CartScreenState extends State<CartScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to place order. Status: ${response.statusCode}'),
+              content: Text(
+                'Failed to place order. Status: ${response.statusCode}',
+              ),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 3),
             ),
@@ -347,21 +358,21 @@ class _CartScreenState extends State<CartScreen> {
                                 const SizedBox(height: 4), // Add some spacing
                                 // Show Total + Tax only for UAE users, otherwise show regular Total
                                 isUAEUser
-                                  ? Text(
-                                      'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        color: Colors.green[700],
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 13,
+                                    ? Text(
+                                        'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          // fontWeight: FontWeight.w700,
+                                          fontSize: 13,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Total: ₹${item.total.toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                    )
-                                  : Text(
-                                      'Total: ₹${item.total.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                      ),
-                                    ),
                               ],
                             ),
                           ),
@@ -574,13 +585,15 @@ class _CartScreenState extends State<CartScreen> {
                           style: TextStyle(fontSize: 15),
                         ),
                         Text(
-                          isUAEUser 
-                            ? '₹${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
-                            : '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
+                          isUAEUser
+                              ? '₹${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
+                              : '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 15,
                             color: isUAEUser ? Colors.green[700] : Colors.black,
-                            fontWeight: isUAEUser ? FontWeight.w700 : FontWeight.normal,
+                            fontWeight: isUAEUser
+                                ? FontWeight.w700
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -652,13 +665,13 @@ class _CartScreenState extends State<CartScreen> {
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(
-                            onPressed: _isProcessingCheckout 
-                              ? null 
-                              : () => _proceedToCheckout(cartProvider),
+                            onPressed: _isProcessingCheckout
+                                ? null
+                                : () => _proceedToCheckout(cartProvider),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _isProcessingCheckout 
-                                ? Colors.grey 
-                                : Color(0xFFCEB007),
+                              backgroundColor: _isProcessingCheckout
+                                  ? Colors.grey
+                                  : Color(0xFFCEB007),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -667,34 +680,37 @@ class _CartScreenState extends State<CartScreen> {
                               elevation: 2,
                             ),
                             child: _isProcessingCheckout
-                              ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ? Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const Text(
-                                      'Processing...',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        'Processing...',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
+                                    ],
+                                  )
+                                : const Text(
+                                    'Proceed to Checkout',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ],
-                                )
-                              : const Text(
-                                  'Proceed to Checkout',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
                                   ),
-                                ),
                           ),
                         ),
                       ],

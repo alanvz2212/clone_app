@@ -232,21 +232,40 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
             child: BlocBuilder<DuesBloc, DuesState>(
               builder: (context, state) {
                 if (state is DuesLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFFCEB007)),
+                  );
                 } else if (state is DuesError) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error, size: 64),
+                        Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
                         const SizedBox(height: 16),
                         Text(
-                          'Error: ${state.message}',
-                          textAlign: TextAlign.center,
+                          'Error loading dues',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[600],
+                          ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            state.message,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: _loadDues,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFCEB007),
+                            foregroundColor: Colors.white,
+                          ),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -254,13 +273,29 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                   );
                 } else if (state is DuesLoaded) {
                   if (state.dues.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inbox, size: 64),
-                          SizedBox(height: 16),
-                          Text('No dues found', style: TextStyle(fontSize: 18)),
+                          Icon(
+                            Icons.receipt_long_outlined,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No pending invoices found',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'You have no outstanding dues',
+                            style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                          ),
                         ],
                       ),
                     );
@@ -268,8 +303,9 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
 
                   return RefreshIndicator(
                     onRefresh: () async => _refreshDues(),
+                    color: const Color(0xFFCEB007),
                     child: ListView.builder(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.all(16),
                       itemCount: state.dues.length,
                       itemBuilder: (context, index) {
                         final due = state.dues[index];
@@ -319,13 +355,11 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
 
   Widget _buildDueCard(DuesModel due) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(6.0),
-        side: BorderSide(width: 1, color: Colors.grey[400]!),
-      ),
+      margin: const EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -336,26 +370,28 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                 Expanded(
                   child: Text(
                     due.billNo,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[700],
                     ),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
+                    horizontal: 8,
+                    vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey[400]!),
+                    color: Color(0xFFCEB007),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     due.type,
                     style: const TextStyle(
+                      color: Colors.white,
                       fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -370,18 +406,19 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Bill Date',
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Colors.grey[600],
                         ),
                       ),
                       Text(
                         DateFormat('dd MMM yyyy').format(due.billDate),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
                         ),
                       ),
                     ],
@@ -391,18 +428,19 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Due Date',
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Colors.grey[600],
                         ),
                       ),
                       Text(
                         DateFormat('dd MMM yyyy').format(due.dueDate),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
                         ),
                       ),
                     ],
@@ -420,18 +458,19 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Debit',
                           style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
                         ),
                         Text(
                           '₹${due.debit.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
                           ),
                         ),
                       ],
@@ -443,18 +482,19 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Credit',
                           style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
                         ),
                         Text(
                           '₹${due.credit.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey[700],
                           ),
                         ),
                       ],
@@ -465,18 +505,19 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Outstanding',
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Colors.grey[600],
                         ),
                       ),
                       Text(
                         '₹${due.outStandingAmount.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
                         ),
                       ),
                     ],

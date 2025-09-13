@@ -282,129 +282,136 @@ class _AuthScreenState extends State<AuthScreen>
     return BlocBuilder<DealerAuthBloc, DealerAuthState>(
       builder: (context, state) {
         final isLoading = state.isLoading;
+        final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+        final isKeyboardVisible = keyboardHeight > 0;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 40),
-
-              // Mobile Number / Dealer ID Field
-              TextFormField(
-                controller: _dealerMobileController,
-                keyboardType: TextInputType.text,
-                enabled: !isLoading,
-                decoration: InputDecoration(
-                  labelText: 'Mobile Number / Dealer ID',
-                  prefixIcon: const Icon(Icons.person),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: isKeyboardVisible ? 0 : MediaQuery.of(context).size.height * 0.3,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: isKeyboardVisible ? MainAxisAlignment.start : MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Mobile Number / Dealer ID Field
+                TextFormField(
+                  controller: _dealerMobileController,
+                  keyboardType: TextInputType.text,
+                  enabled: !isLoading,
+                  decoration: InputDecoration(
+                    labelText: 'Mobile Number / Dealer ID',
+                    prefixIcon: const Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-              // Password Field
-              TextFormField(
-                controller: _dealerPasswordController,
-                obscureText: !_isDealerPasswordVisible,
-                enabled: !isLoading,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isDealerPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                // Password Field
+                TextFormField(
+                  controller: _dealerPasswordController,
+                  obscureText: !_isDealerPasswordVisible,
+                  enabled: !isLoading,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isDealerPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isDealerPasswordVisible =
+                                    !_isDealerPasswordVisible;
+                              });
+                            },
                     ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                // Forgot Password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
                     onPressed: isLoading
                         ? null
                         : () {
-                            setState(() {
-                              _isDealerPasswordVisible =
-                                  !_isDealerPasswordVisible;
-                            });
+                            _showDealerForgotPassword(context);
                           },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          _showDealerForgotPassword(context);
-                        },
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Color(0xFFCEB007),
-                      fontWeight: FontWeight.w500,
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Color(0xFFCEB007),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Login Button
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        _handleDealerLogin();
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFCEB007),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                // Login Button
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          _handleDealerLogin();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCEB007),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                   ),
-                  elevation: 2,
-                ),
-                child: isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                  child: isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      )
-                    : const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-
-              // Extra space to ensure content is scrollable when keyboard appears
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 100),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -415,129 +422,136 @@ class _AuthScreenState extends State<AuthScreen>
     return BlocBuilder<TransporterAuthBloc, TransporterAuthState>(
       builder: (context, state) {
         final isLoading = state.isLoading;
+        final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+        final isKeyboardVisible = keyboardHeight > 0;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 40),
-
-              // Mobile Number / Transporter ID Field
-              TextFormField(
-                controller: _transporterMobileController,
-                keyboardType: TextInputType.text,
-                enabled: !isLoading,
-                decoration: InputDecoration(
-                  labelText: 'Mobile Number / Transporter ID',
-                  prefixIcon: const Icon(Icons.person),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: isKeyboardVisible ? 0 : MediaQuery.of(context).size.height * 0.3,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: isKeyboardVisible ? MainAxisAlignment.start : MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Mobile Number / Transporter ID Field
+                TextFormField(
+                  controller: _transporterMobileController,
+                  keyboardType: TextInputType.text,
+                  enabled: !isLoading,
+                  decoration: InputDecoration(
+                    labelText: 'Mobile Number / Transporter ID',
+                    prefixIcon: const Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-              // Password Field
-              TextFormField(
-                controller: _transporterPasswordController,
-                obscureText: !_isTransporterPasswordVisible,
-                enabled: !isLoading,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isTransporterPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
+                // Password Field
+                TextFormField(
+                  controller: _transporterPasswordController,
+                  obscureText: !_isTransporterPasswordVisible,
+                  enabled: !isLoading,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isTransporterPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              setState(() {
+                                _isTransporterPasswordVisible =
+                                    !_isTransporterPasswordVisible;
+                              });
+                            },
                     ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                // Forgot Password
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
                     onPressed: isLoading
                         ? null
                         : () {
-                            setState(() {
-                              _isTransporterPasswordVisible =
-                                  !_isTransporterPasswordVisible;
-                            });
+                            _showTransporterForgotPassword(context);
                           },
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          _showTransporterForgotPassword(context);
-                        },
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      color: Color(0xFFCEB007),
-                      fontWeight: FontWeight.w500,
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Color(0xFFCEB007),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Login Button
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        _handleTransporterLogin();
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFCEB007),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                // Login Button
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () {
+                          _handleTransporterLogin();
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFCEB007),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 2,
                   ),
-                  elevation: 2,
-                ),
-                child: isLoading
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                  child: isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
+                      : const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      )
-                    : const Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-
-              // Extra space to ensure content is scrollable when keyboard appears
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom + 100),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -802,4 +816,5 @@ class _AuthScreenState extends State<AuthScreen>
       print('Error storing hardcoded transporter auth: $e');
     }
   }
-}
+
+  }

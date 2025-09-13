@@ -8,6 +8,11 @@ class StorageService {
   static const String _userTypeKey = 'user_type';
   static const String _isFirstLaunchKey = 'is_first_launch';
   static const String _stayLoggedInKey = 'stay_logged_in';
+  static const String _rememberCredentialsKey = 'remember_credentials';
+  static const String _savedDealerIdKey = 'saved_dealer_id';
+  static const String _savedDealerPasswordKey = 'saved_dealer_password';
+  static const String _savedTransporterIdKey = 'saved_transporter_id';
+  static const String _savedTransporterPasswordKey = 'saved_transporter_password';
 
   late final SharedPreferences _prefs;
 
@@ -86,6 +91,58 @@ class StorageService {
 
   Future<void> clearStayLoggedIn() async {
     await _prefs.remove(_stayLoggedInKey);
+  }
+
+  // Credential management
+  Future<void> setRememberCredentials(bool remember) async {
+    await _prefs.setBool(_rememberCredentialsKey, remember);
+  }
+
+  Future<bool> getRememberCredentials() async {
+    return _prefs.getBool(_rememberCredentialsKey) ?? false;
+  }
+
+  // Dealer credentials
+  Future<void> saveDealerCredentials(String id, String password) async {
+    await _prefs.setString(_savedDealerIdKey, id);
+    await _prefs.setString(_savedDealerPasswordKey, password);
+  }
+
+  Future<Map<String, String?>> getDealerCredentials() async {
+    return {
+      'id': _prefs.getString(_savedDealerIdKey),
+      'password': _prefs.getString(_savedDealerPasswordKey),
+    };
+  }
+
+  Future<void> clearDealerCredentials() async {
+    await _prefs.remove(_savedDealerIdKey);
+    await _prefs.remove(_savedDealerPasswordKey);
+  }
+
+  // Transporter credentials
+  Future<void> saveTransporterCredentials(String id, String password) async {
+    await _prefs.setString(_savedTransporterIdKey, id);
+    await _prefs.setString(_savedTransporterPasswordKey, password);
+  }
+
+  Future<Map<String, String?>> getTransporterCredentials() async {
+    return {
+      'id': _prefs.getString(_savedTransporterIdKey),
+      'password': _prefs.getString(_savedTransporterPasswordKey),
+    };
+  }
+
+  Future<void> clearTransporterCredentials() async {
+    await _prefs.remove(_savedTransporterIdKey);
+    await _prefs.remove(_savedTransporterPasswordKey);
+  }
+
+  // Clear all saved credentials
+  Future<void> clearAllCredentials() async {
+    await _prefs.remove(_rememberCredentialsKey);
+    await clearDealerCredentials();
+    await clearTransporterCredentials();
   }
 
   // Generic storage methods

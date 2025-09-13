@@ -83,12 +83,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
       body: Container(color: Colors.grey[50], child: _buildBody()),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(
-          left: 16,
-          right: 16,
-          bottom: 16,
-          top: 8,
-        ),
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -182,9 +177,10 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
               children: [
                 Text(
                   order.invoice,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    color: Colors.grey[600],
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    // fontWeight: FontWeight.bold,
                   ),
                 ),
                 _buildStatusChip(order.orderstatus),
@@ -210,10 +206,11 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
                   style: const TextStyle(color: Colors.grey, fontSize: 14),
                 ),
                 Text(
-                  '\₹${order.total.toStringAsFixed(2)}',
-                  style: const TextStyle(
+                  '\₹ ${order.total.toStringAsFixed(2)}',
+                  style: TextStyle(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[600],
+                    // fontWeight: FontWeight.bold,
                     // color: Colors.green,
                   ),
                 ),
@@ -235,7 +232,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
         ),
         child: const Text(
           'Pending',
-          style: TextStyle(fontSize: 12, color: Colors.black54),
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
       );
     }
@@ -246,7 +243,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
     switch (status.toLowerCase()) {
       case 'billed':
         backgroundColor = Colors.white!;
-        textColor = Colors.black!;
+        textColor = Colors.grey!;
         break;
       default:
         backgroundColor = Colors.blue[100]!;

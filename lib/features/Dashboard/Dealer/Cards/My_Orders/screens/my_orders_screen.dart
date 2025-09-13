@@ -462,9 +462,16 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ),
 
             // Right side - View button
-            InkWell(
-              onTap: () => _showOrderDetails(orderData),
-              child: const Icon(Icons.visibility_outlined, size: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: InkWell(
+                onTap: () => _showOrderDetails(orderData),
+                child: const Icon(
+                  Icons.visibility_outlined,
+                  size: 30,
+                  color: Colors.grey,
+                ),
+              ),
             ),
           ],
         ),

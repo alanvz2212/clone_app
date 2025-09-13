@@ -27,6 +27,10 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
 
   Map<String, SearchItem> itemsMap = {}; // Store item details for cart
 
+  // Check if user is in UAE (you can modify this logic based on your app's user location detection)
+  bool get isUAEUser =>
+      true; // For now, set to true for testing. Replace with actual UAE detection logic
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -405,14 +409,25 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                       item.currentSalesPrice != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
-                                      child: Text(
-                                        'Total: ₹${(item.currentSalesPrice! * currentQuantity).toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          // fontWeight: FontWeight.w600,
-                                          fontSize: 12,
-                                        ),
-                                      ),
+                                      child:
+                                          // Show Total + Tax only for UAE users, otherwise show regular Total
+                                          isUAEUser && item.tax?.percent != null
+                                          ? Text(
+                                              'Total + Tax: ₹${((item.currentSalesPrice! * currentQuantity) + (item.currentSalesPrice! * currentQuantity * (item.tax!.percent! / 100))).toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                // fontWeight: FontWeight.w700,
+                                                fontSize: 13,
+                                              ),
+                                            )
+                                          : Text(
+                                              'Total: ₹${(item.currentSalesPrice! * currentQuantity).toStringAsFixed(2)}',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                // fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
                                     ),
                                 ],
                               ),

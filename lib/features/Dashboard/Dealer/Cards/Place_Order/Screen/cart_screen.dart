@@ -19,6 +19,12 @@ class _CartScreenState extends State<CartScreen> {
   final Map<String, TextEditingController> _controllers = {};
   bool _isProcessingCheckout = false;
   late UserService _userService;
+  
+  // Check if user is in UAE (you can modify this logic based on your app's user location detection)
+  bool get isUAEUser => true; // For now, set to true for testing. Replace with actual UAE detection logic
+  
+  // Tax rate (18% GST)
+  static const double taxRate = 0.18;
 
   @override
   void initState() {
@@ -339,13 +345,23 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                                 // ADD THIS BELOW THE EXISTING ROW
                                 const SizedBox(height: 4), // Add some spacing
-                                Text(
-                                  'Total: ₹${item.total.toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                  ),
-                                ),
+                                // Show Total + Tax only for UAE users, otherwise show regular Total
+                                isUAEUser
+                                  ? Text(
+                                      'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: Colors.green[700],
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Total: ₹${item.total.toStringAsFixed(2)}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                      ),
+                                    ),
                               ],
                             ),
                           ),
@@ -553,13 +569,19 @@ class _CartScreenState extends State<CartScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Total Amount:',
+                        Text(
+                          isUAEUser ? 'Total Amount + Tax:' : 'Total Amount:',
                           style: TextStyle(fontSize: 15),
                         ),
                         Text(
-                          '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
-                          style: const TextStyle(fontSize: 15),
+                          isUAEUser 
+                            ? '₹${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
+                            : '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: isUAEUser ? Colors.green[700] : Colors.black,
+                            fontWeight: isUAEUser ? FontWeight.w700 : FontWeight.normal,
+                          ),
                         ),
                       ],
                     ),

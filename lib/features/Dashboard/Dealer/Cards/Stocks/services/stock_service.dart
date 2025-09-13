@@ -9,8 +9,12 @@ class StockService {
 
   static Future<StockResponse?> getItemStockDetails(int itemId) async {
     try {
-      final url = Uri.parse('$baseUrl/General/Item/ItemStockDetails?itemId=$itemId');
-      
+      final url = Uri.parse(
+        '$baseUrl/General/Item/ItemStockDetails?itemId=$itemId',
+      );
+
+      //  http://devapi.abm4trades.com/General/Item/MobileSearch?Search=sa
+
       final response = await http.post(
         url,
         headers: {
@@ -25,7 +29,9 @@ class StockService {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         return StockResponse.fromJson(jsonData);
       } else {
-        print('Failed to load stock details. Status code: ${response.statusCode}');
+        print(
+          'Failed to load stock details. Status code: ${response.statusCode}',
+        );
         print('Response body: ${response.body}');
         return null;
       }
@@ -35,11 +41,15 @@ class StockService {
     }
   }
 
-  static Future<StockResponse?> getItemStockDetailsByName(String itemName) async {
+  static Future<StockResponse?> getItemStockDetailsByName(
+    String itemName,
+  ) async {
     try {
       // First, search for the item by name
-      final searchUrl = Uri.parse('${ApiEndpoints.itemSearch}?Search=$itemName');
-      
+      final searchUrl = Uri.parse(
+        '${ApiEndpoints.itemSearch}?Search=$itemName',
+      );
+
       final searchResponse = await http.post(
         searchUrl,
         headers: {
@@ -51,13 +61,15 @@ class StockService {
       );
 
       if (searchResponse.statusCode == 200) {
-        final Map<String, dynamic> searchData = json.decode(searchResponse.body);
+        final Map<String, dynamic> searchData = json.decode(
+          searchResponse.body,
+        );
         final List<dynamic>? items = searchData['data'] as List<dynamic>?;
-        
+
         if (items != null && items.isNotEmpty) {
           // Get the first matching item's ID
           final int itemId = items.first['id'] as int;
-          
+
           // Now fetch stock details using the item ID
           return await getItemStockDetails(itemId);
         } else {
@@ -65,7 +77,9 @@ class StockService {
           return null;
         }
       } else {
-        print('Failed to search items. Status code: ${searchResponse.statusCode}');
+        print(
+          'Failed to search items. Status code: ${searchResponse.statusCode}',
+        );
         print('Response body: ${searchResponse.body}');
         return null;
       }

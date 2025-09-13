@@ -8,7 +8,7 @@ class ApiEndpoints {
   static const String refreshToken = '$baseUrl/auth/Login/Refresh';
 
   // Search Endpoints
-  static const String itemSearch = '$baseUrl/General/Item/Search';
+  static const String itemSearch = '$baseUrl/General/Item/MobileSearch';
 
   // Order Endpoints
   static const String customerOrders = '$baseUrl/api/MobileOrder/CustomerOrder';

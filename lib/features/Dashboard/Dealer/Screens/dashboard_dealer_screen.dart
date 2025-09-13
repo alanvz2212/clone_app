@@ -1,9 +1,10 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/new_myorders_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/screens/my_orders_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/dues_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Old_My_Orders/screens/my_orders_screen.dart';
+// import 'package:clone/features/Dashboard/Dealer/Cards/Old_My_Orders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
 import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
@@ -16,6 +17,7 @@ import '../../../auth/dealer/bloc/dealer_auth_event.dart';
 import '../../../auth/dealer/bloc/dealer_auth_state.dart';
 
 class DashboardDealerScreen extends StatelessWidget {
+  ////// My Cart
   const DashboardDealerScreen({super.key});
 
   void _navigateToMyOrders(BuildContext context) {
@@ -24,16 +26,37 @@ class DashboardDealerScreen extends StatelessWidget {
     ).push(MaterialPageRoute(builder: (context) => const MyOrdersScreen()));
   }
 
+  Future<void> _navigateToDues(BuildContext context) async {
+    ////// Pending invoices
+    // Get current user's customer ID dynamically
+    final userService = getIt<UserService>();
+    final customerId = await userService.getCurrentCustomerIdWithFallback();
+
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => DuesScreen()));
+  }
+
   void _navigateToStocks(BuildContext context) {
+    ///stock
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
 
   void _navigateToNewMyOrders(BuildContext context) {
+    ////My orders
+    // Get current user's customer ID from DealerAuthBloc
+    final authState = context.read<DealerAuthBloc>().state;
+    int customerId = 40807; // Default fallback
+    
+    if (authState.isAuthenticated && authState.dealer != null) {
+      customerId = authState.dealer!.customerId;
+    }
+
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (context) => const NewMyOrdersScreen()));
+    ).push(MaterialPageRoute(builder: (context) => NewMyOrdersScreen(customerId: customerId)));
   }
 
   // Future<void> _navigateToInvoices(BuildContext context) async {
@@ -47,16 +70,6 @@ class DashboardDealerScreen extends StatelessWidget {
   //     ),
   //   );
   // }
-
-  Future<void> _navigateToDues(BuildContext context) async {
-    // Get current user's customer ID dynamically
-    final userService = getIt<UserService>();
-    final customerId = await userService.getCurrentCustomerIdWithFallback();
-
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => DuesScreen()));
-  }
 
   void _navigateToNewArrivals(BuildContext context) {
     ScaffoldMessenger.of(

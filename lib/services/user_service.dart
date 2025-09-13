@@ -1,11 +1,14 @@
 import '../features/auth/models/user.dart';
 import '../features/auth/dealer/models/dealer.dart';
+import '../features/auth/dealer/bloc/dealer_auth_bloc.dart';
+import '../features/auth/dealer/bloc/dealer_auth_state.dart';
 import 'auth_service.dart';
 
 class UserService {
   final AuthService _authService;
+  final DealerAuthBloc? _dealerAuthBloc;
   
-  UserService(this._authService);
+  UserService(this._authService, [this._dealerAuthBloc]);
 
   /// Get the current logged-in user
   Future<User?> getCurrentUser() async {

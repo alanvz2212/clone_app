@@ -751,7 +751,7 @@ class _CartScreenState extends State<CartScreen> {
                   child: Text(
                     'App Version - ${StringConstant.version}',
                     style: TextStyle(
-                      color: Color(0xFFCEB007),
+                      color: Color.fromARGB(255, 95, 91, 91),
                       fontWeight: FontWeight.w500,
                     ),
                   ),

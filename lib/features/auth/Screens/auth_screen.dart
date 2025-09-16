@@ -15,6 +15,9 @@ import '../../../services/auth_service.dart';
 import '../../../services/storage_service.dart';
 import '../models/user.dart';
 import '../../../constants/string_constants.dart';
+import '../../OTP_authentication/Sent_otp/bloc/otp_bloc.dart';
+import '../../OTP_authentication/Sent_otp/bloc/otp_event.dart';
+import '../../OTP_authentication/Sent_otp/bloc/otp_state.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -44,6 +47,9 @@ class _AuthScreenState extends State<AuthScreen>
   final TextEditingController _transporterPasswordController =
       TextEditingController();
 
+  // BLoC
+  late final OtpBloc _otpBloc;
+
   bool _isDealerPasswordVisible = false;
   bool _isTransporterPasswordVisible = false;
   bool _dealerStayLoggedIn = true;
@@ -53,6 +59,7 @@ class _AuthScreenState extends State<AuthScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _otpBloc = getIt<OtpBloc>();
     _loadSavedCredentials();
   }
 
@@ -98,30 +105,48 @@ class _AuthScreenState extends State<AuthScreen>
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
     final isKeyboardVisible = keyboardHeight > 0;
 
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<DealerAuthBloc, DealerAuthState>(
-          listener: (context, state) {
-            if (state.isAuthenticated && state.dealer != null) {
-              Helpers.showSuccessSnackBar(context, 'Login successful!');
-              context.go(AppRouter.dealerDashboard);
-            } else if (state.error != null) {
-              Helpers.showErrorSnackBar(context, state.error!);
-            }
-          },
-        ),
-        BlocListener<TransporterAuthBloc, TransporterAuthState>(
-          listener: (context, state) {
-            if (state.isAuthenticated && state.transporter != null) {
-              Helpers.showSuccessSnackBar(context, 'Login successful!');
-              context.go(AppRouter.transporterDashboard);
-            } else if (state.error != null) {
-              Helpers.showErrorSnackBar(context, state.error!);
-            }
-          },
-        ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _otpBloc),
       ],
-      child: Scaffold(
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<DealerAuthBloc, DealerAuthState>(
+            listener: (context, state) {
+              if (state.isAuthenticated && state.dealer != null) {
+                Helpers.showSuccessSnackBar(context, 'Login successful!');
+                context.go(AppRouter.dealerDashboard);
+              } else if (state.error != null) {
+                Helpers.showErrorSnackBar(context, state.error!);
+              }
+            },
+          ),
+          BlocListener<TransporterAuthBloc, TransporterAuthState>(
+            listener: (context, state) {
+              if (state.isAuthenticated && state.transporter != null) {
+                Helpers.showSuccessSnackBar(context, 'Login successful!');
+                context.go(AppRouter.transporterDashboard);
+              } else if (state.error != null) {
+                Helpers.showErrorSnackBar(context, state.error!);
+              }
+            },
+          ),
+          BlocListener<OtpBloc, OtpState>(
+            listener: (context, state) {
+              if (state.isSuccess && state.message != null) {
+                Helpers.showSuccessSnackBar(context, state.message!);
+                // Navigate directly to verify OTP screen with phone number
+                final phoneNumber = _tabController.index == 0 
+                    ? _dealerMobileController.text.trim()
+                    : _transporterMobileController.text.trim();
+                context.go('/verify-otp?phone=$phoneNumber');
+              } else if (state.error != null) {
+                Helpers.showErrorSnackBar(context, state.error!);
+              }
+            },
+          ),
+        ],
+        child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true,
         body: SafeArea(
@@ -303,7 +328,7 @@ class _AuthScreenState extends State<AuthScreen>
           ),
         ),
       ),
-    );
+     ) );
   }
 
   Widget _buildDealerLogin() {
@@ -324,14 +349,13 @@ class _AuthScreenState extends State<AuthScreen>
               mainAxisAlignment: isKeyboardVisible ? MainAxisAlignment.start : MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Mobile Number / Dealer ID Field
                 TextFormField(
                   controller: _dealerMobileController,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.phone,
                   enabled: !isLoading,
                   decoration: InputDecoration(
-                    labelText: 'Mobile Number / Dealer ID',
-                    prefixIcon: const Icon(Icons.person),
+                    labelText: 'Phone Number',
+                    prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -341,95 +365,15 @@ class _AuthScreenState extends State<AuthScreen>
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Password Field
-                TextFormField(
-                  controller: _dealerPasswordController,
-                  obscureText: !_isDealerPasswordVisible,
-                  enabled: !isLoading,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isDealerPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                              setState(() {
-                                _isDealerPasswordVisible =
-                                    !_isDealerPasswordVisible;
-                              });
-                            },
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // Stay logged in checkbox
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _dealerStayLoggedIn,
-                      onChanged: isLoading
-                          ? null
-                          : (value) {
-                              setState(() {
-                                _dealerStayLoggedIn = value ?? false;
-                              });
-                            },
-                      activeColor: Color(0xFFCEB007),
-                    ),
-                    Text(
-                      'Stay logged in',
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const Spacer(),
-                    // Forgot Password
-                    TextButton(
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                              _showDealerForgotPassword(context);
-                            },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Color(0xFFCEB007),
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
 
                 const SizedBox(height: 20),
 
-                // Login Button
                 ElevatedButton(
                   onPressed: isLoading
                       ? null
                       : () {
-                          _handleDealerLogin();
+                          _sendOTPForDealer();
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFCEB007),
@@ -452,13 +396,38 @@ class _AuthScreenState extends State<AuthScreen>
                           ),
                         )
                       : const Text(
-                          'Login',
+                          'Send OTP',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                 ),
+
+                const SizedBox(height: 15),
+
+                // Row(
+                //   children: [
+                //     Checkbox(
+                //       value: _dealerStayLoggedIn,
+                //       onChanged: isLoading
+                //           ? null
+                //           : (value) {
+                //               setState(() {
+                //                 _dealerStayLoggedIn = value ?? false;
+                //               });
+                //             },
+                //       activeColor: Color(0xFFCEB007),
+                //     ),
+                //     Text(
+                //       'Stay logged in',
+                //       style: TextStyle(
+                //         color: Colors.grey.shade700,
+                //         fontSize: 14,
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -485,14 +454,13 @@ class _AuthScreenState extends State<AuthScreen>
               mainAxisAlignment: isKeyboardVisible ? MainAxisAlignment.start : MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Mobile Number / Transporter ID Field
                 TextFormField(
                   controller: _transporterMobileController,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.phone,
                   enabled: !isLoading,
                   decoration: InputDecoration(
-                    labelText: 'Mobile Number / Transporter ID',
-                    prefixIcon: const Icon(Icons.person),
+                    labelText: 'Phone Number',
+                    prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -501,75 +469,16 @@ class _AuthScreenState extends State<AuthScreen>
                       borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Password Field
-                TextFormField(
-                  controller: _transporterPasswordController,
-                  obscureText: !_isTransporterPasswordVisible,
-                  enabled: !isLoading,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isTransporterPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                              setState(() {
-                                _isTransporterPasswordVisible =
-                                    !_isTransporterPasswordVisible;
-                              });
-                            },
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Color(0xFFCEB007), width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                // Forgot Password
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            _showTransporterForgotPassword(context);
-                          },
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Color(0xFFCEB007),
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
                   ),
                 ),
 
                 const SizedBox(height: 20),
 
-                // Login Button
                 ElevatedButton(
                   onPressed: isLoading
                       ? null
                       : () {
-                          _handleTransporterLogin();
+                          _sendOTPForTransporter();
                         },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFFCEB007),
@@ -592,12 +501,37 @@ class _AuthScreenState extends State<AuthScreen>
                           ),
                         )
                       : const Text(
-                          'Login',
+                          'Send OTP',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                ),
+
+                const SizedBox(height: 15),
+
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _transporterStayLoggedIn,
+                      onChanged: isLoading
+                          ? null
+                          : (value) {
+                              setState(() {
+                                _transporterStayLoggedIn = value ?? false;
+                              });
+                            },
+                      activeColor: Color(0xFFCEB007),
+                    ),
+                    // Text(
+                    //   'Stay logged in',
+                    //   style: TextStyle(
+                    //     color: Colors.grey.shade700,
+                    //     fontSize: 14,
+                    //   ),
+                    // ),
+                  ],
                 ),
               ],
             ),
@@ -709,109 +643,11 @@ class _AuthScreenState extends State<AuthScreen>
   }
 
   void _showDealerForgotPassword(BuildContext context) {
-    final controller = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Forgot Password - DEALER'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Enter your mobile number or dealer ID to reset your password:',
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  labelText: 'Mobile Number / Dealer ID',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final mobileOrId = controller.text.trim();
-                if (mobileOrId.isNotEmpty) {
-                  context.read<DealerAuthBloc>().add(
-                    DealerForgotPasswordRequested(mobileNumberOrId: mobileOrId),
-                  );
-                  Navigator.of(dialogContext).pop();
-                } else {
-                  Helpers.showErrorSnackBar(
-                    context,
-                    'Please enter your mobile number or dealer ID',
-                  );
-                }
-              },
-              child: const Text('Send'),
-            ),
-          ],
-        );
-      },
-    );
+    context.go(AppRouter.sendOtp);
   }
 
   void _showTransporterForgotPassword(BuildContext context) {
-    final controller = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Forgot Password - TRANSPORTER'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Enter your mobile number or transporter ID to reset your password:',
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: controller,
-                decoration: const InputDecoration(
-                  labelText: 'Mobile Number / Transporter ID',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                final mobileOrId = controller.text.trim();
-                if (mobileOrId.isNotEmpty) {
-                  context.read<TransporterAuthBloc>().add(
-                    TransporterForgotPasswordRequested(
-                      mobileNumberOrId: mobileOrId,
-                    ),
-                  );
-                  Navigator.of(dialogContext).pop();
-                } else {
-                  Helpers.showErrorSnackBar(
-                    context,
-                    'Please enter your mobile number or transporter ID',
-                  );
-                }
-              },
-              child: const Text('Send'),
-            ),
-          ],
-        );
-      },
-    );
+    context.go(AppRouter.sendOtp);
   }
 
   void _showContactSupport(BuildContext context) {
@@ -896,6 +732,40 @@ class _AuthScreenState extends State<AuthScreen>
     } catch (e) {
       print('Error storing hardcoded transporter auth: $e');
     }
+  }
+
+  void _sendOTPForDealer() {
+    final phoneNumber = _dealerMobileController.text.trim();
+    
+    if (phoneNumber.isEmpty) {
+      Helpers.showErrorSnackBar(context, 'Please enter phone number');
+      return;
+    }
+
+    if (phoneNumber.length != 10) {
+      Helpers.showErrorSnackBar(context, 'Please enter valid 10 digit phone number');
+      return;
+    }
+
+    // Send OTP using the bloc
+    _otpBloc.add(SendOtpRequested(phoneNumber: phoneNumber));
+  }
+
+  void _sendOTPForTransporter() {
+    final phoneNumber = _transporterMobileController.text.trim();
+    
+    if (phoneNumber.isEmpty) {
+      Helpers.showErrorSnackBar(context, 'Please enter phone number');
+      return;
+    }
+
+    if (phoneNumber.length != 10) {
+      Helpers.showErrorSnackBar(context, 'Please enter valid 10 digit phone number');
+      return;
+    }
+
+    // Send OTP using the bloc
+    _otpBloc.add(SendOtpRequested(phoneNumber: phoneNumber));
   }
 
   }

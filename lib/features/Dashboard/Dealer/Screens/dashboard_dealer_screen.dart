@@ -447,50 +447,58 @@ class QuickAccessTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Image and Badge Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Image container (replaces the icon)
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      // color: Colors.grey.withOpacity(0.1), // Optional background
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Image.asset(
-                      imagePath, // Use the imagePath parameter
-                      width: 40, // Adjust size as needed
-                      height: 40,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  if (badge != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        badge!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+              SizedBox(
+                height: 56,
+                width: double.infinity,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Image.asset(
+                          imagePath,
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.contain,
                         ),
                       ),
                     ),
-                ],
+                    if (badge != null)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
 
-              // Title
               Text(
                 title,
                 style: const TextStyle(
@@ -498,6 +506,7 @@ class QuickAccessTile extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
                 ),
+                textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -505,7 +514,6 @@ class QuickAccessTile extends StatelessWidget {
 
               const Spacer(),
 
-              // Arrow Icon
               Align(
                 alignment: Alignment.centerRight,
                 child: Icon(

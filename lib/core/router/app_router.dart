@@ -4,12 +4,16 @@ import '../../features/Splash/splash_view.dart';
 import '../../features/auth/screens/auth_screen.dart';
 import '../../features/Dashboard/Dealer/Screens/dashboard_dealer_screen.dart';
 import '../../features/Dashboard/Transporter/Screens/dashboard_transporter_screen.dart';
+import '../../features/OTP_authentication/Sent_otp/screens/send_otp_screen.dart';
+import '../../features/OTP_authentication/verify_otp/screens/verify_otp_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
   static const String auth = '/auth';
   static const String dealerDashboard = '/dealer-dashboard';
   static const String transporterDashboard = '/transporter-dashboard';
+  static const String sendOtp = '/send-otp';
+  static const String verifyOtp = '/verify-otp';
 
   static final GoRouter router = GoRouter(
     initialLocation: splash,
@@ -33,6 +37,19 @@ class AppRouter {
         path: transporterDashboard,
         name: 'transporter-dashboard',
         builder: (context, state) => const DashboardTransporterScreen(),
+      ),
+      GoRoute(
+        path: sendOtp,
+        name: 'send-otp',
+        builder: (context, state) => const SendOtpScreen(),
+      ),
+      GoRoute(
+        path: verifyOtp,
+        name: 'verify-otp',
+        builder: (context, state) {
+          final phoneNumber = state.uri.queryParameters['phone'] ?? '';
+          return VerifyOtpScreen(phoneNumber: phoneNumber);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -436,6 +436,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                             // Quantity Input Field
                             Container(
                               width: 50,
+                              height: 40,
                               margin: const EdgeInsets.only(right: 8),
                               child: TextField(
                                 controller: quantityController,
@@ -501,13 +502,15 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                             // Add item to Cart button (Individual)
                             Container(
                               width: 50,
+                              height: 40,
                               margin: const EdgeInsets.only(right: 8),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: currentQuantity > 0
                                       ? Color(0xFFCEB007).withOpacity(0.1)
                                       : Colors.grey[100],
-                                  padding: const EdgeInsets.all(8),
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(50, 40),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     side: BorderSide(

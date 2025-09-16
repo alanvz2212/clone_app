@@ -11,6 +11,10 @@ import '../../features/auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../../features/auth/transporter/bloc/transporter_auth_bloc.dart';
 import '../../features/Dashboard/Dealer/Cards/Place_Order/repositories/search_item_repository.dart';
 import '../../features/Dashboard/Dealer/Cards/Place_Order/bloc/search_item_bloc.dart';
+import '../../features/OTP_authentication/Sent_otp/services/otp_service.dart';
+import '../../features/OTP_authentication/Sent_otp/bloc/otp_bloc.dart';
+import '../../features/OTP_authentication/verify_otp/services/verify_otp_service.dart';
+import '../../features/OTP_authentication/verify_otp/bloc/verify_otp_bloc.dart';
 import '../../constants/api_endpoints.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -55,6 +59,14 @@ Future<void> setupDependencyInjection() async {
     () => SearchItemRepository(),
   );
 
+  getIt.registerLazySingleton<OtpService>(
+    () => OtpService(),
+  );
+
+  getIt.registerLazySingleton<VerifyOtpService>(
+    () => VerifyOtpService(),
+  );
+
   // BLoCs
   getIt.registerFactory<DealerAuthBloc>(
     () => DealerAuthBloc(
@@ -72,6 +84,14 @@ Future<void> setupDependencyInjection() async {
 
   getIt.registerFactory<SearchItemBloc>(
     () => SearchItemBloc(repository: getIt<SearchItemRepository>()),
+  );
+
+  getIt.registerFactory<OtpBloc>(
+    () => OtpBloc(otpService: getIt<OtpService>()),
+  );
+
+  getIt.registerFactory<VerifyOtpBloc>(
+    () => VerifyOtpBloc(verifyOtpService: getIt<VerifyOtpService>()),
   );
 }
 

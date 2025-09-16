@@ -223,44 +223,18 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
   }
 
   Widget _buildStatusChip(String? status) {
-    if (status == null) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'Pending',
-          style: TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-      );
-    }
-
-    Color backgroundColor;
-    Color textColor;
-
-    switch (status.toLowerCase()) {
-      case 'billed':
-        backgroundColor = Colors.white!;
-        textColor = Colors.grey!;
-        break;
-      default:
-        backgroundColor = Colors.blue[100]!;
-        textColor = Colors.blue[800]!;
-    }
-
+    // Always show Pending chip in this module
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      // decoration: BoxDecoration(
+      //   color: Colors.blue[100],
+      //   borderRadius: BorderRadius.circular(12),
+      // ),
       child: Text(
-        status,
+        'Pending',
         style: TextStyle(
           fontSize: 12,
-          color: textColor,
+          // color: Colors.blue[800],
           fontWeight: FontWeight.w500,
         ),
       ),

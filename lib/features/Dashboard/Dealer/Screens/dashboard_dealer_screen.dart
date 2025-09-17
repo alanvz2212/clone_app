@@ -1,4 +1,4 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/My_Orders/screens/my_orders_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/My%20Cart/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/dues_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';

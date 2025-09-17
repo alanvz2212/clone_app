@@ -9,21 +9,21 @@ import '../bloc/search_item_event.dart';
 import '../bloc/search_item_state.dart';
 import '../models/search_item_model.dart';
 import '../providers/cart_provider.dart';
+
 class PlaceOrderScreen extends StatefulWidget {
   const PlaceOrderScreen({super.key});
   @override
   State<PlaceOrderScreen> createState() => _PlaceOrderScreenState();
 }
+
 class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
   SearchItem? selectedItem;
   Map<String, int> itemQuantities = {};
-  Map<String, TextEditingController> quantityControllers =
-      {};
+  Map<String, TextEditingController> quantityControllers = {};
   Map<String, SearchItem> itemsMap = {};
-  bool get isUAEUser =>
-      true;
+  bool get isUAEUser => true;
   @override
   void dispose() {
     _searchController.dispose();
@@ -32,6 +32,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     }
     super.dispose();
   }
+
   void _onSearchChanged(String value) {
     setState(() {
       searchQuery = value;
@@ -44,6 +45,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       context.read<SearchItemBloc>().add(const SearchItemCleared());
     }
   }
+
   void _clearSearch() {
     _searchController.clear();
     setState(() {
@@ -52,6 +54,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     });
     context.read<SearchItemBloc>().add(const SearchItemCleared());
   }
+
   void _updateQuantity(String itemId, String value, SearchItem item) {
     int? quantity = int.tryParse(value);
     if (quantity != null && quantity >= 0) {
@@ -75,12 +78,14 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       );
     }
   }
+
   TextEditingController _getQuantityController(String itemId) {
     if (!quantityControllers.containsKey(itemId)) {
       quantityControllers[itemId] = TextEditingController();
     }
     return quantityControllers[itemId]!;
   }
+
   void _addAllItemsToCart() {
     if (itemQuantities.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -130,6 +135,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,7 +155,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
             Image.asset(
               'assets/logo1.png',
               width: 80,
-                        height: 80,
+              height: 80,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 25),
@@ -161,7 +167,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(width: 90),
+            const SizedBox(width: 60),
             Consumer<CartProvider>(
               builder: (context, cartProvider, child) {
                 return Stack(
@@ -400,9 +406,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 keyboardType: TextInputType.number,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(
-                                    4,
-                                  ),
+                                  LengthLimitingTextInputFormatter(4),
                                 ],
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
@@ -592,4 +596,3 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     );
   }
 }
-

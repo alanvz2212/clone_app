@@ -6,16 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/feedback_bloc.dart';
 import '../bloc/feedback_event.dart';
 import '../bloc/feedback_state.dart';
-
 class FeedbackScreen extends StatefulWidget {
   final int? customerId;
-
   const FeedbackScreen({super.key, this.customerId});
-
   @override
   State<FeedbackScreen> createState() => _FeedbackScreenState();
 }
-
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
@@ -23,13 +19,11 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   final TextEditingController _feedbackController = TextEditingController();
   int _rating = 0;
   late UserService _userService;
-
   @override
   void initState() {
     super.initState();
     _userService = getIt<UserService>();
   }
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -37,7 +31,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     _feedbackController.dispose();
     super.dispose();
   }
-
   Future<void> _submitFeedback(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       if (_rating == 0) {
@@ -49,20 +42,16 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         );
         return;
       }
-
-      // Get current user's customer ID
       final customerId =
           widget.customerId ??
           await _userService.getCurrentCustomerIdWithFallback();
-
-      // Submit feedback via BLoC
       context.read<FeedbackBloc>().add(
         SubmitFeedbackEvent(
           referenceId: 0,
           referenceType: "mobile_app",
           companyId: 19,
           name: _nameController.text,
-          customerId: customerId, // Use dynamic customer ID
+          customerId: customerId,
           email: _emailController.text,
           customerFeedBack: _feedbackController.text,
           rating: _rating,
@@ -70,7 +59,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -87,7 +75,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     duration: const Duration(seconds: 2),
                   ),
                 );
-                // Clear form after successful submission
                 _nameController.clear();
                 _emailController.clear();
                 _feedbackController.clear();
@@ -145,7 +132,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                     key: _formKey,
                     child: ListView(
                       children: [
-                        // Header
                         Text(
                           'We value your opinion!',
                           style: TextStyle(
@@ -165,8 +151,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 30),
-
-                        // Rating Section
                         Text(
                           'How would you rate our service?',
                           style: TextStyle(
@@ -196,8 +180,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           }),
                         ),
                         const SizedBox(height: 20),
-
-                        // Name Field
                         TextFormField(
                           controller: _nameController,
                           decoration: InputDecoration(
@@ -226,8 +208,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-
-                        // Email Field
                         TextFormField(
                           controller: _emailController,
                           decoration: InputDecoration(
@@ -260,8 +240,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-
-                        // Feedback Field
                         TextFormField(
                           controller: _feedbackController,
                           maxLines: 5,
@@ -291,8 +269,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                           },
                         ),
                         const SizedBox(height: 30),
-
-                        // Submit Button
                         ElevatedButton(
                           onPressed: state is FeedbackLoading
                               ? null
@@ -324,16 +300,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                 ),
                         ),
                         const SizedBox(height: 70),
-
-                        // Optional: Contact Info
-                        // Text(
-                        //   'Prefer to contact us directly?\nEmail: support@abm.com\nPhone: +91-XXXXX-XXXXX',
-                        //   style: TextStyle(
-                        //     fontSize: 12,
-                        //     color: Colors.grey[600],
-                        //   ),
-                        //   textAlign: TextAlign.center,
-                        // ),
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 16,
@@ -348,7 +314,6 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                                 'App Version - ${StringConstant.version}',
                                 style: TextStyle(
                                   color: Color.fromARGB(255, 95, 91, 91),
-
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -372,3 +337,4 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     );
   }
 }
+

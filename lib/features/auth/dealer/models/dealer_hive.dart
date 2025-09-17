@@ -1,126 +1,87 @@
 import 'package:hive/hive.dart';
 import 'dealer.dart';
-
 part 'dealer_hive.g.dart';
-
-@HiveType(typeId: 1) // Unique typeId for Dealer model
+@HiveType(typeId: 1)
 class DealerHive {
   @HiveField(0)
   final String name;
-
   @HiveField(1)
   final String email;
-
   @HiveField(2)
   final String mobile;
-
   @HiveField(3)
-  final int customerId;
-
+  final int id;
   @HiveField(4)
   final String? contactPerson;
-
   @HiveField(5)
   final String? contactNumber;
-
   @HiveField(6)
   final int? stateId;
-
   @HiveField(7)
   final int? taxID;
-
   @HiveField(8)
   final int? type;
-
   @HiveField(9)
   final int? countryId;
-
   @HiveField(10)
   final int? districtId;
-
   @HiveField(11)
   final String? notes;
-
   @HiveField(12)
   final String? numberOfCreditDays;
-
   @HiveField(13)
   final String? numberOfBlockDays;
-
   @HiveField(14)
   final int? executiveId;
-
   @HiveField(15)
   final String? pinCode;
-
   @HiveField(16)
   final String? bankName;
-
   @HiveField(17)
   final String? bankBranch;
-
   @HiveField(18)
   final String? accountNumber;
-
   @HiveField(19)
   final String? ifscCode;
-
   @HiveField(20)
   final String? upiId;
-
   @HiveField(21)
   final String? iban;
-
   @HiveField(22)
   final String? swiftCode;
-
   @HiveField(23)
   final int? status;
-
   @HiveField(24)
   final int? allowEmail;
-
   @HiveField(25)
   final int? allowTCS;
-
   @HiveField(26)
   final int? allowSMS;
-
   @HiveField(27)
   final String? blockReason;
-
   @HiveField(28)
   final String? creditLimit;
-
   @HiveField(29)
   final bool? useCostCentre;
-
   @HiveField(30)
   final String? gstRegistrationType;
-
   @HiveField(31)
   final String? gstNo;
-
   @HiveField(32)
   final String? panNo;
-
   @HiveField(33)
   final String? typeofDuty;
-
   @HiveField(34)
   final String? gstApplicablility;
-
   @HiveField(35)
   final String? taxType;
-
   @HiveField(36)
   final String? hsnCode;
-
   DealerHive({
     required this.name,
     required this.email,
     required this.mobile,
-    required this.customerId,
+    required this.id,
     this.contactPerson,
     this.contactNumber,
     this.stateId,
@@ -155,14 +116,12 @@ class DealerHive {
     this.taxType,
     this.hsnCode,
   });
-
-  // Convert from Dealer model to DealerHive
   factory DealerHive.fromDealer(Dealer dealer) {
     return DealerHive(
       name: dealer.name,
       email: dealer.email,
       mobile: dealer.mobile,
-      customerId: dealer.customerId,
+      id: dealer.id,
       contactPerson: dealer.contactPerson,
       contactNumber: dealer.contactNumber,
       stateId: dealer.stateId,
@@ -198,14 +157,12 @@ class DealerHive {
       hsnCode: dealer.hsnCode,
     );
   }
-
-  // Convert from DealerHive to Dealer model
   Dealer toDealer() {
     return Dealer(
       name: name,
       email: email,
       mobile: mobile,
-      customerId: customerId,
+      id: id,
       contactPerson: contactPerson,
       contactNumber: contactNumber,
       stateId: stateId,
@@ -242,3 +199,4 @@ class DealerHive {
     );
   }
 }
+

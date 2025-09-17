@@ -8,7 +8,6 @@ class DuesModel {
   final double credit;
   final double outStandingAmount;
   final String type;
-
   DuesModel({
     required this.id,
     required this.name,
@@ -20,7 +19,6 @@ class DuesModel {
     required this.outStandingAmount,
     required this.type,
   });
-
   factory DuesModel.fromJson(Map<String, dynamic> json) {
     return DuesModel(
       id: json['id'] ?? 0,
@@ -34,7 +32,6 @@ class DuesModel {
       type: json['type'] ?? '',
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -49,14 +46,12 @@ class DuesModel {
     };
   }
 }
-
 class DuesRequest {
   final String dateFrom;
   final String dateTo;
   final int customerId;
   final int costCentreId;
   final String type;
-
   DuesRequest({
     required this.dateFrom,
     required this.dateTo,
@@ -64,7 +59,6 @@ class DuesRequest {
     this.costCentreId = 0,
     this.type = "string",
   });
-
   Map<String, dynamic> toJson() {
     return {
       'datefrom': dateFrom,
@@ -75,3 +69,4 @@ class DuesRequest {
     };
   }
 }
+

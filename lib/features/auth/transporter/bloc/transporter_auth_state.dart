@@ -1,13 +1,11 @@
 import 'package:equatable/equatable.dart';
 import '../models/transporter.dart';
-
 class TransporterAuthState extends Equatable {
   final bool isAuthenticated;
   final Transporter? transporter;
   final String? token;
   final bool isLoading;
   final String? error;
-
   const TransporterAuthState({
     this.isAuthenticated = false,
     this.transporter,
@@ -15,7 +13,6 @@ class TransporterAuthState extends Equatable {
     this.isLoading = false,
     this.error,
   });
-
   TransporterAuthState copyWith({
     bool? isAuthenticated,
     Transporter? transporter,
@@ -31,7 +28,7 @@ class TransporterAuthState extends Equatable {
       error: error,
     );
   }
-
   @override
   List<Object?> get props => [isAuthenticated, transporter, token, isLoading, error];
 }
+

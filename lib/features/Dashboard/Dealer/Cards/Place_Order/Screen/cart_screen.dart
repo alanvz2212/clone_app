@@ -7,45 +7,30 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
-
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
-
 class _CartScreenState extends State<CartScreen> {
   final Map<String, TextEditingController> _controllers = {};
   bool _isProcessingCheckout = false;
   late UserService _userService;
-
-  // Check if user is in UAE (you can modify this logic based on your app's user location detection)
   bool get isUAEUser =>
-      true; // For now, set to true for testing. Replace with actual UAE detection logic
-
-  // Tax rate (18% GST)
+      true;
   static const double taxRate = 0.18;
-
   @override
   void initState() {
     super.initState();
     _userService = getIt<UserService>();
   }
-
-  // API call method for checkout
   Future<void> _proceedToCheckout(CartProvider cartProvider) async {
     if (_isProcessingCheckout) return;
-
     setState(() {
       _isProcessingCheckout = true;
     });
-
     try {
-      // Get current user's customer ID
       final customerId = await _userService.getCurrentCustomerIdWithFallback();
-
-      // Prepare the mobile order items from cart
       List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((
         item,
       ) {
@@ -60,8 +45,6 @@ class _CartScreenState extends State<CartScreen> {
           "completedQuantity": 0,
         };
       }).toList();
-
-      // Prepare the request body
       Map<String, dynamic> requestBody = {
         "id": 0,
         "referenceId": 0,
@@ -70,16 +53,14 @@ class _CartScreenState extends State<CartScreen> {
         "billTypeId": 0,
         "increment": 0,
         "invoice": "string",
-        "customerId": customerId, // Use dynamic customer ID
+        "customerId": customerId,
         "mobileOrderStatusId": 1,
         "notes": "Notes",
         "mobileOrderItem": mobileOrderItems,
       };
-
-      // Make the API call
       final response = await http.post(
         Uri.parse(
-          'http://devapi.abm4trades.com/api/MobileOrder/NewMobileOrder',
+          'https://tmsapi.abm4trades.com/api/MobileOrder/CustomerOrder',
         ),
         headers: {
           'accept': '*/*',
@@ -88,14 +69,10 @@ class _CartScreenState extends State<CartScreen> {
         },
         body: jsonEncode(requestBody),
       );
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-
         if (responseData['success'] == true) {
-          // Success - clear cart and show success message
           cartProvider.clearCart();
-
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -106,12 +83,9 @@ class _CartScreenState extends State<CartScreen> {
                 duration: const Duration(seconds: 3),
               ),
             );
-
-            // Navigate back or to order confirmation screen
             Navigator.of(context).pop();
           }
         } else {
-          // API returned success: false
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -125,7 +99,6 @@ class _CartScreenState extends State<CartScreen> {
           }
         }
       } else {
-        // HTTP error
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -139,7 +112,6 @@ class _CartScreenState extends State<CartScreen> {
         }
       }
     } catch (e) {
-      // Network or other error
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -157,7 +129,6 @@ class _CartScreenState extends State<CartScreen> {
       }
     }
   }
-
   void _updateQuantity(
     CartProvider cartProvider,
     String itemId,
@@ -175,7 +146,6 @@ class _CartScreenState extends State<CartScreen> {
         ),
       );
     } else if (newQuantity == 0) {
-      // Remove item if quantity is set to 0
       cartProvider.removeItem(itemId);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -194,16 +164,13 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
   }
-
   @override
   void dispose() {
-    // Dispose all controllers
     for (var controller in _controllers.values) {
       controller.dispose();
     }
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,7 +235,6 @@ class _CartScreenState extends State<CartScreen> {
               ),
             );
           }
-
           return Column(
             children: [
               Expanded(
@@ -277,12 +243,9 @@ class _CartScreenState extends State<CartScreen> {
                   itemCount: cartProvider.items.length,
                   itemBuilder: (context, index) {
                     final item = cartProvider.items[index];
-
-                    // Create a controller for each item to track text changes
                     _controllers[item.itemId] ??= TextEditingController(
                       text: '${item.quantity}',
                     );
-
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
@@ -301,7 +264,6 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       child: Row(
                         children: [
-                          // Item Details
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,28 +276,6 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                // Row(
-                                //   children: [
-                                //     Text(
-                                //       'Price: ₹${item.price.toStringAsFixed(2)}',
-                                //       style: TextStyle(
-                                //         color: Colors.black,
-                                //         // fontWeight: FontWeight.w500,
-                                //         fontSize: 12,
-                                //       ),
-                                //     ),
-                                //     const SizedBox(width: 15),
-                                //     Text(
-                                //       'Total: ₹${item.total.toStringAsFixed(2)}',
-                                //       style: TextStyle(
-                                //         color: Colors.black,
-                                //         // fontWeight: FontWeight.w600,
-                                //         fontSize: 12,
-                                //       ),
-                                //     ),
-                                //   ],
-                                // ),
-                                // Only show price information if item has a price (not 0.0)
                                 if (item.price > 0.0) ...[
                                   Row(
                                     children: [
@@ -348,14 +288,12 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 4), // Add some spacing
-                                  // Show Total + Tax only for UAE users, otherwise show regular Total
+                                  const SizedBox(height: 4),
                                   isUAEUser
                                       ? Text(
                                           'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
                                           style: TextStyle(
                                             color: Colors.black,
-                                            // fontWeight: FontWeight.w700,
                                             fontSize: 13,
                                           ),
                                         )
@@ -367,7 +305,6 @@ class _CartScreenState extends State<CartScreen> {
                                           ),
                                         ),
                                 ] else ...[
-                                  // For items without price, show a message
                                   Text(
                                     'Price not available',
                                     style: TextStyle(
@@ -380,11 +317,8 @@ class _CartScreenState extends State<CartScreen> {
                               ],
                             ),
                           ),
-
-                          // Quantity Input + Tick Button + Delete - UPDATED TO MATCH PLACE ORDER SCREEN
                           Row(
                             children: [
-                              // Quantity Input Field - UPDATED STYLE
                               Container(
                                 width: 50,
                                 margin: const EdgeInsets.only(right: 8),
@@ -440,8 +374,6 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                               ),
-
-                              // Tick Button - UPDATED STYLE
                               Container(
                                 width: 50,
                                 margin: const EdgeInsets.only(right: 8),
@@ -480,8 +412,6 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                               ),
-
-                              // Delete Button
                               IconButton(
                                 onPressed: () {
                                   showDialog(
@@ -555,8 +485,6 @@ class _CartScreenState extends State<CartScreen> {
                   },
                 ),
               ),
-
-              // Cart Summary
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -581,7 +509,6 @@ class _CartScreenState extends State<CartScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    // Only show total amount if there are items with prices
                     if (cartProvider.totalAmount > 0.0) ...[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -625,7 +552,6 @@ class _CartScreenState extends State<CartScreen> {
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        // Clear Cart Button
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
@@ -685,7 +611,6 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        // Proceed to Checkout Button
                         Expanded(
                           flex: 2,
                           child: ElevatedButton(
@@ -742,8 +667,6 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
               ),
-
-              // App Version
               Padding(
                 padding: const EdgeInsets.only(left: 16, bottom: 16, top: 8),
                 child: Align(
@@ -764,3 +687,4 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 }
+

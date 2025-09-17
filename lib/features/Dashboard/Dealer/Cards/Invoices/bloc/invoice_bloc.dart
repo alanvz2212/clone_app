@@ -4,11 +4,9 @@ import '../models/invoice_model.dart';
 import '../services/invoice_service.dart';
 import 'invoice_event.dart';
 import 'invoice_state.dart';
-
 class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
   final InvoiceService _invoiceService;
   final Logger _logger = Logger();
-
   InvoiceBloc({InvoiceService? invoiceService})
     : _invoiceService = invoiceService ?? InvoiceService(),
       super(InvoiceInitial()) {
@@ -16,7 +14,6 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     on<RefreshInvoices>(_onRefreshInvoices);
     on<RetryLoadInvoices>(_onRetryLoadInvoices);
   }
-
   Future<void> _onLoadInvoices(
     LoadInvoices event,
     Emitter<InvoiceState> emit,
@@ -24,17 +21,14 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     try {
       emit(InvoiceLoading());
       _logger.i('Loading invoices for customer: ${event.customerId}');
-
       final invoices = await _invoiceService.getCustomerInvoices(
         event.customerId,
       );
-
       if (invoices.isEmpty) {
         emit(InvoiceEmpty(customerId: event.customerId));
       } else {
         emit(InvoiceLoaded(invoices: invoices, customerId: event.customerId));
       }
-
       _logger.i('Successfully loaded ${invoices.length} invoices');
     } catch (error) {
       _logger.e('Error loading invoices: $error');
@@ -46,32 +40,26 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       );
     }
   }
-
   Future<void> _onRefreshInvoices(
     RefreshInvoices event,
     Emitter<InvoiceState> emit,
   ) async {
     try {
-      // Show refreshing state with current data if available
       if (state is InvoiceLoaded) {
         final currentState = state as InvoiceLoaded;
         emit(InvoiceRefreshing(currentInvoices: currentState.invoices));
       } else {
         emit(InvoiceLoading());
       }
-
       _logger.i('Refreshing invoices for customer: ${event.customerId}');
-
       final invoices = await _invoiceService.getCustomerInvoices(
         event.customerId,
       );
-
       if (invoices.isEmpty) {
         emit(InvoiceEmpty(customerId: event.customerId));
       } else {
         emit(InvoiceLoaded(invoices: invoices, customerId: event.customerId));
       }
-
       _logger.i('Successfully refreshed ${invoices.length} invoices');
     } catch (error) {
       _logger.e('Error refreshing invoices: $error');
@@ -83,7 +71,6 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       );
     }
   }
-
   Future<void> _onRetryLoadInvoices(
     RetryLoadInvoices event,
     Emitter<InvoiceState> emit,
@@ -91,7 +78,6 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     _logger.i('Retrying to load invoices for customer: ${event.customerId}');
     add(LoadInvoices(customerId: event.customerId));
   }
-
   String _getErrorMessage(dynamic error) {
     if (error.toString().contains('SocketException') ||
         error.toString().contains('NetworkException')) {
@@ -113,3 +99,4 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     }
   }
 }
+

@@ -9,54 +9,41 @@ import '../bloc/search_item_event.dart';
 import '../bloc/search_item_state.dart';
 import '../models/search_item_model.dart';
 import '../providers/cart_provider.dart';
-
 class PlaceOrderScreen extends StatefulWidget {
   const PlaceOrderScreen({super.key});
-
   @override
   State<PlaceOrderScreen> createState() => _PlaceOrderScreenState();
 }
-
 class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
   final TextEditingController _searchController = TextEditingController();
   String searchQuery = '';
   SearchItem? selectedItem;
-  Map<String, int> itemQuantities = {}; // Track quantities for each item
+  Map<String, int> itemQuantities = {};
   Map<String, TextEditingController> quantityControllers =
-      {}; // Controllers for quantity inputs
-
-  Map<String, SearchItem> itemsMap = {}; // Store item details for cart
-
-  // Check if user is in UAE (you can modify this logic based on your app's user location detection)
+      {};
+  Map<String, SearchItem> itemsMap = {};
   bool get isUAEUser =>
-      true; // For now, set to true for testing. Replace with actual UAE detection logic
-
+      true;
   @override
   void dispose() {
     _searchController.dispose();
-    // Dispose all quantity controllers
     for (var controller in quantityControllers.values) {
       controller.dispose();
     }
     super.dispose();
   }
-
   void _onSearchChanged(String value) {
     setState(() {
       searchQuery = value;
     });
-
     if (value.trim().isNotEmpty) {
-      // Trigger search with BLoC
       context.read<SearchItemBloc>().add(
         SearchItemRequested(searchQuery: value.trim()),
       );
     } else {
-      // Clear search results
       context.read<SearchItemBloc>().add(const SearchItemCleared());
     }
   }
-
   void _clearSearch() {
     _searchController.clear();
     setState(() {
@@ -65,7 +52,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     });
     context.read<SearchItemBloc>().add(const SearchItemCleared());
   }
-
   void _updateQuantity(String itemId, String value, SearchItem item) {
     int? quantity = int.tryParse(value);
     if (quantity != null && quantity >= 0) {
@@ -76,8 +62,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
           itemQuantities[itemId] = quantity;
         }
       });
-
-      // Show feedback to user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -91,14 +75,12 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       );
     }
   }
-
   TextEditingController _getQuantityController(String itemId) {
     if (!quantityControllers.containsKey(itemId)) {
       quantityControllers[itemId] = TextEditingController();
     }
     return quantityControllers[itemId]!;
   }
-
   void _addAllItemsToCart() {
     if (itemQuantities.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -110,11 +92,8 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       );
       return;
     }
-
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
     int itemsAdded = 0;
-
-    // Add all items with quantities to cart
     itemQuantities.forEach((itemId, quantity) {
       if (itemsMap.containsKey(itemId) && quantity > 0) {
         final item = itemsMap[itemId]!;
@@ -127,16 +106,13 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
         itemsAdded++;
       }
     });
-
     if (itemsAdded > 0) {
-      // Clear current selections after adding to cart
       setState(() {
         itemQuantities.clear();
         for (var controller in quantityControllers.values) {
           controller.clear();
         }
       });
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('$itemsAdded items added to cart successfully!'),
@@ -154,7 +130,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -238,7 +213,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       ),
       body: Column(
         children: [
-          // Search Field Container
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -284,16 +258,13 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               ),
             ),
           ),
-
-          // Main Content Area - Search Results (Top Half)
           Expanded(
-            flex: 1, // Top half of the screen
+            flex: 1,
             child: BlocBuilder<SearchItemBloc, SearchItemState>(
               builder: (context, state) {
                 if (state.isLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
-
                 if (state.error != null) {
                   return Center(
                     child: Column(
@@ -328,7 +299,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     ),
                   );
                 }
-
                 if (state.items.isEmpty && searchQuery.isNotEmpty) {
                   return Center(
                     child: Column(
@@ -351,7 +321,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     ),
                   );
                 }
-
                 if (state.items.isNotEmpty) {
                   return ListView.builder(
                     padding: const EdgeInsets.all(16),
@@ -361,17 +330,13 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                       final itemId = item.id?.toString() ?? index.toString();
                       final currentQuantity = itemQuantities[itemId] ?? 0;
                       final quantityController = _getQuantityController(itemId);
-
                       itemsMap[itemId] = item;
-
-                      // Update controller text if quantity changed externally
                       if (quantityController.text !=
                           currentQuantity.toString()) {
                         quantityController.text = currentQuantity == 0
                             ? ''
                             : currentQuantity.toString();
                       }
-
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(12),
@@ -382,7 +347,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                         ),
                         child: Row(
                           children: [
-                            // Item Info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,7 +354,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                   Text(
                                     item.name ?? 'Unknown Item',
                                     style: const TextStyle(
-                                      // fontWeight: FontWeight.w600,
                                       fontSize: 14,
                                       color: Colors.black,
                                     ),
@@ -401,7 +364,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                       '₹${item.currentSalesPrice!.toStringAsFixed(2)}',
                                       style: TextStyle(
                                         color: Colors.black,
-                                        // fontWeight: FontWeight.w500,
                                         fontSize: 14,
                                       ),
                                     ),
@@ -410,13 +372,11 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 4),
                                       child:
-                                          // Show Total + Tax only for UAE users, otherwise show regular Total
                                           isUAEUser && item.tax?.percent != null
                                           ? Text(
                                               'Total + Tax: ₹${((item.currentSalesPrice! * currentQuantity) + (item.currentSalesPrice! * currentQuantity * (item.tax!.percent! / 100))).toStringAsFixed(2)}',
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                // fontWeight: FontWeight.w700,
                                                 fontSize: 13,
                                               ),
                                             )
@@ -424,7 +384,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                               'Total: ₹${(item.currentSalesPrice! * currentQuantity).toStringAsFixed(2)}',
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                // fontWeight: FontWeight.w600,
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -432,8 +391,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 ],
                               ),
                             ),
-
-                            // Quantity Input Field
                             Container(
                               width: 50,
                               height: 40,
@@ -445,7 +402,7 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                   FilteringTextInputFormatter.digitsOnly,
                                   LengthLimitingTextInputFormatter(
                                     4,
-                                  ), // Max 4 digits
+                                  ),
                                 ],
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
@@ -498,8 +455,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 },
                               ),
                             ),
-
-                            // Add item to Cart button (Individual)
                             Container(
                               width: 50,
                               height: 40,
@@ -522,7 +477,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                 ),
                                 onPressed: () {
                                   if (currentQuantity > 0) {
-                                    // Add item to cart
                                     final cartProvider =
                                         Provider.of<CartProvider>(
                                           context,
@@ -534,7 +488,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                       item.currentSalesPrice ?? 0.0,
                                       currentQuantity,
                                     );
-
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
@@ -573,8 +526,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                     },
                   );
                 }
-
-                // Default state - no search
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -591,8 +542,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               },
             ),
           ),
-
-          // Add All Items to Cart Button
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
@@ -617,7 +566,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.only(
               left: 16,
@@ -632,7 +580,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                   'App Version - ${StringConstant.version}',
                   style: TextStyle(
                     color: Color.fromARGB(255, 95, 91, 91),
-
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -645,3 +592,4 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
     );
   }
 }
+

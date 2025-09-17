@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
 import '../models/invoice_model.dart';
 import '../services/invoice_service.dart';
-
 class InvoiceScreen extends StatefulWidget {
   final int customerId;
-
   const InvoiceScreen({Key? key, required this.customerId}) : super(key: key);
-
   @override
   State<InvoiceScreen> createState() => _InvoiceScreenState();
 }
-
 class _InvoiceScreenState extends State<InvoiceScreen> {
   List<InvoiceModel> invoices = [];
   bool isLoading = true;
   String errorMessage = '';
   late final InvoiceService _invoiceService;
-
   @override
   void initState() {
     super.initState();
     _invoiceService = InvoiceService();
     fetchInvoices();
   }
-
   Future<void> fetchInvoices() async {
     try {
       setState(() {
         isLoading = true;
         errorMessage = '';
       });
-
       final fetchedInvoices = await _invoiceService.getCustomerInvoices(
         widget.customerId,
       );
-
       setState(() {
         invoices = fetchedInvoices;
         isLoading = false;
@@ -46,13 +38,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       });
     }
   }
-
   @override
   void dispose() {
     _invoiceService.dispose();
     super.dispose();
   }
-
   String formatDate(String dateString) {
     try {
       DateTime date = DateTime.parse(dateString);
@@ -61,7 +51,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       return dateString;
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,28 +145,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 'Invoice : ${invoice.invoice}',
                                 style: const TextStyle(
                                   fontSize: 15,
-                                  // fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               ),
-                              // Container(
-                              //   padding: const EdgeInsets.symmetric(
-                              //     horizontal: 8,
-                              //     vertical: 4,
-                              //   ),
-                              //   decoration: BoxDecoration(
-                              //     color: Colors.green[100],
-                              //     borderRadius: BorderRadius.circular(12),
-                              //   ),
-                              //   child: Text(
-                              //     '₹${invoice.total.toStringAsFixed(2)}',
-                              //     style: TextStyle(
-                              //       fontSize: 16,
-                              //       fontWeight: FontWeight.bold,
-                              //       color: Colors.green[700],
-                              //     ),
-                              //   ),
-                              // ),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -190,16 +160,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                             'Date',
                             formatDate(invoice.invoiceDate),
                           ),
-                          // const SizedBox(height: 8),
-                          // _buildInfoRow(
-                          //   'Customer Name',
-                          //   invoice.customer.name,
-                          // ),
-                          // const SizedBox(height: 8),
-                          // _buildInfoRow(
-                          //   'Salesman Name',
-                          //   invoice.salesman.name,
-                          // ),
                           const SizedBox(height: 8),
                           _buildInfoRow(
                             'Total Amount',
@@ -214,7 +174,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             ),
     );
   }
-
   Widget _buildInfoRow(String label, String value) {
     return Row(
       children: [
@@ -236,3 +195,4 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     );
   }
 }
+

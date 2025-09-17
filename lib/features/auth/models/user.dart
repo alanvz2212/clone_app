@@ -1,32 +1,28 @@
 enum UserType { dealer, transporter }
-
-// Base user class for backward compatibility with services
 class User {
-  final String id;
+  final String userId;
   final String mobileNumber;
   final String name;
   final String email;
   final UserType userType;
-  final int customerId; // Added customerId field
+  final int id;
   final bool isActive;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
-
   const User({
-    required this.id,
+    required this.userId,
     required this.mobileNumber,
     required this.name,
     required this.email,
     required this.userType,
-    required this.customerId, // Added customerId parameter
+    required this.id,
     this.isActive = true,
     required this.createdAt,
     this.lastLoginAt,
   });
-
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'] as String,
+      userId: json['id'] as String,
       mobileNumber: json['mobile_number'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
@@ -34,7 +30,7 @@ class User {
         (type) => type.name == json['user_type'],
         orElse: () => UserType.dealer,
       ),
-      customerId: json['customer_id'] as int? ?? json['customerId'] as int? ?? 0, // Added customerId parsing with fallback
+      id: json['customer_id'] as int? ?? json['customerId'] as int? ?? 0,
       isActive: json['is_active'] as bool? ?? true,
       createdAt: DateTime.parse(json['created_at'] as String),
       lastLoginAt: json['last_login_at'] != null
@@ -42,18 +38,18 @@ class User {
           : null,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'id': userId,
       'mobile_number': mobileNumber,
       'name': name,
       'email': email,
       'user_type': userType.name,
-      'customer_id': customerId, // Added customerId to JSON
+      'customer_id': id,
       'is_active': isActive,
       'created_at': createdAt.toIso8601String(),
       'last_login_at': lastLoginAt?.toIso8601String(),
     };
   }
 }
+

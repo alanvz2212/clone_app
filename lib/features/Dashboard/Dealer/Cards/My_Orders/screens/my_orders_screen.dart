@@ -8,19 +8,15 @@ import '../models/order_models.dart';
 import '../services/orders_service.dart';
 import '../bloc/bloc.dart';
 import '../../../../../../../constants/string_constants.dart';
-
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
-
   @override
   State<MyOrdersScreen> createState() => _MyOrdersScreenState();
 }
-
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   late OrdersBloc _ordersBloc;
   late UserService _userService;
   int? _currentCustomerId;
-
   @override
   void initState() {
     super.initState();
@@ -28,12 +24,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     _ordersBloc = OrdersBloc(ordersService: OrdersService(getIt<ApiService>()));
     _loadOrders();
   }
-
   Future<void> _loadOrders() async {
     _currentCustomerId = await _userService.getCurrentCustomerIdWithFallback();
     _ordersBloc.add(FetchOrders(_currentCustomerId!));
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -75,21 +69,19 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           actions: [
             IconButton(
               icon: const Icon(
-                Icons.add, // Using the 'add' icon as you specified
+                Icons.add,
                 color: Colors.white,
               ),
               onPressed: () {
-                // Replace this with navigation to your 'Alan' page
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) =>
-                        PlaceOrderScreen(), // Replace 'AlanPage' with your actual page/widget name
+                        PlaceOrderScreen(),
                   ),
                 );
               },
             ),
           ],
-
           titleSpacing: 0,
         ),
         body: Column(
@@ -101,7 +93,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 },
               ),
             ),
-            // App Version at the bottom
             Padding(
               padding: const EdgeInsets.only(
                 left: 16,
@@ -128,14 +119,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
-
   Widget _buildBody(BuildContext context, OrdersState state) {
     if (state is OrdersLoading) {
       return const Center(
         child: CircularProgressIndicator(color: Color(0xFFCEB007)),
       );
     }
-
     if (state is OrdersError) {
       return Center(
         child: Column(
@@ -162,8 +151,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () =>
-                  _ordersBloc.add(FetchOrders(_currentCustomerId ?? 38590)),
+              onPressed: () async {
+                final customerId = _currentCustomerId ?? await _userService.getCurrentCustomerIdWithFallback();
+                _ordersBloc.add(FetchOrders(customerId));
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCEB007),
                 foregroundColor: Colors.white,
@@ -174,7 +165,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ),
       );
     }
-
     if (state is OrdersEmpty) {
       return Center(
         child: Column(
@@ -203,7 +193,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ),
       );
     }
-
     if (state is OrdersLoaded || state is OrdersRefreshing) {
       final orders = state is OrdersLoaded
           ? state.orders
@@ -221,10 +210,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           ? state.customEndDate
           : (state as OrdersRefreshing).customEndDate;
       final isRefreshing = state is OrdersRefreshing;
-
       return Column(
         children: [
-          // Filter Section
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -316,8 +303,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
               ],
             ),
           ),
-
-          // Results Count
           if (filteredOrders.isNotEmpty)
             Container(
               width: double.infinity,
@@ -327,8 +312,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ),
-
-          // Orders List
           Expanded(
             child: filteredOrders.isEmpty
                 ? Center(
@@ -362,9 +345,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   )
                 : RefreshIndicator(
                     onRefresh: () async {
-                      _ordersBloc.add(
-                        RefreshOrders(_currentCustomerId ?? 38590),
-                      );
+                      final customerId = _currentCustomerId ?? await _userService.getCurrentCustomerIdWithFallback();
+                      _ordersBloc.add(RefreshOrders(customerId));
                     },
                     color: const Color(0xFFCEB007),
                     child: Stack(
@@ -397,15 +379,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ],
       );
     }
-
     return const SizedBox.shrink();
   }
-
   Widget _buildOrderCard(OrderData orderData) {
     final order = orderData.order;
     final items = orderData.items;
     final totalItems = items.length;
-
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -414,12 +393,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            // Left side - Order info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Date
                   Row(
                     children: [
                       const SizedBox(width: 8),
@@ -434,8 +411,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // Invoice Number
                   Row(
                     children: [
                       const SizedBox(width: 8),
@@ -446,8 +421,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // Number of Items
                   Row(
                     children: [
                       const SizedBox(width: 8),
@@ -460,8 +433,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 ],
               ),
             ),
-
-            // Right side - View button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: InkWell(
@@ -478,7 +449,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
-
   Widget _buildFilterChip(
     BuildContext context,
     String label,
@@ -515,7 +485,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
-
   void _onFilterChanged(BuildContext context, DateFilter filter) {
     if (filter == DateFilter.custom) {
       _showCustomDatePicker(context);
@@ -523,7 +492,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       _ordersBloc.add(FilterOrders(filter: filter));
     }
   }
-
   Future<void> _showCustomDatePicker(BuildContext context) async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -540,7 +508,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         );
       },
     );
-
     if (picked != null) {
       _ordersBloc.add(
         FilterOrders(
@@ -550,15 +517,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ),
       );
     } else {
-      // If user cancels, revert to "All" filter
       _ordersBloc.add(const FilterOrders(filter: DateFilter.all));
     }
   }
-
   void _showOrderDetails(OrderData orderData) {
     final order = orderData.order;
     final items = orderData.items;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -574,7 +538,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ),
         child: Column(
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 8),
               height: 4,
@@ -584,8 +547,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-
-            // Header
             Padding(
               padding: const EdgeInsets.all(16),
               child: Row(
@@ -618,10 +579,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 ],
               ),
             ),
-
             const Divider(height: 1),
-
-            // Items list
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
@@ -635,8 +593,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       child: Row(
                         children: [
                           const SizedBox(width: 12),
-
-                          // Item details
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -663,8 +619,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                               ],
                             ),
                           ),
-
-                          // Status indicator
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -694,8 +648,6 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 },
               ),
             ),
-
-            // Footer with order info
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -746,18 +698,16 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
-
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
-
   String _formatDateShort(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-
   @override
   void dispose() {
     _ordersBloc.close();
     super.dispose();
   }
 }
+

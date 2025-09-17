@@ -1,17 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'user.dart';
-
 class LoginRequest extends Equatable {
   final String mobileNumberOrId;
   final String password;
   final UserType userType;
-
   const LoginRequest({
     required this.mobileNumberOrId,
     required this.password,
     required this.userType,
   });
-
   Map<String, dynamic> toJson() {
     return {
       'mobile_number_or_id': mobileNumberOrId,
@@ -19,18 +16,15 @@ class LoginRequest extends Equatable {
       'user_type': userType.name,
     };
   }
-
   @override
   List<Object?> get props => [mobileNumberOrId, password, userType];
 }
-
 class LoginResponse extends Equatable {
   final bool success;
   final String? token;
   final User? user;
   final String? message;
   final String? error;
-
   const LoginResponse({
     required this.success,
     this.token,
@@ -38,7 +32,6 @@ class LoginResponse extends Equatable {
     this.message,
     this.error,
   });
-
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
       success: json['success'] as bool,
@@ -48,7 +41,6 @@ class LoginResponse extends Equatable {
       error: json['error'] as String?,
     );
   }
-
   factory LoginResponse.success({
     required String token,
     required User user,
@@ -61,31 +53,26 @@ class LoginResponse extends Equatable {
       message: message,
     );
   }
-
   factory LoginResponse.failure({required String error}) {
     return LoginResponse(success: false, error: error);
   }
-
   @override
   List<Object?> get props => [success, token, user, message, error];
 }
-
 class ForgotPasswordRequest extends Equatable {
   final String mobileNumberOrId;
   final UserType userType;
-
   const ForgotPasswordRequest({
     required this.mobileNumberOrId,
     required this.userType,
   });
-
   Map<String, dynamic> toJson() {
     return {
       'mobile_number_or_id': mobileNumberOrId,
       'user_type': userType.name,
     };
   }
-
   @override
   List<Object?> get props => [mobileNumberOrId, userType];
 }
+

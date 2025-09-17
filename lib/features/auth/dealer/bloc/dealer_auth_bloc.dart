@@ -5,11 +5,9 @@ import '../services/dealer_auth_hive_service.dart';
 import 'dealer_auth_event.dart';
 import 'dealer_auth_state.dart';
 import '../../../../services/auth_service.dart';
-
 class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
   final DealerAuthRepository _repository;
   final AuthService _authService;
-
   DealerAuthBloc({
     required DealerAuthRepository repository,
     required AuthService authService,
@@ -21,29 +19,21 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
     on<DealerAuthRestoreRequested>(_onAuthRestoreRequested);
     on<DealerForgotPasswordRequested>(_onForgotPasswordRequested);
   }
-
   Future<void> _onLoginRequested(
     DealerLoginRequested event,
     Emitter<DealerAuthState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, error: null));
-
     try {
       final request = DealerLoginRequest(
         mobileNumberOrId: event.mobileNumberOrId,
         password: event.password,
       );
-
       final response = await _repository.login(request);
-
       if (response.success &&
           response.dealer != null &&
           response.token != null) {
-        
-        // Set the JWT token in the API service for future requests
         await _authService.setToken(response.token!);
-        
-        // Save authentication data to Hive
         await DealerAuthHiveService.saveAuthData(
           token: response.token!,
           dealer: response.dealer!,
@@ -51,7 +41,6 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
           password: event.password,
           stayLoggedIn: event.stayLoggedIn,
         );
-        
         emit(
           state.copyWith(
             isAuthenticated: true,
@@ -78,45 +67,31 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
       );
     }
   }
-
   Future<void> _onLogoutRequested(
     DealerLogoutRequested event,
     Emitter<DealerAuthState> emit,
   ) async {
     try {
-      // Use AuthService to properly clear all authentication data
       await _authService.logout();
-      
-      // Clear Hive authentication data
       await DealerAuthHiveService.clearAuthData();
-      
-      // Clear bloc state
       emit(const DealerAuthState());
     } catch (e) {
-      // Even if logout API fails, clear local state
       await DealerAuthHiveService.clearAuthData();
       emit(const DealerAuthState());
     }
   }
-
   Future<void> _onAuthRestoreRequested(
     DealerAuthRestoreRequested event,
     Emitter<DealerAuthState> emit,
   ) async {
     try {
-      // Check if user should stay logged in and has valid auth data
-      if (DealerAuthHiveService.shouldStayLoggedIn() && 
+      if (DealerAuthHiveService.shouldStayLoggedIn() &&
           DealerAuthHiveService.isAuthenticated()) {
-        
         final authData = DealerAuthHiveService.getAuthData();
-        if (authData != null && 
-            authData.token != null && 
+        if (authData != null &&
+            authData.token != null &&
             authData.dealer != null) {
-          
-          // Set the token in the API service
           await _authService.setToken(authData.token!);
-          
-          // Restore the authentication state
           emit(
             state.copyWith(
               isAuthenticated: true,
@@ -126,35 +101,28 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
               error: null,
             ),
           );
-          
           print('=== Authentication restored from Hive ===');
           print('Dealer: ${authData.dealer!.name}');
-          print('Customer ID: ${authData.dealer!.customerId}');
+          print('Customer ID: ${authData.dealer!.id}');
           return;
         }
       }
-      
-      // If no valid auth data, ensure we're in logged out state
       emit(const DealerAuthState());
     } catch (e) {
       print('=== Error restoring authentication: $e ===');
       emit(const DealerAuthState());
     }
   }
-
   Future<void> _onForgotPasswordRequested(
     DealerForgotPasswordRequested event,
     Emitter<DealerAuthState> emit,
   ) async {
     emit(state.copyWith(isLoading: true, error: null));
-
     try {
       final request = DealerForgotPasswordRequest(
         mobileNumberOrId: event.mobileNumberOrId,
       );
-
       final success = await _repository.forgotPassword(request);
-
       if (success) {
         emit(state.copyWith(isLoading: false, error: null));
       } else {
@@ -175,3 +143,4 @@ class DealerAuthBloc extends Bloc<DealerAuthEvent, DealerAuthState> {
     }
   }
 }
+

@@ -3,31 +3,24 @@ import '../services/orders_service.dart';
 import '../models/order_models.dart';
 import 'orders_event.dart';
 import 'orders_state.dart';
-
 class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   final OrdersService ordersService;
-
   OrdersBloc({required this.ordersService}) : super(const OrdersInitial()) {
     on<FetchOrders>(_onFetchOrders);
     on<RefreshOrders>(_onRefreshOrders);
     on<FilterOrders>(_onFilterOrders);
     on<ClearOrders>(_onClearOrders);
   }
-
   Future<void> _onFetchOrders(
     FetchOrders event,
     Emitter<OrdersState> emit,
   ) async {
     emit(const OrdersLoading());
-
     try {
       final orderResponse = await ordersService.getCustomerOrders(event.customerId);
-      
       if (orderResponse.success && orderResponse.orders.isNotEmpty) {
-        // Sort orders by creation date in descending order (newest first)
         final sortedOrders = List<OrderData>.from(orderResponse.orders);
         sortedOrders.sort((a, b) => b.order.createdDate.compareTo(a.order.createdDate));
-        
         emit(OrdersLoaded(
           orders: sortedOrders,
           filteredOrders: sortedOrders,
@@ -42,13 +35,11 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       emit(OrdersError('Error: ${e.toString()}'));
     }
   }
-
   Future<void> _onRefreshOrders(
     RefreshOrders event,
     Emitter<OrdersState> emit,
   ) async {
     final currentState = state;
-    
     if (currentState is OrdersLoaded) {
       emit(OrdersRefreshing(
         orders: currentState.orders,
@@ -58,15 +49,11 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
         customEndDate: currentState.customEndDate,
       ));
     }
-
     try {
       final orderResponse = await ordersService.getCustomerOrders(event.customerId);
-      
       if (orderResponse.success && orderResponse.orders.isNotEmpty) {
-        // Sort orders by creation date in descending order (newest first)
         final sortedOrders = List<OrderData>.from(orderResponse.orders);
         sortedOrders.sort((a, b) => b.order.createdDate.compareTo(a.order.createdDate));
-        
         final filteredOrders = currentState is OrdersLoaded
             ? _applyDateFilter(
                 sortedOrders,
@@ -75,18 +62,17 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
                 currentState.customEndDate,
               )
             : sortedOrders;
-
         emit(OrdersLoaded(
           orders: sortedOrders,
           filteredOrders: filteredOrders,
-          currentFilter: currentState is OrdersLoaded 
-              ? currentState.currentFilter 
+          currentFilter: currentState is OrdersLoaded
+              ? currentState.currentFilter
               : DateFilter.all,
-          customStartDate: currentState is OrdersLoaded 
-              ? currentState.customStartDate 
+          customStartDate: currentState is OrdersLoaded
+              ? currentState.customStartDate
               : null,
-          customEndDate: currentState is OrdersLoaded 
-              ? currentState.customEndDate 
+          customEndDate: currentState is OrdersLoaded
+              ? currentState.customEndDate
               : null,
         ));
       } else if (orderResponse.orders.isEmpty) {
@@ -98,13 +84,11 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       emit(OrdersError('Error: ${e.toString()}'));
     }
   }
-
   void _onFilterOrders(
     FilterOrders event,
     Emitter<OrdersState> emit,
   ) {
     final currentState = state;
-    
     if (currentState is OrdersLoaded) {
       final filteredOrders = _applyDateFilter(
         currentState.orders,
@@ -112,7 +96,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
         event.startDate,
         event.endDate,
       );
-
       emit(currentState.copyWith(
         filteredOrders: filteredOrders,
         currentFilter: event.filter,
@@ -121,14 +104,12 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
       ));
     }
   }
-
   void _onClearOrders(
     ClearOrders event,
     Emitter<OrdersState> emit,
   ) {
     emit(const OrdersInitial());
   }
-
   List<OrderData> _applyDateFilter(
     List<OrderData> orders,
     DateFilter filter,
@@ -137,11 +118,9 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
   ) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-
     switch (filter) {
       case DateFilter.all:
         return List.from(orders);
-      
       case DateFilter.today:
         return orders.where((orderData) {
           final orderDate = DateTime(
@@ -151,7 +130,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           );
           return orderDate.isAtSameMomentAs(today);
         }).toList();
-      
       case DateFilter.thisWeek:
         final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
         final endOfWeek = startOfWeek.add(const Duration(days: 6));
@@ -164,7 +142,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           return orderDate.isAfter(startOfWeek.subtract(const Duration(days: 1))) &&
                  orderDate.isBefore(endOfWeek.add(const Duration(days: 1)));
         }).toList();
-      
       case DateFilter.thisMonth:
         final startOfMonth = DateTime(now.year, now.month, 1);
         final endOfMonth = DateTime(now.year, now.month + 1, 0);
@@ -177,7 +154,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           return orderDate.isAfter(startOfMonth.subtract(const Duration(days: 1))) &&
                  orderDate.isBefore(endOfMonth.add(const Duration(days: 1)));
         }).toList();
-      
       case DateFilter.last30Days:
         final thirtyDaysAgo = today.subtract(const Duration(days: 30));
         return orders.where((orderData) {
@@ -188,7 +164,6 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
           );
           return orderDate.isAfter(thirtyDaysAgo.subtract(const Duration(days: 1)));
         }).toList();
-      
       case DateFilter.custom:
         if (customStartDate != null && customEndDate != null) {
           return orders.where((orderData) {
@@ -206,3 +181,4 @@ class OrdersBloc extends Bloc<OrdersEvent, OrdersState> {
     }
   }
 }
+

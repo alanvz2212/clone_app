@@ -1,13 +1,11 @@
 import 'package:equatable/equatable.dart';
 import '../models/dealer.dart';
-
 class DealerAuthState extends Equatable {
   final bool isAuthenticated;
   final Dealer? dealer;
   final String? token;
   final bool isLoading;
   final String? error;
-
   const DealerAuthState({
     this.isAuthenticated = false,
     this.dealer,
@@ -15,7 +13,6 @@ class DealerAuthState extends Equatable {
     this.isLoading = false,
     this.error,
   });
-
   DealerAuthState copyWith({
     bool? isAuthenticated,
     Dealer? dealer,
@@ -31,7 +28,7 @@ class DealerAuthState extends Equatable {
       error: error,
     );
   }
-
   @override
   List<Object?> get props => [isAuthenticated, dealer, token, isLoading, error];
 }
+

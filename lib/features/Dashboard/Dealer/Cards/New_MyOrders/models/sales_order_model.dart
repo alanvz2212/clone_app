@@ -4,7 +4,6 @@ class SalesOrder {
   final double total;
   final DateTime invoiceDate;
   final String? orderstatus;
-
   SalesOrder({
     required this.id,
     required this.invoice,
@@ -12,7 +11,6 @@ class SalesOrder {
     required this.invoiceDate,
     this.orderstatus,
   });
-
   factory SalesOrder.fromJson(Map<String, dynamic> json) {
     return SalesOrder(
       id: json['id'],
@@ -22,7 +20,6 @@ class SalesOrder {
       orderstatus: json['orderstatus'],
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -33,3 +30,4 @@ class SalesOrder {
     };
   }
 }
+

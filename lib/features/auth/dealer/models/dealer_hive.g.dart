@@ -1,15 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'dealer_hive.dart';
-
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
 class DealerHiveAdapter extends TypeAdapter<DealerHive> {
   @override
   final int typeId = 1;
-
   @override
   DealerHive read(BinaryReader reader) {
     final numOfFields = reader.readByte();
@@ -20,7 +12,7 @@ class DealerHiveAdapter extends TypeAdapter<DealerHive> {
       name: fields[0] as String,
       email: fields[1] as String,
       mobile: fields[2] as String,
-      customerId: fields[3] as int,
+      id: fields[3] as int,
       contactPerson: fields[4] as String?,
       contactNumber: fields[5] as String?,
       stateId: fields[6] as int?,
@@ -56,7 +48,6 @@ class DealerHiveAdapter extends TypeAdapter<DealerHive> {
       hsnCode: fields[36] as String?,
     );
   }
-
   @override
   void write(BinaryWriter writer, DealerHive obj) {
     writer
@@ -68,7 +59,7 @@ class DealerHiveAdapter extends TypeAdapter<DealerHive> {
       ..writeByte(2)
       ..write(obj.mobile)
       ..writeByte(3)
-      ..write(obj.customerId)
+      ..write(obj.id)
       ..writeByte(4)
       ..write(obj.contactPerson)
       ..writeByte(5)
@@ -136,10 +127,8 @@ class DealerHiveAdapter extends TypeAdapter<DealerHive> {
       ..writeByte(36)
       ..write(obj.hsnCode);
   }
-
   @override
   int get hashCode => typeId.hashCode;
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -147,3 +136,4 @@ class DealerHiveAdapter extends TypeAdapter<DealerHive> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+

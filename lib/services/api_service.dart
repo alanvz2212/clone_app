@@ -3,14 +3,12 @@ import 'package:logger/logger.dart';
 import '../constants/string_constants.dart';
 import 'cache_service.dart';
 import 'network_service.dart';
-
 class ApiService {
-  static const String baseUrl = 'http://devapi.abm4trades.com';
+  static const String baseUrl = 'https://tmsapi.abm4trades.com';//tmsapi.abm4trades.com';
   late final Dio _dio;
   final Logger _logger = Logger();
   final CacheService _cacheService;
   final NetworkService _networkService;
-
   ApiService(this._cacheService, this._networkService) {
     _dio = Dio(
       BaseOptions(
@@ -23,10 +21,8 @@ class ApiService {
         },
       ),
     );
-
     _setupInterceptors();
   }
-
   void _setupInterceptors() {
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -51,22 +47,18 @@ class ApiService {
       ),
     );
   }
-
   void setAuthToken(String token) {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
-
   void removeAuthToken() {
     _dio.options.headers.remove('Authorization');
   }
-
   Future<Response<T>> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     await _checkNetworkConnection();
-
     try {
       return await _dio.get<T>(
         path,
@@ -77,8 +69,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  /// GET request with caching support
   Future<Response<T>> getCached<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
@@ -87,8 +77,6 @@ class ApiService {
     bool forceRefresh = false,
   }) async {
     final cacheKey = _generateCacheKey(path, queryParameters);
-
-    // Check cache first (unless force refresh)
     if (!forceRefresh) {
       final cachedData = await _cacheService.getCachedResponse(cacheKey);
       if (cachedData != null) {
@@ -100,18 +88,13 @@ class ApiService {
         );
       }
     }
-
-    // Check network connection
     await _checkNetworkConnection();
-
     try {
       final response = await _dio.get<T>(
         path,
         queryParameters: queryParameters,
         options: options,
       );
-
-      // Cache successful response
       if (response.statusCode == 200 && response.data != null) {
         await _cacheService.cacheResponse(
           cacheKey,
@@ -120,10 +103,8 @@ class ApiService {
         );
         _logger.d('Cached response for: $path');
       }
-
       return response;
     } on DioException catch (e) {
-      // If network fails, try to return cached data as fallback
       if (!forceRefresh) {
         final cachedData = await _cacheService.getCachedResponse(cacheKey);
         if (cachedData != null) {
@@ -138,7 +119,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
   Future<Response<T>> post<T>(
     String path, {
     dynamic data,
@@ -146,7 +126,6 @@ class ApiService {
     Options? options,
   }) async {
     await _checkNetworkConnection();
-
     try {
       return await _dio.post<T>(
         path,
@@ -158,8 +137,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  // Special method for customer login with different base URL
   Future<Response<T>> postCustomerLogin<T>(
     String fullUrl, {
     dynamic data,
@@ -167,9 +144,7 @@ class ApiService {
     Options? options,
   }) async {
     await _checkNetworkConnection();
-
     try {
-      // Create a temporary Dio instance for this specific endpoint
       final tempDio = Dio(
         BaseOptions(
           connectTimeout: const Duration(seconds: 30),
@@ -177,13 +152,10 @@ class ApiService {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            // Use the hardcoded token for customer login as well
             'Authorization': 'Bearer $token',
           },
         ),
       );
-
-      // Add the same interceptors for logging
       tempDio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
@@ -206,7 +178,6 @@ class ApiService {
           },
         ),
       );
-
       return await tempDio.post<T>(
         fullUrl,
         data: data,
@@ -217,17 +188,13 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  // Special method for GET requests with full URL (like refresh token)
   Future<Response<T>> getFullUrl<T>(
     String fullUrl, {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     await _checkNetworkConnection();
-
     try {
-      // Create a temporary Dio instance for this specific endpoint
       final tempDio = Dio(
         BaseOptions(
           connectTimeout: const Duration(seconds: 30),
@@ -235,13 +202,10 @@ class ApiService {
           headers: {
             'Content-Type': 'application/json',
             'Accept': '*/*',
-            // Use the current auth token
             'Authorization': _dio.options.headers['Authorization'],
           },
         ),
       );
-
-      // Add the same interceptors for logging
       tempDio.interceptors.add(
         InterceptorsWrapper(
           onRequest: (options, handler) {
@@ -263,7 +227,6 @@ class ApiService {
           },
         ),
       );
-
       return await tempDio.get<T>(
         fullUrl,
         queryParameters: queryParameters,
@@ -273,7 +236,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
   Future<Response<T>> put<T>(
     String path, {
     dynamic data,
@@ -281,7 +243,6 @@ class ApiService {
     Options? options,
   }) async {
     await _checkNetworkConnection();
-
     try {
       return await _dio.put<T>(
         path,
@@ -293,7 +254,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
   Future<Response<T>> delete<T>(
     String path, {
     dynamic data,
@@ -301,7 +261,6 @@ class ApiService {
     Options? options,
   }) async {
     await _checkNetworkConnection();
-
     try {
       return await _dio.delete<T>(
         path,
@@ -313,8 +272,6 @@ class ApiService {
       throw _handleError(e);
     }
   }
-
-  /// Check network connection before making requests
   Future<void> _checkNetworkConnection() async {
     final isConnected = await _networkService.isConnected();
     if (!isConnected) {
@@ -324,8 +281,6 @@ class ApiService {
       );
     }
   }
-
-  /// Generate cache key from path and query parameters
   String _generateCacheKey(String path, Map<String, dynamic>? queryParameters) {
     final buffer = StringBuffer(path);
     if (queryParameters != null && queryParameters.isNotEmpty) {
@@ -339,13 +294,9 @@ class ApiService {
     }
     return buffer.toString();
   }
-
-  /// Clear all cached responses
   Future<void> clearCache() async {
     await _cacheService.clearAllCache();
   }
-
-  /// Clear specific cached response
   Future<void> clearCacheForPath(
     String path, [
     Map<String, dynamic>? queryParameters,
@@ -353,7 +304,6 @@ class ApiService {
     final cacheKey = _generateCacheKey(path, queryParameters);
     await _cacheService.clearCache(cacheKey);
   }
-
   ApiException _handleError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
@@ -385,13 +335,11 @@ class ApiService {
     }
   }
 }
-
 class ApiException implements Exception {
   final String message;
   final int statusCode;
-
   ApiException({required this.message, required this.statusCode});
-
   @override
   String toString() => 'ApiException: $message (Status: $statusCode)';
 }
+

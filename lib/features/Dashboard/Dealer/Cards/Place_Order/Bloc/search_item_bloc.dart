@@ -3,10 +3,8 @@ import '../models/search_item_model.dart';
 import '../repositories/search_item_repository.dart';
 import 'search_item_event.dart';
 import 'search_item_state.dart';
-
 class SearchItemBloc extends Bloc<SearchItemEvent, SearchItemState> {
   final SearchItemRepository _repository;
-
   SearchItemBloc({required SearchItemRepository repository})
     : _repository = repository,
       super(const SearchItemState()) {
@@ -14,7 +12,6 @@ class SearchItemBloc extends Bloc<SearchItemEvent, SearchItemState> {
     on<SearchItemCleared>(_onSearchItemCleared);
     on<SearchItemRemoved>(_onSearchItemRemoved);
   }
-
   Future<void> _onSearchItemRequested(
     SearchItemRequested event,
     Emitter<SearchItemState> emit,
@@ -25,7 +22,6 @@ class SearchItemBloc extends Bloc<SearchItemEvent, SearchItemState> {
       );
       return;
     }
-
     emit(
       state.copyWith(
         isLoading: true,
@@ -33,11 +29,9 @@ class SearchItemBloc extends Bloc<SearchItemEvent, SearchItemState> {
         searchQuery: event.searchQuery,
       ),
     );
-
     try {
       final request = SearchItemRequest(search: event.searchQuery);
       final response = await _repository.searchItems(request);
-
       if (response.success && response.items != null) {
         emit(
           state.copyWith(isLoading: false, items: response.items!, error: null),
@@ -67,15 +61,12 @@ class SearchItemBloc extends Bloc<SearchItemEvent, SearchItemState> {
   ) async {
     emit(const SearchItemState());
   }
-
   Future<void> _onSearchItemRemoved(
     SearchItemRemoved event,
     Emitter<SearchItemState> emit,
   ) async {
-    // Remove the item from the current list
     final updatedItems = List<SearchItem>.from(state.items)
       ..removeWhere((item) => item.id == event.item.id);
-    
     emit(
       state.copyWith(
         items: updatedItems,
@@ -83,3 +74,4 @@ class SearchItemBloc extends Bloc<SearchItemEvent, SearchItemState> {
     );
   }
 }
+

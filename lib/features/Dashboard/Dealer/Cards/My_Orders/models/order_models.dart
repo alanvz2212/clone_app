@@ -1,12 +1,10 @@
 class OrderResponse {
   final bool success;
   final List<OrderData> orders;
-
   OrderResponse({
     required this.success,
     required this.orders,
   });
-
   factory OrderResponse.fromJson(Map<String, dynamic> json) {
     return OrderResponse(
       success: json['success'] ?? false,
@@ -17,16 +15,13 @@ class OrderResponse {
     );
   }
 }
-
 class OrderData {
   final Order order;
   final List<OrderItem> items;
-
   OrderData({
     required this.order,
     required this.items,
   });
-
   factory OrderData.fromJson(Map<String, dynamic> json) {
     return OrderData(
       order: Order.fromJson(json['order'] as Map<String, dynamic>),
@@ -37,7 +32,6 @@ class OrderData {
     );
   }
 }
-
 class Order {
   final int id;
   final String invoice;
@@ -48,7 +42,6 @@ class Order {
   final Company? company;
   final DateTime createdDate;
   final DateTime updatedDate;
-
   Order({
     required this.id,
     required this.invoice,
@@ -60,7 +53,6 @@ class Order {
     required this.createdDate,
     required this.updatedDate,
   });
-
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       id: _parseToInt(json['id']) ?? 0,
@@ -81,7 +73,6 @@ class Order {
       updatedDate: DateTime.parse(json['updatedDate'] ?? DateTime.now().toIso8601String()),
     );
   }
-
   static int? _parseToInt(dynamic value) {
     if (value == null) return null;
     if (value is int) return value;
@@ -90,7 +81,6 @@ class Order {
     return null;
   }
 }
-
 class Customer {
   final String name;
   final String? email;
@@ -98,7 +88,6 @@ class Customer {
   final String? address;
   final String? gstNo;
   final String? panNo;
-
   Customer({
     required this.name,
     this.email,
@@ -107,7 +96,6 @@ class Customer {
     this.gstNo,
     this.panNo,
   });
-
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
       name: json['name'] ?? '',
@@ -119,16 +107,13 @@ class Customer {
     );
   }
 }
-
 class MobileOrderStatus {
   final String name;
   final bool isCompleted;
-
   MobileOrderStatus({
     required this.name,
     required this.isCompleted,
   });
-
   factory MobileOrderStatus.fromJson(Map<String, dynamic> json) {
     return MobileOrderStatus(
       name: json['name'] ?? '',
@@ -136,18 +121,15 @@ class MobileOrderStatus {
     );
   }
 }
-
 class Company {
   final String companyName;
   final String? phoneNumber;
   final String? logo;
-
   Company({
     required this.companyName,
     this.phoneNumber,
     this.logo,
   });
-
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
       companyName: json['companyName'] ?? '',
@@ -156,7 +138,6 @@ class Company {
     );
   }
 }
-
 class OrderItem {
   final int id;
   final int mobileOrderId;
@@ -164,7 +145,6 @@ class OrderItem {
   final int itemQuantity;
   final int completedQuantity;
   final DateTime createdDate;
-
   OrderItem({
     required this.id,
     required this.mobileOrderId,
@@ -173,7 +153,6 @@ class OrderItem {
     required this.completedQuantity,
     required this.createdDate,
   });
-
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
       id: _parseToInt(json['id']) ?? 0,
@@ -184,7 +163,6 @@ class OrderItem {
       createdDate: DateTime.parse(json['createdDate'] ?? DateTime.now().toIso8601String()),
     );
   }
-
   static int? _parseToInt(dynamic value) {
     if (value == null) return null;
     if (value is int) return value;
@@ -193,3 +171,4 @@ class OrderItem {
     return null;
   }
 }
+

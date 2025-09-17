@@ -1,15 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'cart_item_hive.dart';
-
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
 class CartItemHiveAdapter extends TypeAdapter<CartItemHive> {
   @override
   final int typeId = 0;
-
   @override
   CartItemHive read(BinaryReader reader) {
     final numOfFields = reader.readByte();
@@ -23,7 +15,6 @@ class CartItemHiveAdapter extends TypeAdapter<CartItemHive> {
       quantity: fields[3] as int,
     );
   }
-
   @override
   void write(BinaryWriter writer, CartItemHive obj) {
     writer
@@ -37,10 +28,8 @@ class CartItemHiveAdapter extends TypeAdapter<CartItemHive> {
       ..writeByte(3)
       ..write(obj.quantity);
   }
-
   @override
   int get hashCode => typeId.hashCode;
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -48,3 +37,4 @@ class CartItemHiveAdapter extends TypeAdapter<CartItemHive> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+

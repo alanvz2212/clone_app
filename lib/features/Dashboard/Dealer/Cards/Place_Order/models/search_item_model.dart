@@ -1,25 +1,18 @@
 import 'package:equatable/equatable.dart';
-
 class SearchItemRequest extends Equatable {
   final String search;
-
   const SearchItemRequest({required this.search});
-
   Map<String, dynamic> toJson() {
     return {'Search': search};
   }
-
   @override
   List<Object> get props => [search];
 }
-
 class SearchItemResponse extends Equatable {
   final bool success;
   final List<SearchItem>? items;
   final String? error;
-
   const SearchItemResponse({required this.success, this.items, this.error});
-
   factory SearchItemResponse.fromJson(Map<String, dynamic> json) {
     try {
       return SearchItemResponse(
@@ -32,15 +25,12 @@ class SearchItemResponse extends Equatable {
       return SearchItemResponse(success: false, error: e.toString());
     }
   }
-
   factory SearchItemResponse.failure({required String error}) {
     return SearchItemResponse(success: false, error: error);
   }
-
   @override
   List<Object?> get props => [success, items, error];
 }
-
 class SearchItem extends Equatable {
   final int? id;
   final String? name;
@@ -57,7 +47,6 @@ class SearchItem extends Equatable {
   final HsnCode? hsnCode;
   final String? typeOfSupply;
   final bool? isGstApplicable;
-
   const SearchItem({
     this.id,
     this.name,
@@ -75,7 +64,6 @@ class SearchItem extends Equatable {
     this.typeOfSupply,
     this.isGstApplicable,
   });
-
   factory SearchItem.fromJson(Map<String, dynamic> json) {
     return SearchItem(
       id: json['id'] as int?,
@@ -101,7 +89,6 @@ class SearchItem extends Equatable {
       isGstApplicable: json['isGstApplicable'] as bool?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -121,7 +108,6 @@ class SearchItem extends Equatable {
       'isGstApplicable': isGstApplicable,
     };
   }
-
   @override
   List<Object?> get props => [
     id,
@@ -141,14 +127,11 @@ class SearchItem extends Equatable {
     isGstApplicable,
   ];
 }
-
 class ItemCategory extends Equatable {
   final int? id;
   final String? name;
   final int? parentId;
-
   const ItemCategory({this.id, this.name, this.parentId});
-
   factory ItemCategory.fromJson(Map<String, dynamic> json) {
     return ItemCategory(
       id: json['id'] as int?,
@@ -156,22 +139,17 @@ class ItemCategory extends Equatable {
       parentId: json['parentId'] as int?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': name, 'parentId': parentId};
   }
-
   @override
   List<Object?> get props => [id, name, parentId];
 }
-
 class ItemGroup extends Equatable {
   final int? id;
   final String? name;
   final String? description;
-
   const ItemGroup({this.id, this.name, this.description});
-
   factory ItemGroup.fromJson(Map<String, dynamic> json) {
     return ItemGroup(
       id: json['id'] as int?,
@@ -179,40 +157,30 @@ class ItemGroup extends Equatable {
       description: json['description'] as String?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': name, 'description': description};
   }
-
   @override
   List<Object?> get props => [id, name, description];
 }
-
 class Brand extends Equatable {
   final int? id;
   final String? name;
-
   const Brand({this.id, this.name});
-
   factory Brand.fromJson(Map<String, dynamic> json) {
     return Brand(id: json['id'] as int?, name: json['name'] as String?);
   }
-
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': name};
   }
-
   @override
   List<Object?> get props => [id, name];
 }
-
 class Sku extends Equatable {
   final int? id;
   final String? name;
   final String? code;
-
   const Sku({this.id, this.name, this.code});
-
   factory Sku.fromJson(Map<String, dynamic> json) {
     return Sku(
       id: json['id'] as int?,
@@ -220,24 +188,19 @@ class Sku extends Equatable {
       code: json['code'] as String?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': name, 'code': code};
   }
-
   @override
   List<Object?> get props => [id, name, code];
 }
-
 class Tax extends Equatable {
   final int? id;
   final double? percent;
   final double? cgst;
   final double? sgst;
   final String? description;
-
   const Tax({this.id, this.percent, this.cgst, this.sgst, this.description});
-
   factory Tax.fromJson(Map<String, dynamic> json) {
     return Tax(
       id: json['id'] as int?,
@@ -247,7 +210,6 @@ class Tax extends Equatable {
       description: json['description'] as String?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -257,25 +219,20 @@ class Tax extends Equatable {
       'description': description,
     };
   }
-
   @override
   List<Object?> get props => [id, percent, cgst, sgst, description];
 }
-
 class HsnCode extends Equatable {
   final int? id;
   final String? name;
-
   const HsnCode({this.id, this.name});
-
   factory HsnCode.fromJson(Map<String, dynamic> json) {
     return HsnCode(id: json['id'] as int?, name: json['name'] as String?);
   }
-
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': name};
   }
-
   @override
   List<Object?> get props => [id, name];
 }
+

@@ -5,7 +5,6 @@ class InvoiceModel {
   final double total;
   final Customer customer;
   final Salesman salesman;
-
   InvoiceModel({
     required this.invoice,
     required this.invoiceIncrement,
@@ -14,7 +13,6 @@ class InvoiceModel {
     required this.customer,
     required this.salesman,
   });
-
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
     try {
       return InvoiceModel(
@@ -31,7 +29,6 @@ class InvoiceModel {
       rethrow;
     }
   }
-
   Map<String, dynamic> toJson() {
     return {
       'invoice': invoice,
@@ -43,20 +40,17 @@ class InvoiceModel {
     };
   }
 }
-
 class Customer {
   final String name;
   final String email;
   final String mobile;
   final String address;
-
   Customer({
     required this.name,
     required this.email,
     required this.mobile,
     required this.address,
   });
-
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
       name: json['name'] ?? 'Unknown Customer',
@@ -65,7 +59,6 @@ class Customer {
       address: json['address'] ?? '',
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -75,18 +68,15 @@ class Customer {
     };
   }
 }
-
 class Salesman {
   final String name;
   final String email;
   final String mobile;
-
   Salesman({
     required this.name,
     required this.email,
     required this.mobile,
   });
-
   factory Salesman.fromJson(Map<String, dynamic> json) {
     return Salesman(
       name: json['name'] ?? 'Unknown Salesman',
@@ -94,7 +84,6 @@ class Salesman {
       mobile: json['mobile'] ?? '',
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'name': name,
@@ -103,18 +92,15 @@ class Salesman {
     };
   }
 }
-
 class InvoiceResponse {
   final bool success;
   final String message;
   final List<InvoiceModel> data;
-
   InvoiceResponse({
     required this.success,
     required this.message,
     required this.data,
   });
-
   factory InvoiceResponse.fromJson(Map<String, dynamic> json) {
     try {
       print('Parsing InvoiceResponse...');
@@ -122,7 +108,6 @@ class InvoiceResponse {
       print('Message: ${json['message']}');
       print('Data type: ${json['data'].runtimeType}');
       print('Data length: ${(json['data'] as List?)?.length ?? 0}');
-      
       return InvoiceResponse(
         success: json['success'] ?? false,
         message: json['message'] ?? '',
@@ -138,3 +123,4 @@ class InvoiceResponse {
     }
   }
 }
+

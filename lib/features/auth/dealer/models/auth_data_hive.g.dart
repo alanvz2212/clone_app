@@ -1,15 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'auth_data_hive.dart';
-
-// **************************************************************************
-// TypeAdapterGenerator
-// **************************************************************************
-
 class AuthDataHiveAdapter extends TypeAdapter<AuthDataHive> {
   @override
   final int typeId = 2;
-
   @override
   AuthDataHive read(BinaryReader reader) {
     final numOfFields = reader.readByte();
@@ -26,7 +18,6 @@ class AuthDataHiveAdapter extends TypeAdapter<AuthDataHive> {
       password: fields[6] as String?,
     );
   }
-
   @override
   void write(BinaryWriter writer, AuthDataHive obj) {
     writer
@@ -46,10 +37,8 @@ class AuthDataHiveAdapter extends TypeAdapter<AuthDataHive> {
       ..writeByte(6)
       ..write(obj.password);
   }
-
   @override
   int get hashCode => typeId.hashCode;
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -57,3 +46,4 @@ class AuthDataHiveAdapter extends TypeAdapter<AuthDataHive> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
+

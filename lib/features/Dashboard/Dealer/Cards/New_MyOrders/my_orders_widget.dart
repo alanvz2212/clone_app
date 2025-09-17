@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'screens/my_orders_screen.dart';
-
 class MyOrdersWidget extends StatelessWidget {
   final int customerId;
-
   const MyOrdersWidget({
     Key? key,
     required this.customerId,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -59,3 +56,4 @@ class MyOrdersWidget extends StatelessWidget {
     );
   }
 }
+

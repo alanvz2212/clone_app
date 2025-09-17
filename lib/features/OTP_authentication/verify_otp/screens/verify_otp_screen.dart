@@ -8,30 +8,24 @@ import '../../../../core/di/injection.dart';
 import '../bloc/verify_otp_bloc.dart';
 import '../bloc/verify_otp_event.dart';
 import '../bloc/verify_otp_state.dart';
-
 class VerifyOtpScreen extends StatefulWidget {
   final String phoneNumber;
-  
   const VerifyOtpScreen({
     super.key,
     required this.phoneNumber,
   });
-
   @override
   State<VerifyOtpScreen> createState() => _VerifyOtpScreenState();
 }
-
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   final List<TextEditingController> _otpControllers = List.generate(6, (index) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
   late final VerifyOtpBloc _verifyOtpBloc;
-
   @override
   void initState() {
     super.initState();
     _verifyOtpBloc = getIt<VerifyOtpBloc>();
   }
-
   @override
   void dispose() {
     for (var controller in _otpControllers) {
@@ -43,7 +37,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     _verifyOtpBloc.close();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -67,7 +60,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     );
   },
 ),
-
         title: Row(
           children: [
             Image.asset(
@@ -93,7 +85,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         listener: (context, state) {
           if (state.isSuccess && state.message != null) {
             Helpers.showSuccessSnackBar(context, state.message!);
-            // Navigate to dashboard based on user type
             if (state.userData?.type == 0) {
               context.go('/dealer-dashboard');
             } else {
@@ -110,30 +101,16 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 40),
-              
               Text(
                 'Enter verification code',
                 style: TextStyle(
                   fontSize: 24,
-                  // fontWeight: FontWeight.w500,
                   color: Colors.grey.shade800,
                 ),
                 textAlign: TextAlign.center,
               ),
-              
               const SizedBox(height: 10),
-              
-              // Text(
-              //   'We sent a 6-digit code to ${widget.phoneNumber}',
-              //   style: TextStyle(
-              //     fontSize: 16,
-              //     color: Colors.grey.shade600,
-              //   ),
-              //   textAlign: TextAlign.center,
-              // ),
-              
               const SizedBox(height: 40),
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(6, (index) {
@@ -175,7 +152,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         } else if (value.isEmpty && index > 0) {
                           _focusNodes[index - 1].requestFocus();
                         }
-                        
                         if (index == 5 && value.isNotEmpty) {
                           _verifyOtp();
                         }
@@ -184,9 +160,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                   );
                 }),
               ),
-              
               const SizedBox(height: 30),
-              
               BlocBuilder<VerifyOtpBloc, VerifyOtpState>(
                 builder: (context, state) {
                   return ElevatedButton(
@@ -219,31 +193,10 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                   );
                 },
               ),
-              
               const SizedBox(height: 20),
-              
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Text(
-                  //   "Didn't receive code? ",
-                  //   style: TextStyle(
-                  //     color: Colors.grey.shade600,
-                  //     fontSize: 14,
-                  //   ),
-                  // ),
-                  // TextButton(
-                  //   onPressed: _resendOtp,
-                  //   child: const Text(
-                  //     'Resend',
-                  //     style: TextStyle(
-                  //       color: Color(0xFFCEB007),
-                  //       fontSize: 14,
-                  //       fontWeight: FontWeight.bold,
-                  //     ),
-                  //   ),
-                  // ),
-                ],
+                children: [],
               ),
             ],
           ),
@@ -252,22 +205,19 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       ),
     ));
   }
-
   void _verifyOtp() {
     final otp = _otpControllers.map((controller) => controller.text).join();
-    
     if (otp.length != 6) {
       Helpers.showErrorSnackBar(context, 'Please enter complete 6-digit OTP');
       return;
     }
-
     _verifyOtpBloc.add(VerifyOtpRequested(
       phoneNumber: widget.phoneNumber,
       otp: otp,
     ));
   }
-
   void _resendOtp() {
     Helpers.showSuccessSnackBar(context, 'OTP sent to ${widget.phoneNumber}');
   }
 }
+

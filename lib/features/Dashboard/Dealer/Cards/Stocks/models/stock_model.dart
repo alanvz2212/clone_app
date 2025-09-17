@@ -1,12 +1,10 @@
 class StockResponse {
   final bool success;
   final List<StockDetail> stockDetails;
-
   StockResponse({
     required this.success,
     required this.stockDetails,
   });
-
   factory StockResponse.fromJson(Map<String, dynamic> json) {
     return StockResponse(
       success: json['success'] ?? false,
@@ -17,7 +15,6 @@ class StockResponse {
     );
   }
 }
-
 class StockDetail {
   final int itemId;
   final Item item;
@@ -55,7 +52,6 @@ class StockDetail {
   final String createdDate;
   final String updatedDate;
   final String? createdBy;
-
   StockDetail({
     required this.itemId,
     required this.item,
@@ -94,7 +90,6 @@ class StockDetail {
     required this.updatedDate,
     this.createdBy,
   });
-
   factory StockDetail.fromJson(Map<String, dynamic> json) {
     return StockDetail(
       itemId: (json['itemId'] ?? 0).toInt(),
@@ -136,7 +131,6 @@ class StockDetail {
     );
   }
 }
-
 class Item {
   final String name;
   final String? barcode;
@@ -196,7 +190,6 @@ class Item {
   final String createdDate;
   final String updatedDate;
   final String? createdBy;
-
   Item({
     required this.name,
     this.barcode,
@@ -257,7 +250,6 @@ class Item {
     required this.updatedDate,
     this.createdBy,
   });
-
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       name: json['name'] ?? '',
@@ -321,7 +313,6 @@ class Item {
     );
   }
 }
-
 class Warehouse {
   final String name;
   final String? code;
@@ -349,7 +340,6 @@ class Warehouse {
   final String createdDate;
   final String updatedDate;
   final String? createdBy;
-
   Warehouse({
     required this.name,
     this.code,
@@ -378,7 +368,6 @@ class Warehouse {
     required this.updatedDate,
     this.createdBy,
   });
-
   factory Warehouse.fromJson(Map<String, dynamic> json) {
     return Warehouse(
       name: json['name'] ?? '',
@@ -410,3 +399,4 @@ class Warehouse {
     );
   }
 }
+

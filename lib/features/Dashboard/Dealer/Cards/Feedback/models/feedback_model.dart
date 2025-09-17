@@ -7,7 +7,6 @@ class FeedbackRequest {
   final String email;
   final String customerFeedBack;
   final int rating;
-
   FeedbackRequest({
     required this.referenceId,
     required this.referenceType,
@@ -18,7 +17,6 @@ class FeedbackRequest {
     required this.customerFeedBack,
     required this.rating,
   });
-
   Map<String, dynamic> toJson() {
     return {
       'referenceId': referenceId,
@@ -32,20 +30,17 @@ class FeedbackRequest {
     };
   }
 }
-
 class FeedbackResponse {
   final bool success;
   final String message;
   final dynamic data;
   final dynamic additionalData;
-
   FeedbackResponse({
     required this.success,
     required this.message,
     this.data,
     this.additionalData,
   });
-
   factory FeedbackResponse.fromJson(Map<String, dynamic> json) {
     return FeedbackResponse(
       success: json['success'] ?? false,
@@ -55,3 +50,4 @@ class FeedbackResponse {
     );
   }
 }
+

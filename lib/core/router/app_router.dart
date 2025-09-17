@@ -6,7 +6,6 @@ import '../../features/Dashboard/Dealer/Screens/dashboard_dealer_screen.dart';
 import '../../features/Dashboard/Transporter/Screens/dashboard_transporter_screen.dart';
 import '../../features/OTP_authentication/Sent_otp/screens/send_otp_screen.dart';
 import '../../features/OTP_authentication/verify_otp/screens/verify_otp_screen.dart';
-
 class AppRouter {
   static const String splash = '/';
   static const String auth = '/auth';
@@ -14,7 +13,6 @@ class AppRouter {
   static const String transporterDashboard = '/transporter-dashboard';
   static const String sendOtp = '/send-otp';
   static const String verifyOtp = '/verify-otp';
-
   static final GoRouter router = GoRouter(
     initialLocation: splash,
     routes: [
@@ -74,3 +72,4 @@ class AppRouter {
     ),
   );
 }
+

@@ -1,5 +1,4 @@
 import '../models/verify_otp_response.dart';
-
 class VerifyOtpState {
   final bool isLoading;
   final bool isSuccess;
@@ -8,7 +7,6 @@ class VerifyOtpState {
   final UserData? userData;
   final String? token;
   final String? refreshToken;
-
   VerifyOtpState({
     this.isLoading = false,
     this.isSuccess = false,
@@ -18,7 +16,6 @@ class VerifyOtpState {
     this.token,
     this.refreshToken,
   });
-
   VerifyOtpState copyWith({
     bool? isLoading,
     bool? isSuccess,
@@ -39,3 +36,4 @@ class VerifyOtpState {
     );
   }
 }
+

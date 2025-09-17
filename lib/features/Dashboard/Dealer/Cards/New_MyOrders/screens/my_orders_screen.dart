@@ -2,39 +2,31 @@ import 'package:flutter/material.dart';
 import '../models/sales_order_model.dart';
 import '../services/sales_order_service.dart';
 import 'package:clone/constants/string_constants.dart';
-
 class NewMyOrdersScreen extends StatefulWidget {
   final int customerId;
-
   const NewMyOrdersScreen({Key? key, required this.customerId})
     : super(key: key);
-
   @override
   State<NewMyOrdersScreen> createState() => _NewMyOrdersScreenState();
 }
-
 class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
   List<SalesOrder> salesOrders = [];
   bool isLoading = true;
   String? errorMessage;
-
   @override
   void initState() {
     super.initState();
     fetchSalesOrders();
   }
-
   Future<void> fetchSalesOrders() async {
     try {
       setState(() {
         isLoading = true;
         errorMessage = null;
       });
-
       final orders = await SalesOrderService.getCustomerSalesOrders(
         widget.customerId,
       );
-
       setState(() {
         salesOrders = orders;
         isLoading = false;
@@ -46,7 +38,6 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,12 +91,10 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
     );
   }
-
   Widget _buildBody() {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-
     if (errorMessage != null) {
       return Center(
         child: Column(
@@ -132,7 +121,6 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
         ),
       );
     }
-
     if (salesOrders.isEmpty) {
       return const Center(
         child: Column(
@@ -148,7 +136,6 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
         ),
       );
     }
-
     return RefreshIndicator(
       onRefresh: fetchSalesOrders,
       child: ListView.builder(
@@ -161,7 +148,6 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
     );
   }
-
   Widget _buildOrderCard(SalesOrder order) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -180,7 +166,6 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
                   style: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 16,
-                    // fontWeight: FontWeight.bold,
                   ),
                 ),
                 _buildStatusChip(order.orderstatus),
@@ -210,8 +195,6 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],
-                    // fontWeight: FontWeight.bold,
-                    // color: Colors.green,
                   ),
                 ),
               ],
@@ -221,27 +204,20 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
     );
   }
-
   Widget _buildStatusChip(String? status) {
-    // Always show Pending chip in this module
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      // decoration: BoxDecoration(
-      //   color: Colors.blue[100],
-      //   borderRadius: BorderRadius.circular(12),
-      // ),
       child: Text(
         'Pending',
         style: TextStyle(
           fontSize: 12,
-          // color: Colors.blue[800],
           fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
-
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
+

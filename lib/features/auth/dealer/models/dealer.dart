@@ -1,10 +1,9 @@
 import 'package:equatable/equatable.dart';
-
 class Dealer extends Equatable {
   final String name;
   final String email;
   final String mobile;
-  final int customerId; // Added customerId field
+  final int id;
   final String? contactPerson;
   final String? contactNumber;
   final int? stateId;
@@ -38,12 +37,11 @@ class Dealer extends Equatable {
   final String? gstApplicablility;
   final String? taxType;
   final String? hsnCode;
-
   const Dealer({
     required this.name,
     required this.email,
     required this.mobile,
-    required this.customerId, // Added customerId parameter
+    required this.id,
     this.contactPerson,
     this.contactNumber,
     this.stateId,
@@ -78,7 +76,6 @@ class Dealer extends Equatable {
     this.taxType,
     this.hsnCode,
   });
-
   factory Dealer.fromJson(Map<String, dynamic> json) {
     print('=== Dealer.fromJson Debug ===');
     print('Dealer JSON: $json');
@@ -86,42 +83,33 @@ class Dealer extends Equatable {
     print('Email field: ${json['email']}');
     print('Mobile field: ${json['mobile']}');
     print('=== End Dealer Debug ===');
-
-    // Handle different possible field names for name
     String name =
         json['name'] as String? ??
         json['dealer_name'] as String? ??
         json['full_name'] as String? ??
         json['username'] as String? ??
         'Unknown Dealer';
-
-    // Handle different possible field names for email
     String email =
         json['email'] as String? ??
         json['email_address'] as String? ??
         json['dealer_email'] as String? ??
         '';
-
-    // Handle different possible field names for mobile
     String mobile =
         json['mobile'] as String? ??
         json['mobile_number'] as String? ??
         json['phone'] as String? ??
         json['phone_number'] as String? ??
         '';
-
-    // Handle different possible field names for customerId
-    int customerId =
+    int id =
         json['customerId'] as int? ??
         json['customer_id'] as int? ??
         json['id'] as int? ??
-        0; // Default fallback
-
+        0;
     return Dealer(
       name: name,
       email: email,
       mobile: mobile,
-      customerId: customerId,
+      id: id,
       contactPerson: json['contactPerson'] as String?,
       contactNumber: json['contactNumber'] as String?,
       stateId: json['stateId'] as int?,
@@ -157,13 +145,12 @@ class Dealer extends Equatable {
       hsnCode: json['hsnCode'] as String?,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'email': email,
       'mobile': mobile,
-      'customerId': customerId, // Added customerId to JSON
+      'customerId': id,
       'contactPerson': contactPerson,
       'contactNumber': contactNumber,
       'stateId': stateId,
@@ -199,7 +186,6 @@ class Dealer extends Equatable {
       'hsnCode': hsnCode,
     };
   }
-
   Dealer copyWith({
     String? name,
     String? email,
@@ -243,7 +229,7 @@ class Dealer extends Equatable {
       name: name ?? this.name,
       email: email ?? this.email,
       mobile: mobile ?? this.mobile,
-      customerId: customerId ?? this.customerId,
+      id: customerId ?? this.id,
       contactPerson: contactPerson ?? this.contactPerson,
       contactNumber: contactNumber ?? this.contactNumber,
       stateId: stateId ?? this.stateId,
@@ -279,13 +265,12 @@ class Dealer extends Equatable {
       hsnCode: hsnCode ?? this.hsnCode,
     );
   }
-
   @override
   List<Object?> get props => [
     name,
     email,
     mobile,
-    customerId,
+    id,
     contactPerson,
     contactNumber,
     stateId,
@@ -321,3 +306,4 @@ class Dealer extends Equatable {
     hsnCode,
   ];
 }
+

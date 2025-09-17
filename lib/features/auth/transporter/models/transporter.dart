@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-
 class Transporter extends Equatable {
   final String id;
   final String mobileNumber;
@@ -9,7 +8,6 @@ class Transporter extends Equatable {
   final bool isActive;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
-
   const Transporter({
     required this.id,
     required this.mobileNumber,
@@ -20,7 +18,6 @@ class Transporter extends Equatable {
     required this.createdAt,
     this.lastLoginAt,
   });
-
   factory Transporter.fromJson(Map<String, dynamic> json) {
     return Transporter(
       id: json['id'] as String,
@@ -35,7 +32,6 @@ class Transporter extends Equatable {
           : null,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -49,7 +45,6 @@ class Transporter extends Equatable {
       'last_login_at': lastLoginAt?.toIso8601String(),
     };
   }
-
   Transporter copyWith({
     String? id,
     String? mobileNumber,
@@ -71,7 +66,6 @@ class Transporter extends Equatable {
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
     );
   }
-
   @override
   List<Object?> get props => [
     id,
@@ -84,3 +78,4 @@ class Transporter extends Equatable {
     lastLoginAt,
   ];
 }
+

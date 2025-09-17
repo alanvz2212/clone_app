@@ -1,31 +1,22 @@
 import 'package:hive/hive.dart';
 import 'dealer_hive.dart';
-
 part 'auth_data_hive.g.dart';
-
-@HiveType(typeId: 2) // Unique typeId for AuthData model
+@HiveType(typeId: 2)
 class AuthDataHive {
   @HiveField(0)
   final String? token;
-
   @HiveField(1)
   final DealerHive? dealer;
-
   @HiveField(2)
   final bool isAuthenticated;
-
   @HiveField(3)
   final DateTime? loginTime;
-
   @HiveField(4)
   final bool stayLoggedIn;
-
   @HiveField(5)
   final String? mobileNumber;
-
   @HiveField(6)
   final String? password;
-
   AuthDataHive({
     this.token,
     this.dealer,
@@ -35,7 +26,6 @@ class AuthDataHive {
     this.mobileNumber,
     this.password,
   });
-
   AuthDataHive copyWith({
     String? token,
     DealerHive? dealer,
@@ -55,8 +45,6 @@ class AuthDataHive {
       password: password ?? this.password,
     );
   }
-
-  // Create empty/logout state
   static AuthDataHive empty() {
     return AuthDataHive(
       token: null,
@@ -69,3 +57,4 @@ class AuthDataHive {
     );
   }
 }
+

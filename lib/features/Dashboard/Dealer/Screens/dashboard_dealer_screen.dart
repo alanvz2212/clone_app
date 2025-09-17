@@ -4,7 +4,6 @@ import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/d
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
-// import 'package:clone/features/Dashboard/Dealer/Cards/Old_My_Orders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
 import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
@@ -15,72 +14,38 @@ import '../../../../core/router/router_extensions.dart';
 import '../../../auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../../../auth/dealer/bloc/dealer_auth_event.dart';
 import '../../../auth/dealer/bloc/dealer_auth_state.dart';
-
 class DashboardDealerScreen extends StatelessWidget {
-  ////// My Cart
   const DashboardDealerScreen({super.key});
-
   void _navigateToMyOrders(BuildContext context) {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const MyOrdersScreen()));
   }
-
   Future<void> _navigateToDues(BuildContext context) async {
-    ////// Pending invoices
-    // Get current user's customer ID dynamically
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
-
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => DuesScreen()));
   }
-
   void _navigateToStocks(BuildContext context) {
-    ///stock
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
-
-  void _navigateToNewMyOrders(BuildContext context) {
-    ////My orders
-    // Get current user's customer ID from DealerAuthBloc
-    final authState = context.read<DealerAuthBloc>().state;
-    int customerId = 40807; // Default fallback
-    
-    if (authState.isAuthenticated && authState.dealer != null) {
-      customerId = authState.dealer!.customerId;
-    }
-
+  Future<void> _navigateToNewMyOrders(BuildContext context) async {
+    final userService = getIt<UserService>();
+    final customerId = await userService.getCurrentCustomerIdWithFallback();
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => NewMyOrdersScreen(customerId: customerId)));
   }
-
-  // Future<void> _navigateToInvoices(BuildContext context) async {
-  //   // Get current user's customer ID dynamically
-  //   final userService = getIt<UserService>();
-  //   final customerId = await userService.getCurrentCustomerIdWithFallback();
-
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (context) => InvoiceScreen(customerId: customerId),
-  //     ),
-  //   );
-  // }
-
   void _navigateToNewArrivals(BuildContext context) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Navigate to New Arrivals')));
   }
-
   void _navigateToPromotions(BuildContext context) {
-    // ScaffoldMessenger.of(
-    //   context,
-    // ).showSnackBar(const SnackBar(content: Text('Navigate to Promotions')));
   }
   AlertDialog __handleLogout(BuildContext context) {
     return (AlertDialog(
@@ -94,9 +59,7 @@ class DashboardDealerScreen extends StatelessWidget {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            // Trigger logout event
             context.read<DealerAuthBloc>().add(DealerLogoutRequested());
-            // Navigate to auth screen
             context.goToAuth();
           },
           child: const Text('Logout', style: TextStyle(color: Colors.black)),
@@ -104,36 +67,23 @@ class DashboardDealerScreen extends StatelessWidget {
       ],
     ));
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            // Icon(CupertinoIcons.back),
-            // const SizedBox(width: 8),
             Image.asset(
-              'assets/logo1.png', // Replace with your image path
+              'assets/logo1.png',
               width: 70,
               height: 35,
               fit: BoxFit.contain,
             ),
-            // const SizedBox(width: 8),
             const SizedBox(width: 35),
             const Text(
               'Dealer Dashboard',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
-            // const SizedBox(width: 45),
-            // IconButton(
-            //   onPressed: () {
-            //     Navigator.of(context).push(
-            //       MaterialPageRoute(builder: (context) => const AuthScreen()),
-            //     );
-            //   },
-            //   icon: Icon(Icons.logout),
-            // ),
           ],
         ),
         backgroundColor: const Color(0xFFCEB007),
@@ -153,7 +103,6 @@ class DashboardDealerScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Top Bar with Welcome and Notification
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16.0),
@@ -171,7 +120,6 @@ class DashboardDealerScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Welcome Text
                 BlocBuilder<DealerAuthBloc, DealerAuthState>(
                   builder: (context, state) {
                     print('=== Dashboard BlocBuilder Debug ===');
@@ -180,7 +128,6 @@ class DashboardDealerScreen extends StatelessWidget {
                     print('Dealer: ${state.dealer}');
                     print('Dealer Name: ${state.dealer?.name}');
                     print('=== End Dashboard Debug ===');
-
                     final dealerName = state.dealer?.name ?? 'Dealer';
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +136,6 @@ class DashboardDealerScreen extends StatelessWidget {
                           'Welcome back,\n$dealerName',
                           style: TextStyle(
                             color: Color.fromARGB(255, 95, 91, 91),
-
                             fontWeight: FontWeight.w400,
                             fontSize: 17,
                           ),
@@ -198,12 +144,10 @@ class DashboardDealerScreen extends StatelessWidget {
                     );
                   },
                 ),
-                // Notification Icon
                 Stack(
                   children: [
                     IconButton(
                       onPressed: () {
-                        // Handle notification tap
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Notifications clicked'),
@@ -217,14 +161,11 @@ class DashboardDealerScreen extends StatelessWidget {
                         size: 28,
                       ),
                     ),
-                    // Notification badge
                   ],
                 ),
               ],
             ),
           ),
-
-          // Quick Access Tiles Section
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -240,74 +181,6 @@ class DashboardDealerScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Grid Layout for Tiles
-                  // GridView.count(
-                  //   crossAxisCount: 2,
-                  //   shrinkWrap: true,
-                  //   physics: const NeverScrollableScrollPhysics(),
-                  //   crossAxisSpacing: 12,
-                  //   mainAxisSpacing: 12,
-                  //   childAspectRatio: 1.0, // Square tiles
-                  //   children: [
-                  //     QuickAccessTile(
-                  //       title: 'Place Order',
-                  //       // subtitle: 'Create new orders',
-                  //       // icon: Icons.add_shopping_cart,
-                  //       // color: Color.fromARGB(255, 95, 91, 91),
-                  //       onTap: () => Navigator.of(context).push(
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const PlaceOrderScreen(),
-                  //         ),
-                  //       ),
-                  //       // subtitle: '',
-                  //     ),
-                  //     QuickAccessTile(
-                  //       title: 'My Cart',
-                  //       // subtitle: 'Track orders',
-                  //       // icon: Icons.receipt_long,
-                  //       // color: Color.fromARGB(255, 95, 91, 91),
-                  //       onTap: () => _navigateToMyOrders(context),
-                  //     ),
-                  // QuickAccessTile(
-                  //   title: 'New Arrivals',
-
-                  //   icon: Icons.fiber_new,
-                  //   color: Color.fromARGB(255, 95, 91, 91),
-                  //   onTap: () => _navigateToNewArrivals(context),
-                  // ),
-                  //     QuickAccessTile(
-                  //       title: 'Invoices',
-                  //       // icon: Icons.inventory_2,
-                  //       // color: Color.fromARGB(255, 95, 91, 91),
-                  //       onTap: () => _navigateToInvoices(context),
-                  //     ),
-                  // QuickAccessTile(
-                  //   title: 'Schemes',
-                  //   // subtitle: '',
-                  //   icon: Icons.local_offer,
-                  //   color: Color.fromARGB(255, 95, 91, 91),
-                  //   onTap: () => _navigateToPromotions(context),
-                  // ),
-                  //     QuickAccessTile(
-                  //       title: 'Stocks',
-                  //       // subtitle: '',
-                  //       // icon: Icons.local_offer,
-                  //       // color: Color.fromARGB(255, 95, 91, 91),
-                  //       onTap: () => _navigateToStocks(context),
-                  //     ),
-                  //     QuickAccessTile(
-                  //       title: 'Feedback',
-                  //       // icon: Icons.feedback, // BEST CHOICE - most accurate
-                  //       // color: Color.fromARGB(255, 95, 91, 91),
-                  //       onTap: () => Navigator.of(context).push(
-                  //         MaterialPageRoute(
-                  //           builder: (context) => const FeedbackScreen(),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -316,61 +189,34 @@ class DashboardDealerScreen extends StatelessWidget {
                     mainAxisSpacing: 12,
                     childAspectRatio: 1.0,
                     children: [
-                      // QuickAccessTile(
-                      //   title: 'Place Order',
-                      //   imagePath:
-                      //       'assets/dashboard/place_order.png', // Add your image path
-                      //   onTap: () => Navigator.of(context).push(
-                      //     MaterialPageRoute(
-                      //       builder: (context) => const PlaceOrderScreen(),
-                      //     ),
-                      //   ),
-                      // ),
                       QuickAccessTile(
                         title: 'My Cart',
                         imagePath:
-                            'assets/dashboard/my_cart.png', // Add your image path
+                            'assets/dashboard/my_cart.png',
                         onTap: () => _navigateToMyOrders(context),
                       ),
-
-                      // QuickAccessTile(
-                      //   title: 'New Arrivals',
-                      //   imagePath: 'assets/dashboard/invoices.png',
-                      //   onTap: () => _navigateToNewArrivals(context),
-                      // ),
-                      // QuickAccessTile(
-                      //   title: 'Dues',
-                      //   imagePath:
-                      //       'assets/dashboard/invoices.png', // Add your image path
-                      //   onTap: () => _navigateToInvoices(context),
-                      // ),
                       QuickAccessTile(
                         title: 'Pending Invoices',
                         imagePath:
-                            'assets/dashboard/invoices.png', // Add your image path
+                            'assets/dashboard/invoices.png',
                         onTap: () => _navigateToDues(context),
                       ),
-                      // QuickAccessTile(
-                      //   title: 'Schemes',
-                      //   imagePath: 'assets/dashboard/scheme.png',
-                      //   onTap: () => _navigateToPromotions(context),
-                      // ),
                       QuickAccessTile(
                         title: 'Stocks',
                         imagePath:
-                            'assets/dashboard/stock.png', // Add your image path
+                            'assets/dashboard/stock.png',
                         onTap: () => _navigateToStocks(context),
                       ),
                       QuickAccessTile(
                         title: 'My Orders',
                         imagePath:
-                            'assets/dashboard/place_order.png', // Add your image path
+                            'assets/dashboard/place_order.png',
                         onTap: () => _navigateToNewMyOrders(context),
                       ),
                       QuickAccessTile(
                         title: 'Feedback',
                         imagePath:
-                            'assets/dashboard/feedback.png', // Add your image path
+                            'assets/dashboard/feedback.png',
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const FeedbackScreen(),
@@ -379,18 +225,11 @@ class DashboardDealerScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // Optional: Add more sections below
                   const SizedBox(height: 24),
-                  // You can add more widgets here like:
-                  // - Recent Orders
-                  // - Sales Summary
-                  // - Quick Stats
                 ],
               ),
             ),
           ),
-
-          // App Version at the bottom
           Padding(
             padding: const EdgeInsets.only(
               left: 16,
@@ -405,7 +244,6 @@ class DashboardDealerScreen extends StatelessWidget {
                   'App Version - ${StringConstant.version}',
                   style: TextStyle(
                     color: Color.fromARGB(255, 95, 91, 91),
-
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -418,21 +256,15 @@ class DashboardDealerScreen extends StatelessWidget {
     );
   }
 }
-
 class QuickAccessTile extends StatelessWidget {
   final String title;
   final String imagePath;
-  // final IconData icon;
-  // final Color color;
   final String? badge;
   final VoidCallback onTap;
-
   const QuickAccessTile({
     super.key,
     required this.title,
     required this.imagePath,
-    // required this.icon,
-    // required this.color,
     this.badge,
     required this.onTap,
   });
@@ -449,7 +281,6 @@ class QuickAccessTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Image and Badge Row
               SizedBox(
                 height: 56,
                 width: double.infinity,
@@ -498,7 +329,6 @@ class QuickAccessTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-
               Text(
                 title,
                 style: const TextStyle(
@@ -511,9 +341,7 @@ class QuickAccessTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-
               const Spacer(),
-
               Align(
                 alignment: Alignment.centerRight,
                 child: Icon(
@@ -528,82 +356,5 @@ class QuickAccessTile extends StatelessWidget {
       ),
     );
   }
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Card(
-  //     elevation: 3,
-  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //     child: InkWell(
-  //       onTap: onTap,
-  //       borderRadius: BorderRadius.circular(16),
-  //       child: Container(
-  //         padding: const EdgeInsets.all(16),
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             // Icon and Badge Row
-  //             Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //               children: [
-  //                 // Container(
-  //                 //   padding: const EdgeInsets.all(12),
-  //                 //   decoration: BoxDecoration(
-  //                 //     color: color.withValues(alpha: 0.1),
-  //                 //     borderRadius: BorderRadius.circular(12),
-  //                 //   ),
-  //                 //   child: Icon(icon, color: color, size: 28),
-  //                 // ),
-  //                 if (badge != null)
-  //                   Container(
-  //                     padding: const EdgeInsets.symmetric(
-  //                       horizontal: 8,
-  //                       vertical: 4,
-  //                     ),
-  //                     decoration: BoxDecoration(
-  //                       color: Colors.red,
-  //                       borderRadius: BorderRadius.circular(10),
-  //                     ),
-  //                     child: Text(
-  //                       badge!,
-  //                       style: const TextStyle(
-  //                         color: Colors.white,
-  //                         fontSize: 12,
-  //                         fontWeight: FontWeight.bold,
-  //                       ),
-  //                     ),
-  //                   ),
-  //               ],
-  //             ),
-  //             const SizedBox(height: 12),
-
-  //             // Title
-  //             Text(
-  //               title,
-  //               style: const TextStyle(
-  //                 fontSize: 16,
-  //                 fontWeight: FontWeight.w500,
-  //                 color: Colors.black87,
-  //               ),
-  //               maxLines: 2,
-  //               overflow: TextOverflow.ellipsis,
-  //             ),
-  //             const SizedBox(height: 4),
-
-  //             const Spacer(),
-
-  //             // Arrow Icon
-  //             Align(
-  //               alignment: Alignment.centerRight,
-  //               child: Icon(
-  //                 Icons.arrow_forward_ios,
-  //                 size: 16,
-  //                 color: Colors.grey[400],
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 }
+

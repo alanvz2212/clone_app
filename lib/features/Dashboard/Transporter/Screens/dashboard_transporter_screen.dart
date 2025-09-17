@@ -5,10 +5,8 @@ import '../../../auth/transporter/bloc/transporter_auth_bloc.dart';
 import '../../../auth/transporter/bloc/transporter_auth_event.dart';
 import '../../../auth/transporter/bloc/transporter_auth_state.dart';
 import '../../../../constants/string_constants.dart';
-
 class DashboardTransporterScreen extends StatelessWidget {
   const DashboardTransporterScreen({super.key});
-
   AlertDialog _handleLogout(BuildContext context) {
     return AlertDialog(
       title: const Text('Logout'),
@@ -21,9 +19,7 @@ class DashboardTransporterScreen extends StatelessWidget {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            // Trigger logout event
             context.read<TransporterAuthBloc>().add(TransporterLogoutRequested());
-            // Navigate to auth screen
             context.goToAuth();
           },
           child: const Text('Logout', style: TextStyle(color: Colors.black)),
@@ -31,7 +27,6 @@ class DashboardTransporterScreen extends StatelessWidget {
       ],
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +56,6 @@ class DashboardTransporterScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Welcome Text
                 BlocBuilder<TransporterAuthBloc, TransporterAuthState>(
                   builder: (context, state) {
                     final transporterName = state.transporter?.name ?? 'Transporter';
@@ -84,12 +78,10 @@ class DashboardTransporterScreen extends StatelessWidget {
                     );
                   },
                 ),
-                // Notification Icon
                 Stack(
                   children: [
                     IconButton(
                       onPressed: () {
-                        // Handle notification tap
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Notifications clicked'),
@@ -103,14 +95,11 @@ class DashboardTransporterScreen extends StatelessWidget {
                         size: 28,
                       ),
                     ),
-                    // Notification badge
                   ],
                 ),
               ],
             ),
           ),
-
-          // Quick Access Tiles Section
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -126,46 +115,33 @@ class DashboardTransporterScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Grid Layout for Tiles
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.0, // Square tiles
+                    childAspectRatio: 1.0,
                     children: [
                       QuickAccessTile(
                         title: 'Date-wise Delivery Schedule',
-                        // subtitle: 'Create new orders',
                         icon: Icons.delivery_dining,
                         color: Color(0xFFCEB007),
                         onTap: () => (context),
-                        // subtitle: '',
                       ),
                       QuickAccessTile(
                         title: 'Delivery Button',
-                        // subtitle: 'Track orders',
                         icon: Icons.smart_button_sharp,
                         color: Color(0xFFCEB007),
                         onTap: () => (context),
                       ),
                     ],
                   ),
-
-                  // Optional: Add more sections below
                   const SizedBox(height: 24),
-                  // You can add more widgets here like:
-                  // - Recent Orders
-                  // - Sales Summary
-                  // - Quick Stats
                 ],
               ),
             ),
           ),
-
-          // App Version at the bottom
           Padding(
             padding: const EdgeInsets.only(
               left: 16,
@@ -192,14 +168,12 @@ class DashboardTransporterScreen extends StatelessWidget {
     );
   }
 }
-
 class QuickAccessTile extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color color;
   final String? badge;
   final VoidCallback onTap;
-
   const QuickAccessTile({
     super.key,
     required this.title,
@@ -208,7 +182,6 @@ class QuickAccessTile extends StatelessWidget {
     this.badge,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -222,7 +195,6 @@ class QuickAccessTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Icon and Badge Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -256,8 +228,6 @@ class QuickAccessTile extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-
-              // Title
               Text(
                 title,
                 style: const TextStyle(
@@ -269,10 +239,7 @@ class QuickAccessTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
-
               const Spacer(),
-
-              // Arrow Icon
               Align(
                 alignment: Alignment.centerRight,
                 child: Icon(
@@ -288,3 +255,4 @@ class QuickAccessTile extends StatelessWidget {
     );
   }
 }
+

@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
-
-/// Custom Theme Extensions
-/// Additional theme properties not covered by standard Flutter themes
-
-/// Network Status Theme Extension
 @immutable
 class NetworkStatusTheme extends ThemeExtension<NetworkStatusTheme> {
   const NetworkStatusTheme({
@@ -13,19 +8,16 @@ class NetworkStatusTheme extends ThemeExtension<NetworkStatusTheme> {
     required this.unknownColor,
     required this.textColor,
   });
-
   final Color connectedColor;
   final Color disconnectedColor;
   final Color unknownColor;
   final Color textColor;
-
   static const NetworkStatusTheme light = NetworkStatusTheme(
     connectedColor: AppColors.networkConnected,
     disconnectedColor: AppColors.networkDisconnected,
     unknownColor: AppColors.networkUnknown,
     textColor: AppColors.textOnPrimary,
   );
-
   @override
   NetworkStatusTheme copyWith({
     Color? connectedColor,
@@ -40,7 +32,6 @@ class NetworkStatusTheme extends ThemeExtension<NetworkStatusTheme> {
       textColor: textColor ?? this.textColor,
     );
   }
-
   @override
   NetworkStatusTheme lerp(NetworkStatusTheme? other, double t) {
     if (other is! NetworkStatusTheme) {
@@ -58,8 +49,6 @@ class NetworkStatusTheme extends ThemeExtension<NetworkStatusTheme> {
     );
   }
 }
-
-/// Quick Access Tile Theme Extension
 @immutable
 class QuickAccessTileTheme extends ThemeExtension<QuickAccessTileTheme> {
   const QuickAccessTileTheme({
@@ -69,13 +58,11 @@ class QuickAccessTileTheme extends ThemeExtension<QuickAccessTileTheme> {
     required this.badgeColor,
     required this.badgeTextColor,
   });
-
   final Color backgroundColor;
   final Color iconColor;
   final Color titleColor;
   final Color badgeColor;
   final Color badgeTextColor;
-
   static const QuickAccessTileTheme light = QuickAccessTileTheme(
     backgroundColor: AppColors.surface,
     iconColor: AppColors.primary,
@@ -83,7 +70,6 @@ class QuickAccessTileTheme extends ThemeExtension<QuickAccessTileTheme> {
     badgeColor: AppColors.badgeBackground,
     badgeTextColor: AppColors.badgeText,
   );
-
   @override
   QuickAccessTileTheme copyWith({
     Color? backgroundColor,
@@ -100,7 +86,6 @@ class QuickAccessTileTheme extends ThemeExtension<QuickAccessTileTheme> {
       badgeTextColor: badgeTextColor ?? this.badgeTextColor,
     );
   }
-
   @override
   QuickAccessTileTheme lerp(QuickAccessTileTheme? other, double t) {
     if (other is! QuickAccessTileTheme) {
@@ -115,8 +100,6 @@ class QuickAccessTileTheme extends ThemeExtension<QuickAccessTileTheme> {
     );
   }
 }
-
-/// Dashboard Theme Extension
 @immutable
 class DashboardTheme extends ThemeExtension<DashboardTheme> {
   const DashboardTheme({
@@ -126,21 +109,18 @@ class DashboardTheme extends ThemeExtension<DashboardTheme> {
     required this.userNameTextColor,
     required this.notificationIconColor,
   });
-
   final Color headerBackgroundColor;
   final Color headerTextColor;
   final Color welcomeTextColor;
   final Color userNameTextColor;
   final Color notificationIconColor;
-
   static const DashboardTheme light = DashboardTheme(
     headerBackgroundColor: AppColors.primary,
     headerTextColor: AppColors.textOnPrimary,
-    welcomeTextColor: Color(0x70FFFFFF), // White with 70% opacity
+    welcomeTextColor: Color(0x70FFFFFF),
     userNameTextColor: AppColors.textOnPrimary,
     notificationIconColor: AppColors.textOnPrimary,
   );
-
   @override
   DashboardTheme copyWith({
     Color? headerBackgroundColor,
@@ -159,7 +139,6 @@ class DashboardTheme extends ThemeExtension<DashboardTheme> {
           notificationIconColor ?? this.notificationIconColor,
     );
   }
-
   @override
   DashboardTheme lerp(DashboardTheme? other, double t) {
     if (other is! DashboardTheme) {
@@ -190,17 +169,14 @@ class DashboardTheme extends ThemeExtension<DashboardTheme> {
     );
   }
 }
-
-/// Helper extension to access custom themes from BuildContext
 extension ThemeExtensions on BuildContext {
   NetworkStatusTheme get networkStatusTheme =>
       Theme.of(this).extension<NetworkStatusTheme>() ??
       NetworkStatusTheme.light;
-
   QuickAccessTileTheme get quickAccessTileTheme =>
       Theme.of(this).extension<QuickAccessTileTheme>() ??
       QuickAccessTileTheme.light;
-
   DashboardTheme get dashboardTheme =>
       Theme.of(this).extension<DashboardTheme>() ?? DashboardTheme.light;
 }
+

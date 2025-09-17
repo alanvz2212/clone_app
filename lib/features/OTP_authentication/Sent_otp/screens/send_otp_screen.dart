@@ -7,31 +7,25 @@ import '../bloc/otp_state.dart';
 import '../../../../utils/helpers.dart';
 import '../../../../utils/validators.dart';
 import '../../../../core/di/injection.dart';
-
 class SendOtpScreen extends StatefulWidget {
   const SendOtpScreen({super.key});
-
   @override
   State<SendOtpScreen> createState() => _SendOtpScreenState();
 }
-
 class _SendOtpScreenState extends State<SendOtpScreen> {
   final TextEditingController _phoneController = TextEditingController();
   late final OtpBloc _otpBloc;
-
   @override
   void initState() {
     super.initState();
     _otpBloc = getIt<OtpBloc>();
   }
-
   @override
   void dispose() {
     _phoneController.dispose();
     _otpBloc.close();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
@@ -90,7 +84,6 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 40),
-                  
                   Text(
                     'Enter your phone number',
                     style: TextStyle(
@@ -99,20 +92,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  
-                  // const SizedBox(height: 10),
-                  
-                  // Text(
-                  //   'We will send you an OTP to reset your password',
-                  //   style: TextStyle(
-                  //     fontSize: 16,
-                  //     color: Colors.grey.shade600,
-                  //   ),
-                  //   textAlign: TextAlign.center,
-                  // ),
-                  
                   const SizedBox(height: 40),
-                  
                   TextFormField(
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
@@ -129,9 +109,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                   ),
-                  
                   const SizedBox(height: 30),
-                  
                   BlocBuilder<OtpBloc, OtpState>(
                     builder: (context, state) {
                       return ElevatedButton(
@@ -172,20 +150,17 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
       ),
     );
   }
-
   void _sendOtp() {
     final phoneNumber = _phoneController.text.trim();
-    
     if (phoneNumber.isEmpty) {
       Helpers.showErrorSnackBar(context, 'Please enter phone number');
       return;
     }
-    
     if (phoneNumber.length != 10) {
       Helpers.showErrorSnackBar(context, 'Please enter valid 10 digit phone number');
       return;
     }
-
     _otpBloc.add(SendOtpRequested(phoneNumber: phoneNumber));
   }
 }
+

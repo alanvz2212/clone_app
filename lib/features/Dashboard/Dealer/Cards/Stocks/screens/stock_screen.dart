@@ -11,22 +11,17 @@ import '../../Place_Order/bloc/search_item_bloc.dart';
 import '../../Place_Order/bloc/search_item_event.dart';
 import '../../Place_Order/bloc/search_item_state.dart';
 import '../../../../../../core/di/injection.dart';
-
 class StockScreen extends StatefulWidget {
   final int? itemId;
-
   const StockScreen({super.key, this.itemId});
-
   void _navigateToStocks(BuildContext context) {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
-
   @override
   State<StockScreen> createState() => _StockScreenState();
 }
-
 class _StockScreenState extends State<StockScreen> {
   final TextEditingController _itemNameController = TextEditingController();
   late StockBloc _stockBloc;
@@ -35,26 +30,21 @@ class _StockScreenState extends State<StockScreen> {
   bool _showSuggestions = false;
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
-
   @override
   void initState() {
     super.initState();
     _stockBloc = StockBloc();
     _searchItemBloc = getIt<SearchItemBloc>();
-
     if (widget.itemId != null) {
       _itemNameController.text = widget.itemId.toString();
       _stockBloc.add(FetchStockDetails(widget.itemId!));
     }
   }
-
   void _onSearchChanged(String value) {
     setState(() {
       searchQuery = value;
     });
-
     if (value.trim().isNotEmpty) {
-      // Trigger search for autocomplete suggestions
       _searchItemBloc.add(SearchItemRequested(searchQuery: value.trim()));
       _showSuggestions = true;
       _showOverlay();
@@ -63,7 +53,6 @@ class _StockScreenState extends State<StockScreen> {
       _hideOverlay();
     }
   }
-
   void _clearSearch() {
     _itemNameController.clear();
     setState(() {
@@ -72,7 +61,6 @@ class _StockScreenState extends State<StockScreen> {
     _searchItemBloc.add(const SearchItemCleared());
     _hideOverlay();
   }
-
   void _onSearchPressed() {
     final itemNameText = _itemNameController.text.trim();
     if (itemNameText.isNotEmpty) {
@@ -87,23 +75,18 @@ class _StockScreenState extends State<StockScreen> {
       );
     }
   }
-
   void _onItemSelected(SearchItem item) {
     _itemNameController.text = item.name ?? '';
     setState(() {
       searchQuery = item.name ?? '';
     });
     _hideOverlay();
-
-    // Fetch stock details for selected item
     if (item.id != null) {
       _stockBloc.add(FetchStockDetails(item.id!));
     }
   }
-
   void _showOverlay() {
     if (_overlayEntry != null) return;
-
     _overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         width: MediaQuery.of(context).size.width - 32,
@@ -130,14 +113,12 @@ class _StockScreenState extends State<StockScreen> {
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
-
                   if (state.items.isEmpty) {
                     return const Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Text('No items found'),
                     );
                   }
-
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: state.items.length > 5 ? 5 : state.items.length,
@@ -171,18 +152,17 @@ class _StockScreenState extends State<StockScreen> {
         ),
       ),
     );
-
     Overlay.of(context).insert(_overlayEntry!);
   }
-
   void _hideOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    setState(() {
-      _showSuggestions = false;
-    });
+    if (mounted) {
+      setState(() {
+        _showSuggestions = false;
+      });
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -228,7 +208,6 @@ class _StockScreenState extends State<StockScreen> {
         ),
         body: Column(
           children: [
-            // Search Field Container
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -283,8 +262,6 @@ class _StockScreenState extends State<StockScreen> {
                 ),
               ),
             ),
-
-            // Content Section
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -295,8 +272,6 @@ class _StockScreenState extends State<StockScreen> {
                 ),
               ),
             ),
-
-            // App Version at the bottom
             Padding(
               padding: const EdgeInsets.only(
                 left: 16,
@@ -323,24 +298,19 @@ class _StockScreenState extends State<StockScreen> {
       ),
     );
   }
-
   Widget _buildContent(StockState state) {
     if (state is StockLoading) {
       return const Center(child: Text('Loading stock details...'));
     }
-
     if (state is StockError) {
       return Center(child: Text(state.message, textAlign: TextAlign.center));
     }
-
     if (state is StockEmpty) {
       return const Center(child: Text('No stock details found'));
     }
-
     if (state is StockLoaded) {
       return _buildStockList(state.stockResponse);
     }
-
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -355,33 +325,24 @@ class _StockScreenState extends State<StockScreen> {
       ),
     );
   }
-
   Widget _buildStockList(StockResponse stockResponse) {
     final stockDetails = stockResponse.stockDetails;
     final itemName = stockDetails.isNotEmpty
         ? stockDetails.first.item.name
         : 'Unknown Item';
-
-    // Calculate total pending quantity
     final totalPendingQty = stockDetails.fold<int>(
       0,
       (sum, stock) => sum + (stock.pendingPackageQuantity ?? 0),
     );
-
-    // Calculate total stock quantity
     final totalStockQty = stockDetails.fold<int>(
       0,
       (sum, stock) => sum + (stock.currentStock ?? 0),
     );
-
-    // Calculate net available quantity (Total Stock - Pending Orders)
     final netAvailableQty = totalStockQty - totalPendingQty;
-
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Item Name
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
@@ -389,8 +350,6 @@ class _StockScreenState extends State<StockScreen> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
-
-          // Stock Table
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
@@ -409,7 +368,6 @@ class _StockScreenState extends State<StockScreen> {
                   2: FlexColumnWidth(1),
                 },
                 children: [
-                  // Table Header
                   TableRow(
                     decoration: BoxDecoration(
                       border: Border(
@@ -451,12 +409,9 @@ class _StockScreenState extends State<StockScreen> {
                       ),
                     ],
                   ),
-
-                  // Table Rows
                   ...stockDetails.asMap().entries.map((entry) {
                     final index = entry.key;
                     final stock = entry.value;
-
                     return TableRow(
                       children: [
                         Container(
@@ -505,8 +460,6 @@ class _StockScreenState extends State<StockScreen> {
               ),
             ),
           ),
-
-          // Pending Order Quantity
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Container(
@@ -531,8 +484,6 @@ class _StockScreenState extends State<StockScreen> {
               ),
             ),
           ),
-
-          // Net Available Quantity
           Padding(
             padding: const EdgeInsets.only(
               left: 16.0,
@@ -545,7 +496,6 @@ class _StockScreenState extends State<StockScreen> {
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey[300]!),
                 borderRadius: BorderRadius.circular(8),
-                // color: Colors.green[50],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -566,7 +516,6 @@ class _StockScreenState extends State<StockScreen> {
       ),
     );
   }
-
   Widget _buildStockCard(StockDetail stock) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -578,7 +527,6 @@ class _StockScreenState extends State<StockScreen> {
             Text(stock.warehouse.name),
             if (stock.warehouse.code != null)
               Text('Code: ${stock.warehouse.code}'),
-
             if (stock.warehouse.address != null ||
                 stock.warehouse.city != null) ...[
               const SizedBox(height: 8),
@@ -590,7 +538,6 @@ class _StockScreenState extends State<StockScreen> {
                 ].where((e) => e != null && e.isNotEmpty).join(', '),
               ),
             ],
-
             const SizedBox(height: 12),
             Text('Current Stock: ${stock.currentStock}'),
             Text('Pending Qty: ${stock.pendingPackageQuantity}'),
@@ -601,7 +548,6 @@ class _StockScreenState extends State<StockScreen> {
       ),
     );
   }
-
   @override
   void dispose() {
     _hideOverlay();
@@ -611,3 +557,4 @@ class _StockScreenState extends State<StockScreen> {
     super.dispose();
   }
 }
+

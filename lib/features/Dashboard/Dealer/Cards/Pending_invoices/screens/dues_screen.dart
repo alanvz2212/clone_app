@@ -8,11 +8,11 @@ import '../models/dues_model.dart';
 import '../services/dues_service.dart';
 import '../../../../../auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../../../../../auth/dealer/bloc/dealer_auth_state.dart';
-import 'package:clone/constants/string_constants.dart'; // Add this import
-
+import 'package:clone/constants/string_constants.dart';
+import 'package:clone/core/di/injection.dart';
+import 'package:clone/services/user_service.dart';
 class DuesScreen extends StatelessWidget {
   const DuesScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -21,18 +21,14 @@ class DuesScreen extends StatelessWidget {
     );
   }
 }
-
 class _DuesScreenContent extends StatefulWidget {
   const _DuesScreenContent();
-
   @override
   State<_DuesScreenContent> createState() => _DuesScreenContentState();
 }
-
 class _DuesScreenContentState extends State<_DuesScreenContent> {
   late TextEditingController _dateFromController;
   late TextEditingController _dateToController;
-
   @override
   void initState() {
     super.initState();
@@ -42,51 +38,38 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
     _dateToController = TextEditingController(
       text: DateFormat('yyyy-MM-dd').format(DateTime.now()),
     );
-
-    // Load initial data after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDues();
     });
   }
-
   @override
   void dispose() {
     _dateFromController.dispose();
     _dateToController.dispose();
     super.dispose();
   }
-
-  int _getLoggedInCustomerId() {
-    // Get the logged-in user's customerId from DealerAuthState
-    final authState = context.read<DealerAuthBloc>().state;
-    if (authState.isAuthenticated && authState.dealer != null) {
-      return authState.dealer!.customerId;
-    }
-    return 40807; // Fallback default
+  Future<int> _getLoggedInCustomerId() async {
+    final userService = getIt<UserService>();
+    return await userService.getCurrentCustomerIdWithFallback();
   }
-
-  void _loadDues() {
-    final customerId = _getLoggedInCustomerId();
+  Future<void> _loadDues() async {
+    final customerId = await _getLoggedInCustomerId();
     final request = DuesRequest(
       dateFrom: _dateFromController.text,
       dateTo: _dateToController.text,
       customerId: customerId,
     );
-
     context.read<DuesBloc>().add(LoadDues(request));
   }
-
-  void _refreshDues() {
-    final customerId = _getLoggedInCustomerId();
+  Future<void> _refreshDues() async {
+    final customerId = await _getLoggedInCustomerId();
     final request = DuesRequest(
       dateFrom: _dateFromController.text,
       dateTo: _dateToController.text,
       customerId: customerId,
     );
-
     context.read<DuesBloc>().add(RefreshDues(request));
   }
-
   Future<void> _selectDate(TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -100,7 +83,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,96 +120,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
       body: Column(
         children: [
           SizedBox(height: 20),
-          // Filter Section
-          // Container(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Column(
-          //     children: [
-          //       // Show logged-in user info
-          //       BlocBuilder<DealerAuthBloc, DealerAuthState>(
-          //         builder: (context, authState) {
-          //           if (authState.isAuthenticated && authState.dealer != null) {
-          //             return Container(
-          //               padding: const EdgeInsets.all(12.0),
-          //               decoration: BoxDecoration(
-          //                 borderRadius: BorderRadius.circular(8.0),
-          //                 border: Border.all(color: Colors.grey[400]!),
-          //               ),
-          //               child: Row(
-          //                 children: [
-          //                   const Icon(Icons.person),
-          //                   const SizedBox(width: 8),
-          //                   Expanded(
-          //                     child: Column(
-          //                       crossAxisAlignment: CrossAxisAlignment.start,
-          //                       children: [
-          //                         Text(
-          //                           authState.dealer!.name,
-          //                           style: const TextStyle(
-          //                             fontWeight: FontWeight.bold,
-          //                             fontSize: 16,
-          //                           ),
-          //                         ),
-          //                         Text(
-          //                           'Customer ID: ${authState.dealer!.customerId}',
-          //                           style: const TextStyle(
-          //                             fontSize: 12,
-          //                           ),
-          //                         ),
-          //                       ],
-          //                     ),
-          //                   ),
-          //                 ],
-          //               ),
-          //             );
-          //           }
-          //           return const SizedBox.shrink();
-          //         },
-          //       ),
-          //       const SizedBox(height: 16),
-          //       Row(
-          //         children: [
-          //           Expanded(
-          //             child: TextField(
-          //               controller: _dateFromController,
-          //               decoration: const InputDecoration(
-          //                 labelText: 'Date From',
-          //                 border: OutlineInputBorder(),
-          //                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          //                 suffixIcon: Icon(Icons.calendar_today),
-          //               ),
-          //               readOnly: true,
-          //               onTap: () => _selectDate(_dateFromController),
-          //             ),
-          //           ),
-          //           const SizedBox(width: 12),
-          //           Expanded(
-          //             child: TextField(
-          //               controller: _dateToController,
-          //               decoration: const InputDecoration(
-          //                 labelText: 'Date To',
-          //                 border: OutlineInputBorder(),
-          //                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          //                 suffixIcon: Icon(Icons.calendar_today),
-          //               ),
-          //               readOnly: true,
-          //               onTap: () => _selectDate(_dateToController),
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //       const SizedBox(height: 12),
-          //       SizedBox(
-          //         width: double.infinity,
-          //         child: ElevatedButton(
-          //           onPressed: _loadDues,
-          //           child: const Text('Search'),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // Data Section
           Expanded(
             child: BlocBuilder<DuesBloc, DuesState>(
               builder: (context, state) {
@@ -300,7 +192,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                       ),
                     );
                   }
-
                   return RefreshIndicator(
                     onRefresh: () async => _refreshDues(),
                     color: const Color(0xFFCEB007),
@@ -314,20 +205,16 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
                     ),
                   );
                 }
-
                 return const Center(
                   child: Text('Pull to refresh or search to load data'),
                 );
               },
             ),
           ),
-          
-          // Add version display at the bottom (same format as FeedbackScreen)
           Padding(
             padding: const EdgeInsets.only(
               left: 16,
               right: 16,
-              // bottom: 16,
               top: 8,
             ),
             child: Row(
@@ -352,7 +239,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
       ),
     );
   }
-
   Widget _buildDueCard(DuesModel due) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -363,7 +249,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -398,8 +283,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
               ],
             ),
             const SizedBox(height: 8),
-
-            // Date Information
             Row(
               children: [
                 Expanded(
@@ -449,8 +332,6 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
               ],
             ),
             const SizedBox(height: 8),
-
-            // Amount Information
             Row(
               children: [
                 if (due.debit > 0) ...[
@@ -531,3 +412,4 @@ class _DuesScreenContentState extends State<_DuesScreenContent> {
     );
   }
 }
+

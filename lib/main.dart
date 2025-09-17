@@ -16,31 +16,19 @@ import 'features/auth/transporter/bloc/transporter_auth_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/bloc/search_item_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
 import 'theme/theme.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize Hive
   await Hive.initFlutter();
-
-  // Register Hive adapters
   Hive.registerAdapter(CartItemHiveAdapter());
   Hive.registerAdapter(DealerHiveAdapter());
   Hive.registerAdapter(AuthDataHiveAdapter());
-
-  // Initialize services
   await CartHiveService.init();
   await DealerAuthHiveService.init();
-
-  // Setup dependency injection
   await setupDependencyInjection();
-
   runApp(const MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -73,3 +61,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

@@ -64,8 +64,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
           children: [
             Image.asset(
               'assets/logo1.png',
-              width: 70,
-              height: 35,
+             width: 80,
+                        height: 80,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 33),

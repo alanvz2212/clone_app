@@ -8,11 +8,13 @@ import '../models/order_models.dart';
 import '../services/orders_service.dart';
 import '../bloc/bloc.dart';
 import '../../../../../../../constants/string_constants.dart';
+
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
   @override
   State<MyOrdersScreen> createState() => _MyOrdersScreenState();
 }
+
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   late OrdersBloc _ordersBloc;
   late UserService _userService;
@@ -24,10 +26,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     _ordersBloc = OrdersBloc(ordersService: OrdersService(getIt<ApiService>()));
     _loadOrders();
   }
+
   Future<void> _loadOrders() async {
     _currentCustomerId = await _userService.getCurrentCustomerIdWithFallback();
     _ordersBloc.add(FetchOrders(_currentCustomerId!));
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -51,8 +55,8 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             children: [
               Image.asset(
                 'assets/logo1.png',
-                width: 70,
-                height: 35,
+                width: 80,
+                height: 80,
                 fit: BoxFit.contain,
               ),
               const SizedBox(width: 33),
@@ -68,16 +72,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
           ),
           actions: [
             IconButton(
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.add, color: Colors.white),
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        PlaceOrderScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => PlaceOrderScreen()),
                 );
               },
             ),
@@ -119,6 +117,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
+
   Widget _buildBody(BuildContext context, OrdersState state) {
     if (state is OrdersLoading) {
       return const Center(
@@ -152,7 +151,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () async {
-                final customerId = _currentCustomerId ?? await _userService.getCurrentCustomerIdWithFallback();
+                final customerId =
+                    _currentCustomerId ??
+                    await _userService.getCurrentCustomerIdWithFallback();
                 _ordersBloc.add(FetchOrders(customerId));
               },
               style: ElevatedButton.styleFrom(
@@ -345,7 +346,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   )
                 : RefreshIndicator(
                     onRefresh: () async {
-                      final customerId = _currentCustomerId ?? await _userService.getCurrentCustomerIdWithFallback();
+                      final customerId =
+                          _currentCustomerId ??
+                          await _userService.getCurrentCustomerIdWithFallback();
                       _ordersBloc.add(RefreshOrders(customerId));
                     },
                     color: const Color(0xFFCEB007),
@@ -381,6 +384,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
     return const SizedBox.shrink();
   }
+
   Widget _buildOrderCard(OrderData orderData) {
     final order = orderData.order;
     final items = orderData.items;
@@ -449,6 +453,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
+
   Widget _buildFilterChip(
     BuildContext context,
     String label,
@@ -485,6 +490,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
+
   void _onFilterChanged(BuildContext context, DateFilter filter) {
     if (filter == DateFilter.custom) {
       _showCustomDatePicker(context);
@@ -492,6 +498,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       _ordersBloc.add(FilterOrders(filter: filter));
     }
   }
+
   Future<void> _showCustomDatePicker(BuildContext context) async {
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
@@ -520,6 +527,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       _ordersBloc.add(const FilterOrders(filter: DateFilter.all));
     }
   }
+
   void _showOrderDetails(OrderData orderData) {
     final order = orderData.order;
     final items = orderData.items;
@@ -698,16 +706,18 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
       ),
     );
   }
+
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
+
   String _formatDateShort(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
+
   @override
   void dispose() {
     _ordersBloc.close();
     super.dispose();
   }
 }
-

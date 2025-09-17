@@ -60,7 +60,7 @@ class _CartScreenState extends State<CartScreen> {
       };
       final response = await http.post(
         Uri.parse(
-          'https://tmsapi.abm4trades.com/api/MobileOrder/CustomerOrder',
+          'https://tmsapi.abm4trades.com/api/MobileOrder/NewMobileOrder',
         ),
         headers: {
           'accept': '*/*',
@@ -189,8 +189,8 @@ class _CartScreenState extends State<CartScreen> {
           children: [
             Image.asset(
               'assets/logo1.png',
-              width: 70,
-              height: 35,
+             width: 80,
+                        height: 80,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 25),

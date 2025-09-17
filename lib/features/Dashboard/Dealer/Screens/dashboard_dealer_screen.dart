@@ -14,6 +14,7 @@ import '../../../../core/router/router_extensions.dart';
 import '../../../auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../../../auth/dealer/bloc/dealer_auth_event.dart';
 import '../../../auth/dealer/bloc/dealer_auth_state.dart';
+
 class DashboardDealerScreen extends StatelessWidget {
   const DashboardDealerScreen({super.key});
   void _navigateToMyOrders(BuildContext context) {
@@ -21,6 +22,7 @@ class DashboardDealerScreen extends StatelessWidget {
       context,
     ).push(MaterialPageRoute(builder: (context) => const MyOrdersScreen()));
   }
+
   Future<void> _navigateToDues(BuildContext context) async {
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
@@ -28,25 +30,30 @@ class DashboardDealerScreen extends StatelessWidget {
       context,
     ).push(MaterialPageRoute(builder: (context) => DuesScreen()));
   }
+
   void _navigateToStocks(BuildContext context) {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const StockScreen()));
   }
+
   Future<void> _navigateToNewMyOrders(BuildContext context) async {
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => NewMyOrdersScreen(customerId: customerId)));
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => NewMyOrdersScreen(customerId: customerId),
+      ),
+    );
   }
+
   void _navigateToNewArrivals(BuildContext context) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Navigate to New Arrivals')));
   }
-  void _navigateToPromotions(BuildContext context) {
-  }
+
+  void _navigateToPromotions(BuildContext context) {}
   AlertDialog __handleLogout(BuildContext context) {
     return (AlertDialog(
       title: const Text('Logout'),
@@ -67,6 +74,7 @@ class DashboardDealerScreen extends StatelessWidget {
       ],
     ));
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,8 +83,8 @@ class DashboardDealerScreen extends StatelessWidget {
           children: [
             Image.asset(
               'assets/logo1.png',
-              width: 70,
-              height: 35,
+              width: 80,
+              height: 80,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 35),
@@ -191,32 +199,27 @@ class DashboardDealerScreen extends StatelessWidget {
                     children: [
                       QuickAccessTile(
                         title: 'My Cart',
-                        imagePath:
-                            'assets/dashboard/my_cart.png',
+                        imagePath: 'assets/dashboard/my_cart.png',
                         onTap: () => _navigateToMyOrders(context),
                       ),
                       QuickAccessTile(
                         title: 'Pending Invoices',
-                        imagePath:
-                            'assets/dashboard/invoices.png',
+                        imagePath: 'assets/dashboard/invoices.png',
                         onTap: () => _navigateToDues(context),
                       ),
                       QuickAccessTile(
                         title: 'Stocks',
-                        imagePath:
-                            'assets/dashboard/stock.png',
+                        imagePath: 'assets/dashboard/stock.png',
                         onTap: () => _navigateToStocks(context),
                       ),
                       QuickAccessTile(
                         title: 'My Orders',
-                        imagePath:
-                            'assets/dashboard/place_order.png',
+                        imagePath: 'assets/dashboard/place_order.png',
                         onTap: () => _navigateToNewMyOrders(context),
                       ),
                       QuickAccessTile(
                         title: 'Feedback',
-                        imagePath:
-                            'assets/dashboard/feedback.png',
+                        imagePath: 'assets/dashboard/feedback.png',
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const FeedbackScreen(),
@@ -256,6 +259,7 @@ class DashboardDealerScreen extends StatelessWidget {
     );
   }
 }
+
 class QuickAccessTile extends StatelessWidget {
   final String title;
   final String imagePath;
@@ -357,4 +361,3 @@ class QuickAccessTile extends StatelessWidget {
     );
   }
 }
-

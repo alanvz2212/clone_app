@@ -15,7 +15,6 @@ import 'features/auth/dealer/bloc/dealer_auth_event.dart';
 import 'features/auth/transporter/bloc/transporter_auth_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/bloc/search_item_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
-import 'theme/theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
@@ -48,13 +47,13 @@ class MyApp extends StatelessWidget {
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'clone',
-          theme: AppTheme.lightTheme.copyWith(
-            extensions: [
-              NetworkStatusTheme.light,
-              QuickAccessTileTheme.light,
-              DashboardTheme.light,
-            ],
-          ),
+          // theme: AppTheme.lightTheme.copyWith(
+          //   extensions: [
+          //     NetworkStatusTheme.light,
+          //     QuickAccessTileTheme.light,
+          //     DashboardTheme.light,
+          //   ],
+          // ),
           routerConfig: AppRouter.router,
         ),
       ),

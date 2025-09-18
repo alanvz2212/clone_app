@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../utils/helpers.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../features/auth/dealer/bloc/dealer_auth_bloc.dart';
+import '../../../../features/auth/dealer/bloc/dealer_auth_event.dart';
 import '../bloc/verify_otp_bloc.dart';
 import '../bloc/verify_otp_event.dart';
 import '../bloc/verify_otp_state.dart';
@@ -86,6 +88,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
           if (state.isSuccess && state.message != null) {
             Helpers.showSuccessSnackBar(context, state.message!);
             if (state.userData?.type == 0) {
+              context.read<DealerAuthBloc>().add(DealerAuthRestoreRequested());
               context.go('/dealer-dashboard');
             } else {
               context.go('/transporter-dashboard');

@@ -1,3 +1,4 @@
+import 'package:clone/features/Dashboard/Dealer/Cards/Link/screens/Link_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/My%20Cart/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/dues_screen.dart';
@@ -9,14 +10,29 @@ import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../constants/string_constants.dart';
 import '../../../../core/router/router_extensions.dart';
 import '../../../auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../../../auth/dealer/bloc/dealer_auth_event.dart';
 import '../../../auth/dealer/bloc/dealer_auth_state.dart';
 
-class DashboardDealerScreen extends StatelessWidget {
+class DashboardDealerScreen extends StatefulWidget {
   const DashboardDealerScreen({super.key});
+
+  @override
+  State<DashboardDealerScreen> createState() => _DashboardDealerScreenState();
+}
+
+class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DealerAuthBloc>().add(DealerAuthRestoreRequested());
+    });
+  }
+
   void _navigateToMyOrders(BuildContext context) {
     Navigator.of(
       context,
@@ -54,6 +70,27 @@ class DashboardDealerScreen extends StatelessWidget {
   }
 
   void _navigateToPromotions(BuildContext context) {}
+
+  Future<void> _launchCatalogueWebsite() async {
+    final Uri url = Uri.parse('https://catalogue.abm4trades.com/');
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        await launchUrl(url, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open website: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   AlertDialog __handleLogout(BuildContext context) {
     return (AlertDialog(
       title: const Text('Logout'),
@@ -135,8 +172,19 @@ class DashboardDealerScreen extends StatelessWidget {
                     print('Is Authenticated: ${state.isAuthenticated}');
                     print('Dealer: ${state.dealer}');
                     print('Dealer Name: ${state.dealer?.name}');
+                    print('Dealer Email: ${state.dealer?.email}');
+                    print('Dealer ID: ${state.dealer?.id}');
+                    print('Token: ${state.token != null ? "Present" : "Null"}');
                     print('=== End Dashboard Debug ===');
-                    final dealerName = state.dealer?.name ?? 'Dealer';
+
+                    String dealerName = 'Dealer';
+                    if (state.dealer?.name != null &&
+                        state.dealer!.name.isNotEmpty) {
+                      dealerName = state.dealer!.name;
+                    } else if (state.isAuthenticated) {
+                      dealerName = 'User';
+                    }
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -148,6 +196,11 @@ class DashboardDealerScreen extends StatelessWidget {
                             fontSize: 17,
                           ),
                         ),
+                        if (state.dealer == null && state.isAuthenticated)
+                          Text(
+                            'Debug: Authenticated but no dealer data',
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
                       ],
                     );
                   },
@@ -225,6 +278,11 @@ class DashboardDealerScreen extends StatelessWidget {
                             builder: (context) => const FeedbackScreen(),
                           ),
                         ),
+                      ),
+                      QuickAccessTile(
+                        title: 'Catalog',
+                        imagePath: 'assets/dashboard/item_ledger.png',
+                        onTap: () => _launchCatalogueWebsite(),
                       ),
                     ],
                   ),

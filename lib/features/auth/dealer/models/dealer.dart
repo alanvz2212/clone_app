@@ -112,15 +112,27 @@ class Dealer extends Equatable {
       id: id,
       contactPerson: json['contactPerson'] as String?,
       contactNumber: json['contactNumber'] as String?,
-      stateId: json['stateId'] as int?,
-      taxID: json['taxID'] as int?,
-      type: json['type'] as int?,
-      countryId: json['countryId'] as int?,
-      districtId: json['districtId'] as int?,
+      stateId: json['stateId'] is String 
+          ? int.tryParse(json['stateId'] as String)
+          : json['stateId'] as int?,
+      taxID: json['taxID'] is String 
+          ? int.tryParse(json['taxID'] as String)
+          : json['taxID'] as int?,
+      type: json['type'] is String 
+          ? int.tryParse(json['type'] as String)
+          : json['type'] as int?,
+      countryId: json['countryId'] is String 
+          ? int.tryParse(json['countryId'] as String)
+          : json['countryId'] as int?,
+      districtId: json['districtId'] is String 
+          ? int.tryParse(json['districtId'] as String)
+          : json['districtId'] as int?,
       notes: json['notes'] as String?,
       numberOfCreditDays: json['numberOfCreditDays'] as String?,
       numberOfBlockDays: json['numberOfBlockDays'] as String?,
-      executiveId: json['executiveId'] as int?,
+      executiveId: json['executiveId'] is String 
+          ? int.tryParse(json['executiveId'] as String)
+          : json['executiveId'] as int?,
       pinCode: json['pinCode'] as String?,
       bankName: json['bankName'] as String?,
       bankBranch: json['bankBranch'] as String?,
@@ -129,10 +141,18 @@ class Dealer extends Equatable {
       upiId: json['upiId'] as String?,
       iban: json['iban'] as String?,
       swiftCode: json['swiftCode'] as String?,
-      status: json['status'] as int?,
-      allowEmail: json['allowEmail'] as int?,
-      allowTCS: json['allowTCS'] as int?,
-      allowSMS: json['allowSMS'] as int?,
+      status: json['status'] is String 
+          ? int.tryParse(json['status'] as String)
+          : json['status'] as int?,
+      allowEmail: json['allowEmail'] is String 
+          ? int.tryParse(json['allowEmail'] as String)
+          : json['allowEmail'] as int?,
+      allowTCS: json['allowTCS'] is String 
+          ? int.tryParse(json['allowTCS'] as String)
+          : json['allowTCS'] as int?,
+      allowSMS: json['allowSMS'] is String 
+          ? int.tryParse(json['allowSMS'] as String)
+          : json['allowSMS'] as int?,
       blockReason: json['blockReason'] as String?,
       creditLimit: json['creditLimit'] as String?,
       useCostCentre: json['useCostCentre'] as bool?,

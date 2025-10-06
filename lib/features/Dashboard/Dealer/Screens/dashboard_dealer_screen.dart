@@ -1,16 +1,14 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/Link/screens/Link_screen.dart';
+import 'package:clone/features/Contact_Support/screen/contact_us_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Gallery_Type/screen/gallery_type_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/My%20Cart/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/my_orders_screen.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/dues_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Invoices/screens/invoice_screen.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/Place_order_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/pending_invoices_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
 import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../../constants/string_constants.dart';
 import '../../../../core/router/router_extensions.dart';
 import '../../../auth/dealer/bloc/dealer_auth_bloc.dart';
@@ -28,9 +26,9 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DealerAuthBloc>().add(DealerAuthRestoreRequested());
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   context.read<DealerAuthBloc>().add(DealerAuthRestoreRequested());
+    // });
   }
 
   void _navigateToMyOrders(BuildContext context) {
@@ -39,12 +37,12 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
     ).push(MaterialPageRoute(builder: (context) => const MyOrdersScreen()));
   }
 
-  Future<void> _navigateToDues(BuildContext context) async {
+  Future<void> _navigateToPendingInvoicesScreen(BuildContext context) async {
     final userService = getIt<UserService>();
     final customerId = await userService.getCurrentCustomerIdWithFallback();
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (context) => DuesScreen()));
+    ).push(MaterialPageRoute(builder: (context) => PendingInvoicesScreen()));
   }
 
   void _navigateToStocks(BuildContext context) {
@@ -63,33 +61,23 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
     );
   }
 
-  void _navigateToNewArrivals(BuildContext context) {
-    ScaffoldMessenger.of(
+  void _navigateToFeedback(BuildContext context) {
+    Navigator.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Navigate to New Arrivals')));
+    ).push(MaterialPageRoute(builder: (context) => const FeedbackScreen()));
   }
 
-  void _navigateToPromotions(BuildContext context) {}
-
-  Future<void> _launchCatalogueWebsite() async {
-    final Uri url = Uri.parse('https://catalogue.abm4trades.com/');
-    try {
-      if (await canLaunchUrl(url)) {
-        await launchUrl(url, mode: LaunchMode.externalApplication);
-      } else {
-        await launchUrl(url, mode: LaunchMode.platformDefault);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not open website: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+  void _navigateToGallery(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const GalleryTypeScreen()));
   }
+
+  // void _navigateToContactus(BuildContext context) {
+  //   Navigator.of(
+  //     context,
+  //   ).push(MaterialPageRoute(builder: (context) => const ContactUsScreen()));
+  // }
 
   AlertDialog __handleLogout(BuildContext context) {
     return (AlertDialog(
@@ -124,7 +112,7 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
               height: 80,
               fit: BoxFit.contain,
             ),
-            const SizedBox(width: 35),
+            const SizedBox(width: 25),
             const Text(
               'Dealer Dashboard',
               style: TextStyle(fontWeight: FontWeight.w500),
@@ -172,6 +160,7 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
                     print('Is Authenticated: ${state.isAuthenticated}');
                     print('Dealer: ${state.dealer}');
                     print('Dealer Name: ${state.dealer?.name}');
+                    print('Dealer Name: ${state.dealer?.mobile}');
                     print('Dealer Email: ${state.dealer?.email}');
                     print('Dealer ID: ${state.dealer?.id}');
                     print('Token: ${state.token != null ? "Present" : "Null"}');
@@ -185,11 +174,19 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
                       dealerName = 'User';
                     }
 
+                    String dealerMobile = 'Dealer';
+                    if (state.dealer?.mobile != null &&
+                        state.dealer!.mobile.isNotEmpty) {
+                      dealerMobile = state.dealer!.mobile;
+                    } else if (state.isAuthenticated) {
+                      dealerMobile = 'User';
+                    }
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Welcome back,\n$dealerName',
+                          'Welcome back,\n$dealerName,  $dealerMobile',
                           style: TextStyle(
                             color: Color.fromARGB(255, 95, 91, 91),
                             fontWeight: FontWeight.w400,
@@ -258,7 +255,7 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
                       QuickAccessTile(
                         title: 'Pending Invoices',
                         imagePath: 'assets/dashboard/invoices.png',
-                        onTap: () => _navigateToDues(context),
+                        onTap: () => _navigateToPendingInvoicesScreen(context),
                       ),
                       QuickAccessTile(
                         title: 'Stocks',
@@ -273,17 +270,18 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
                       QuickAccessTile(
                         title: 'Feedback',
                         imagePath: 'assets/dashboard/feedback.png',
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const FeedbackScreen(),
-                          ),
-                        ),
+                        onTap: () => _navigateToFeedback(context),
                       ),
                       QuickAccessTile(
-                        title: 'Catalog',
-                        imagePath: 'assets/dashboard/item_ledger.png',
-                        onTap: () => _launchCatalogueWebsite(),
+                        title: 'Gallery',
+                        imagePath: 'assets/dashboard/gallery.png',
+                        onTap: () => _navigateToGallery(context),
                       ),
+                      // QuickAccessTile(
+                      //   title: 'Contact Us',
+                      //   imagePath: 'assets/dashboard/contact_us.png',
+                      //   onTap: () => _navigateToContactus(context),
+                      // ),
                     ],
                   ),
                   const SizedBox(height: 24),

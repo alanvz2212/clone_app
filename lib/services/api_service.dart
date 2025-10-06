@@ -1,18 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
 import '../constants/string_constants.dart';
+import '../constants/api_endpoints.dart';
 import 'cache_service.dart';
 import 'network_service.dart';
+
 class ApiService {
-  static const String baseUrl = 'https://tmsapi.abm4trades.com';//tmsapi.abm4trades.com';
   late final Dio _dio;
   final Logger _logger = Logger();
   final CacheService _cacheService;
   final NetworkService _networkService;
+  
   ApiService(this._cacheService, this._networkService) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: baseUrl,
+        baseUrl: ApiEndpoints.baseUrl,
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 30),
         headers: {

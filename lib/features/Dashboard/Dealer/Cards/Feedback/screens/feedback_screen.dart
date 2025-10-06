@@ -6,12 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/feedback_bloc.dart';
 import '../bloc/feedback_event.dart';
 import '../bloc/feedback_state.dart';
+
 class FeedbackScreen extends StatefulWidget {
   final int? customerId;
   const FeedbackScreen({super.key, this.customerId});
   @override
   State<FeedbackScreen> createState() => _FeedbackScreenState();
 }
+
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
@@ -24,6 +26,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     super.initState();
     _userService = getIt<UserService>();
   }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -31,6 +34,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     _feedbackController.dispose();
     super.dispose();
   }
+
   Future<void> _submitFeedback(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       if (_rating == 0) {
@@ -59,6 +63,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -337,4 +342,3 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     );
   }
 }
-

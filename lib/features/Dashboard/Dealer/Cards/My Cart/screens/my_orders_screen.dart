@@ -594,6 +594,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final item = items[index];
+                  print(
+                    'Debug - Item name: "${item.name}", Item ID: ${item.itemId}',
+                  );
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     child: Padding(
@@ -606,10 +609,18 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+                                  'Item Name: ${item.name}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
                                   'Item ID: ${item.itemId}',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
                                 const SizedBox(height: 4),

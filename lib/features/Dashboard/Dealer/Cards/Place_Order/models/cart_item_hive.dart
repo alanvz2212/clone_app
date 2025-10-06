@@ -1,6 +1,7 @@
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/models/cart_model.dart';
 import 'package:hive/hive.dart';
 part 'cart_item_hive.g.dart';
+
 @HiveType(typeId: 0)
 class CartItemHive {
   @HiveField(0)
@@ -26,6 +27,7 @@ class CartItemHive {
       quantity: quantity,
     );
   }
+
   factory CartItemHive.fromCartItem(CartItem item) {
     return CartItemHive(
       itemId: item.itemId,
@@ -35,4 +37,3 @@ class CartItemHive {
     );
   }
 }
-

@@ -2,20 +2,65 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/stock_model.dart';
 import '../../../../../../constants/api_endpoints.dart';
+import '../../../../../../constants/string_constants.dart';
 
 class StockService {
-  static const String baseUrl = 'https://tmsapi.abm4trades.com';
-  static const String authToken = '659476889604ib26is5ods8ah9l';
+  Future<StockResponse> getItemStock(String itemId) async {
+    try {
+      final url = Uri.parse(ApiEndpoints.itemStockWithId(itemId));
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: '',
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        return StockResponse.fromJson(jsonData);
+      } else {
+        throw Exception('Failed to load stock data');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
+  Future<List<dynamic>> searchItems(String itemName) async {
+    try {
+      final searchUrl = Uri.parse(ApiEndpoints.itemSearchWithQuery(itemName));
+      final searchResponse = await http.post(
+        searchUrl,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: '',
+      );
+
+      if (searchResponse.statusCode == 200) {
+        final jsonData = json.decode(searchResponse.body);
+        return jsonData['data'] ?? [];
+      } else {
+        throw Exception('Failed to search items');
+      }
+    } catch (e) {
+      throw Exception('Error searching items: $e');
+    }
+  }
+
   static Future<StockResponse?> getItemStockDetails(int itemId) async {
     try {
       final url = Uri.parse(
-        '$baseUrl/General/Item/ItemStockDetails?itemId=$itemId',
+        '${ApiEndpoints.baseUrl}/General/Item/ItemStockDetails?itemId=$itemId',
       );
       final response = await http.post(
         url,
         headers: {
           'accept': '*/*',
-          'Authorization': 'Bearer $authToken',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: '',
@@ -47,7 +92,7 @@ class StockService {
         searchUrl,
         headers: {
           'accept': '*/*',
-          'Authorization': 'Bearer $authToken',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: '',

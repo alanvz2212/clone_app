@@ -1,19 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/sales_order_model.dart';
+import '../../../../../../constants/api_endpoints.dart';
+import '../../../../../../constants/string_constants.dart';
+
 class SalesOrderService {
-  static const String baseUrl = 'https://tmsapi.abm4trades.com';
-  static const String authToken = '659476889604ib26is5ods8ah9l';
-  static Future<List<SalesOrder>> getCustomerSalesOrders(int customerId) async {
+  Future<List<SalesOrder>> getCustomerSalesOrders(int customerId) async {
     try {
-      final url = Uri.parse(
-        '$baseUrl/Inventory/SalesOrder/GetCustomerSalesOrder?customerId=$customerId',
-      );
+      final url = Uri.parse(ApiEndpoints.customerSalesOrderWithId(customerId));
       final response = await http.post(
         url,
         headers: {
           'accept': '*/*',
-          'Authorization': 'Bearer $authToken',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: '',

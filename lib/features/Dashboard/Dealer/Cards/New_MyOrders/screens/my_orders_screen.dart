@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/sales_order_model.dart';
 import '../services/sales_order_service.dart';
 import 'package:clone/constants/string_constants.dart';
+
 class NewMyOrdersScreen extends StatefulWidget {
   final int customerId;
   const NewMyOrdersScreen({Key? key, required this.customerId})
@@ -9,22 +10,27 @@ class NewMyOrdersScreen extends StatefulWidget {
   @override
   State<NewMyOrdersScreen> createState() => _NewMyOrdersScreenState();
 }
+
 class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
   List<SalesOrder> salesOrders = [];
   bool isLoading = true;
   String? errorMessage;
+  late final SalesOrderService _salesOrderService;
+
   @override
   void initState() {
     super.initState();
+    _salesOrderService = SalesOrderService();
     fetchSalesOrders();
   }
+
   Future<void> fetchSalesOrders() async {
     try {
       setState(() {
         isLoading = true;
         errorMessage = null;
       });
-      final orders = await SalesOrderService.getCustomerSalesOrders(
+      final orders = await _salesOrderService.getCustomerSalesOrders(
         widget.customerId,
       );
       setState(() {
@@ -38,6 +44,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,8 +62,8 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
           children: [
             Image.asset(
               'assets/logo1.png',
-               width: 80,
-                        height: 80,
+              width: 80,
+              height: 80,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 30),
@@ -91,6 +98,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
     );
   }
+
   Widget _buildBody() {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -122,7 +130,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       );
     }
     if (salesOrders.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -130,7 +138,11 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
             SizedBox(height: 16),
             Text(
               'No orders found',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
             ),
           ],
         ),
@@ -148,6 +160,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
     );
   }
+
   Widget _buildOrderCard(SalesOrder order) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -163,10 +176,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
               children: [
                 Text(
                   order.invoice,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
                 _buildStatusChip(order.orderstatus),
               ],
@@ -192,10 +202,7 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
                 ),
                 Text(
                   '\₹ ${order.total.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -204,20 +211,18 @@ class _NewMyOrdersScreenState extends State<NewMyOrdersScreen> {
       ),
     );
   }
+
   Widget _buildStatusChip(String? status) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Text(
         'Pending',
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
       ),
     );
   }
+
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
 }
-

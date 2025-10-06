@@ -2,23 +2,25 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
 import '../models/invoice_model.dart';
+import '../../../../../../constants/api_endpoints.dart';
+import '../../../../../../constants/string_constants.dart';
+
 class InvoiceService {
-  static const String _baseUrl = 'https://tmsapi.abm4trades.com';
-  static const String _bearerToken = '659476889604ib26is5ods8ah9l';
   static const Duration _timeout = Duration(seconds: 30);
   final http.Client _client;
+
   InvoiceService({http.Client? client}) : _client = client ?? http.Client();
+
   Future<InvoiceResponse> getCustomerSales(int customerId) async {
     try {
-      final uri = Uri.parse(
-        '$_baseUrl/Inventory/Sales/GetCustomerSales?customerId=$customerId',
-      );
+      final uri = Uri.parse(ApiEndpoints.customerSalesWithId(customerId));
+      
       final response = await _client
           .post(
             uri,
             headers: {
               'accept': '*/*',
-              'Authorization': 'Bearer $_bearerToken',
+              'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
             },
             body: '',

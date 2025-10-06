@@ -1,37 +1,35 @@
 class OrderResponse {
   final bool success;
   final List<OrderData> orders;
-  OrderResponse({
-    required this.success,
-    required this.orders,
-  });
+  OrderResponse({required this.success, required this.orders});
   factory OrderResponse.fromJson(Map<String, dynamic> json) {
     return OrderResponse(
       success: json['success'] ?? false,
-      orders: (json['orders'] as List<dynamic>?)
+      orders:
+          (json['orders'] as List<dynamic>?)
               ?.map((e) => OrderData.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );
   }
 }
+
 class OrderData {
   final Order order;
   final List<OrderItem> items;
-  OrderData({
-    required this.order,
-    required this.items,
-  });
+  OrderData({required this.order, required this.items});
   factory OrderData.fromJson(Map<String, dynamic> json) {
     return OrderData(
       order: Order.fromJson(json['order'] as Map<String, dynamic>),
-      items: (json['items'] as List<dynamic>?)
+      items:
+          (json['items'] as List<dynamic>?)
               ?.map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );
   }
 }
+
 class Order {
   final int id;
   final String invoice;
@@ -63,14 +61,19 @@ class Order {
           : null,
       mobileOrderStatus: json['mobileOrderStatus'] != null
           ? MobileOrderStatus.fromJson(
-              json['mobileOrderStatus'] as Map<String, dynamic>)
+              json['mobileOrderStatus'] as Map<String, dynamic>,
+            )
           : null,
       notes: json['notes'],
       company: json['company'] != null
           ? Company.fromJson(json['company'] as Map<String, dynamic>)
           : null,
-      createdDate: DateTime.parse(json['createdDate'] ?? DateTime.now().toIso8601String()),
-      updatedDate: DateTime.parse(json['updatedDate'] ?? DateTime.now().toIso8601String()),
+      createdDate: DateTime.parse(
+        json['createdDate'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedDate: DateTime.parse(
+        json['updatedDate'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
   static int? _parseToInt(dynamic value) {
@@ -81,6 +84,7 @@ class Order {
     return null;
   }
 }
+
 class Customer {
   final String name;
   final String? email;
@@ -107,13 +111,11 @@ class Customer {
     );
   }
 }
+
 class MobileOrderStatus {
   final String name;
   final bool isCompleted;
-  MobileOrderStatus({
-    required this.name,
-    required this.isCompleted,
-  });
+  MobileOrderStatus({required this.name, required this.isCompleted});
   factory MobileOrderStatus.fromJson(Map<String, dynamic> json) {
     return MobileOrderStatus(
       name: json['name'] ?? '',
@@ -121,15 +123,12 @@ class MobileOrderStatus {
     );
   }
 }
+
 class Company {
   final String companyName;
   final String? phoneNumber;
   final String? logo;
-  Company({
-    required this.companyName,
-    this.phoneNumber,
-    this.logo,
-  });
+  Company({required this.companyName, this.phoneNumber, this.logo});
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
       companyName: json['companyName'] ?? '',
@@ -138,10 +137,12 @@ class Company {
     );
   }
 }
+
 class OrderItem {
   final int id;
   final int mobileOrderId;
   final int itemId;
+  final String name;
   final int itemQuantity;
   final int completedQuantity;
   final DateTime createdDate;
@@ -149,6 +150,7 @@ class OrderItem {
     required this.id,
     required this.mobileOrderId,
     required this.itemId,
+    required this.name,
     required this.itemQuantity,
     required this.completedQuantity,
     required this.createdDate,
@@ -158,9 +160,12 @@ class OrderItem {
       id: _parseToInt(json['id']) ?? 0,
       mobileOrderId: _parseToInt(json['mobileOrderId']) ?? 0,
       itemId: _parseToInt(json['itemId']) ?? 0,
+      name: json['item']?['name'] ?? '',
       itemQuantity: _parseToInt(json['itemQuantity']) ?? 0,
       completedQuantity: _parseToInt(json['completedQuantity']) ?? 0,
-      createdDate: DateTime.parse(json['createdDate'] ?? DateTime.now().toIso8601String()),
+      createdDate: DateTime.parse(
+        json['createdDate'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
   static int? _parseToInt(dynamic value) {
@@ -171,4 +176,3 @@ class OrderItem {
     return null;
   }
 }
-

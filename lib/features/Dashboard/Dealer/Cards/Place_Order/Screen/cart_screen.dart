@@ -1,4 +1,5 @@
 import 'package:clone/constants/string_constants.dart';
+import 'package:clone/constants/api_endpoints.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
 import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
@@ -7,23 +8,25 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
   @override
   State<CartScreen> createState() => _CartScreenState();
 }
+
 class _CartScreenState extends State<CartScreen> {
   final Map<String, TextEditingController> _controllers = {};
   bool _isProcessingCheckout = false;
   late UserService _userService;
-  bool get isUAEUser =>
-      true;
+  bool get isUAEUser => true;
   static const double taxRate = 0.18;
   @override
   void initState() {
     super.initState();
     _userService = getIt<UserService>();
   }
+
   Future<void> _proceedToCheckout(CartProvider cartProvider) async {
     if (_isProcessingCheckout) return;
     setState(() {
@@ -59,12 +62,10 @@ class _CartScreenState extends State<CartScreen> {
         "mobileOrderItem": mobileOrderItems,
       };
       final response = await http.post(
-        Uri.parse(
-          'https://tmsapi.abm4trades.com/api/MobileOrder/NewMobileOrder',
-        ),
+        Uri.parse(ApiEndpoints.newMobileOrder),
         headers: {
           'accept': '*/*',
-          'Authorization': 'Bearer 659476889604ib26is5ods8ah9l',
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(requestBody),
@@ -129,6 +130,7 @@ class _CartScreenState extends State<CartScreen> {
       }
     }
   }
+
   void _updateQuantity(
     CartProvider cartProvider,
     String itemId,
@@ -164,6 +166,7 @@ class _CartScreenState extends State<CartScreen> {
       );
     }
   }
+
   @override
   void dispose() {
     for (var controller in _controllers.values) {
@@ -171,6 +174,7 @@ class _CartScreenState extends State<CartScreen> {
     }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,8 +193,8 @@ class _CartScreenState extends State<CartScreen> {
           children: [
             Image.asset(
               'assets/logo1.png',
-             width: 80,
-                        height: 80,
+              width: 80,
+              height: 80,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 25),
@@ -268,38 +272,39 @@ class _CartScreenState extends State<CartScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black87,
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    if (item.price > 0.0)
+                                      Text(
+                                        '  ₹ ${item.price.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                  ],
                                 ),
                                 const SizedBox(height: 4),
                                 if (item.price > 0.0) ...[
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Price: ₹${item.price.toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
                                   isUAEUser
                                       ? Text(
-                                          'Total + Tax: ₹${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
-                                          style: TextStyle(
+                                          'Total + Tax: ₹ ${(item.total + (item.total * taxRate)).toStringAsFixed(2)}',
+                                          style: const TextStyle(
                                             color: Colors.black,
                                             fontSize: 13,
                                           ),
                                         )
                                       : Text(
-                                          'Total: ₹${item.total.toStringAsFixed(2)}',
-                                          style: TextStyle(
+                                          'Total: ₹ ${item.total.toStringAsFixed(2)}',
+                                          style: const TextStyle(
                                             color: Colors.black,
                                             fontSize: 12,
                                           ),
@@ -519,15 +524,13 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                           Text(
                             isUAEUser
-                                ? '₹${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
-                                : '₹${cartProvider.totalAmount.toStringAsFixed(2)}',
+                                ? '₹ ${(cartProvider.totalAmount + (cartProvider.totalAmount * taxRate)).toStringAsFixed(2)}'
+                                : '₹ ${cartProvider.totalAmount.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 15,
-                              color: isUAEUser
-                                  ? Colors.green[700]
-                                  : Colors.black,
+                              color: isUAEUser ? Colors.black : Colors.black,
                               fontWeight: isUAEUser
-                                  ? FontWeight.w700
+                                  ? FontWeight.w600
                                   : FontWeight.normal,
                             ),
                           ),
@@ -568,7 +571,10 @@ class _CartScreenState extends State<CartScreen> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },
-                                        child: const Text('Cancel'),
+                                        child: const Text(
+                                          'Cancel',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
                                       ),
                                       TextButton(
                                         onPressed: () {
@@ -588,7 +594,7 @@ class _CartScreenState extends State<CartScreen> {
                                         },
                                         child: const Text(
                                           'Clear',
-                                          style: TextStyle(color: Colors.red),
+                                          style: TextStyle(color: Colors.black),
                                         ),
                                       ),
                                     ],
@@ -687,4 +693,3 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 }
-

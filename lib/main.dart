@@ -15,6 +15,7 @@ import 'features/auth/dealer/bloc/dealer_auth_event.dart';
 import 'features/auth/transporter/bloc/transporter_auth_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/bloc/search_item_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
@@ -26,6 +27,7 @@ void main() async {
   await setupDependencyInjection();
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
@@ -35,7 +37,8 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<DealerAuthBloc>(
-            create: (context) => getIt<DealerAuthBloc>()..add(DealerAuthRestoreRequested()),
+            create: (context) =>
+                getIt<DealerAuthBloc>()..add(DealerAuthRestoreRequested()),
           ),
           BlocProvider<TransporterAuthBloc>(
             create: (context) => getIt<TransporterAuthBloc>(),
@@ -47,17 +50,9 @@ class MyApp extends StatelessWidget {
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: 'clone',
-          // theme: AppTheme.lightTheme.copyWith(
-          //   extensions: [
-          //     NetworkStatusTheme.light,
-          //     QuickAccessTileTheme.light,
-          //     DashboardTheme.light,
-          //   ],
-          // ),
           routerConfig: AppRouter.router,
         ),
       ),
     );
   }
 }
-

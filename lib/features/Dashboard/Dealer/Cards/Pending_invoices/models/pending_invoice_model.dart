@@ -1,4 +1,4 @@
-class DuesModel {
+class PendingInvoiceModel {
   final int id;
   final String name;
   final String billNo;
@@ -8,7 +8,8 @@ class DuesModel {
   final double credit;
   final double outStandingAmount;
   final String type;
-  DuesModel({
+
+  PendingInvoiceModel({
     required this.id,
     required this.name,
     required this.billNo,
@@ -19,8 +20,9 @@ class DuesModel {
     required this.outStandingAmount,
     required this.type,
   });
-  factory DuesModel.fromJson(Map<String, dynamic> json) {
-    return DuesModel(
+
+  factory PendingInvoiceModel.fromJson(Map<String, dynamic> json) {
+    return PendingInvoiceModel(
       id: json['id'] ?? 0,
       name: json['name'] ?? '',
       billNo: json['billNo'] ?? '',
@@ -32,6 +34,7 @@ class DuesModel {
       type: json['type'] ?? '',
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -46,27 +49,29 @@ class DuesModel {
     };
   }
 }
-class DuesRequest {
-  final String dateFrom;
-  final String dateTo;
+
+class PendingInvoiceRequest {
+  final String datefrom;
+  final String dateto;
   final int customerId;
   final int costCentreId;
   final String type;
-  DuesRequest({
-    required this.dateFrom,
-    required this.dateTo,
+
+  PendingInvoiceRequest({
+    required this.datefrom,
+    required this.dateto,
     required this.customerId,
     this.costCentreId = 0,
     this.type = "string",
   });
+
   Map<String, dynamic> toJson() {
     return {
-      'datefrom': dateFrom,
-      'dateto': dateTo,
+      'datefrom': datefrom,
+      'dateto': dateto,
       'customerId': customerId,
       'costCentreId': costCentreId,
       'type': type,
     };
   }
 }
-

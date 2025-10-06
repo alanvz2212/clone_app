@@ -15,6 +15,10 @@ import '../../features/OTP_authentication/Sent_otp/services/otp_service.dart';
 import '../../features/OTP_authentication/Sent_otp/bloc/otp_bloc.dart';
 import '../../features/OTP_authentication/verify_otp/services/verify_otp_service.dart';
 import '../../features/OTP_authentication/verify_otp/bloc/verify_otp_bloc.dart';
+import '../../features/Dashboard/Dealer/Cards/Gallery_Type/service/gallery_type_service.dart';
+import '../../features/Dashboard/Dealer/Cards/Gallery_Type/bloc/gallery_type_bloc.dart';
+import '../../features/Dashboard/Dealer/Cards/Gallery/services/gallery_service.dart';
+import '../../features/Dashboard/Dealer/Cards/Gallery/bloc/gallery_bloc.dart';
 import '../../constants/api_endpoints.dart';
 final GetIt getIt = GetIt.instance;
 Future<void> setupDependencyInjection() async {
@@ -50,6 +54,14 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<VerifyOtpService>(
     () => VerifyOtpService(),
   );
+
+  getIt.registerLazySingleton<GalleryService>(
+    () => GalleryService(getIt<ApiService>()),
+  );
+
+  getIt.registerLazySingleton<GalleryDocumentService>(
+    () => GalleryDocumentService(getIt<ApiService>()),
+  );
   getIt.registerFactory<DealerAuthBloc>(
     () => DealerAuthBloc(
       repository: getIt<DealerAuthRepository>(),
@@ -73,6 +85,14 @@ Future<void> setupDependencyInjection() async {
       verifyOtpService: getIt<VerifyOtpService>(),
       authService: getIt<AuthService>(),
     ),
+  );
+
+  getIt.registerFactory<GalleryBloc>(
+    () => GalleryBloc(galleryService: getIt<GalleryService>()),
+  );
+
+  getIt.registerFactory<GalleryDocumentBloc>(
+    () => GalleryDocumentBloc(galleryDocumentService: getIt<GalleryDocumentService>()),
   );
 }
 ApiService get apiService => getIt<ApiService>();

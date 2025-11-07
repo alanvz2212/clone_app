@@ -12,8 +12,6 @@ class StorageService {
   static const String _savedDealerPasswordKey = 'saved_dealer_password';
   static const String _savedTransporterIdKey = 'saved_transporter_id';
   static const String _savedTransporterPasswordKey = 'saved_transporter_password';
-  static const String _mobileUserKey = 'mobile_user';
-  static const String _phoneNumberKey = 'phone_number';
   late final SharedPreferences _prefs;
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
@@ -148,33 +146,6 @@ class StorageService {
   }
   Future<Set<String>> getKeys() async {
     return _prefs.getKeys();
-  }
-  Future<void> setMobileUser(List<dynamic> mobileUser) async {
-    final mobileUserJson = jsonEncode(mobileUser);
-    await _prefs.setString(_mobileUserKey, mobileUserJson);
-  }
-  Future<List<dynamic>> getMobileUser() async {
-    final mobileUserJson = _prefs.getString(_mobileUserKey);
-    if (mobileUserJson != null) {
-      try {
-        return jsonDecode(mobileUserJson) as List<dynamic>;
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  }
-  Future<void> clearMobileUser() async {
-    await _prefs.remove(_mobileUserKey);
-  }
-  Future<void> setPhoneNumber(String phoneNumber) async {
-    await _prefs.setString(_phoneNumberKey, phoneNumber);
-  }
-  Future<String?> getPhoneNumber() async {
-    return _prefs.getString(_phoneNumberKey);
-  }
-  Future<void> clearPhoneNumber() async {
-    await _prefs.remove(_phoneNumberKey);
   }
 }
 

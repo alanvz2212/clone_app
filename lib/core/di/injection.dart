@@ -38,7 +38,7 @@ Future<void> setupDependencyInjection() async {
   await authService.initializeAuth();
   getIt.registerSingleton<AuthService>(authService);
   getIt.registerLazySingleton<UserService>(
-    () => UserService(getIt<AuthService>(), getIt<StorageService>()),
+    () => UserService(getIt<AuthService>()),
   );
   getIt.registerLazySingleton<DealerAuthRepository>(
     () => DealerAuthRepository(baseUrl: ApiEndpoints.baseUrl),
@@ -90,7 +90,6 @@ Future<void> setupDependencyInjection() async {
       verifyOtpService: getIt<VerifyOtpService>(),
       authService: getIt<AuthService>(),
       mobileLogService: getIt<MobileLogService>(),
-      userService: getIt<UserService>(),
     ),
   );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../bloc/gallery_bloc.dart';
 import '../bloc/gallery_event.dart';
 import '../bloc/gallery_state.dart';
@@ -39,6 +40,20 @@ class GalleryView extends StatelessWidget {
     required this.galleryTypeName,
     required this.galleryTypeId,
   }) : super(key: key);
+
+  bool _isVideoFile(String fileName) {
+    final videoExtensions = [
+      '.mp4',
+      '.avi',
+      '.mov',
+      '.mkv',
+      '.flv',
+      '.wmv',
+      '.webm',
+    ];
+    final lowerFileName = fileName.toLowerCase();
+    return videoExtensions.any((ext) => lowerFileName.endsWith(ext));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,14 +133,11 @@ class GalleryView extends StatelessWidget {
                 itemCount: state.documents.length,
                 itemBuilder: (context, index) {
                   final document = state.documents[index];
+                  final isVideo = _isVideoFile(document.fileName);
+
                   return GestureDetector(
-                    onTap: () {
-                      _showFullImage(
-                        context,
-                        document.fullImageUrl,
-                        document.title,
-                      );
-                    },
+                    onTap: () =>
+                        _openImageInBrowser(document.fullImageUrl, context),
                     child: Card(
                       elevation: 4,
                       shape: RoundedRectangleBorder(
@@ -139,24 +151,63 @@ class GalleryView extends StatelessWidget {
                               borderRadius: const BorderRadius.vertical(
                                 top: Radius.circular(12),
                               ),
-                              child: CachedNetworkImage(
-                                imageUrl: document.fullImageUrl,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(
-                                  color: Colors.grey[200],
-                                  child: const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  color: Colors.grey[200],
-                                  child: const Icon(
-                                    Icons.broken_image,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
+                              child: isVideo
+                                  ? Container(
+                                      color: Colors.grey[200],
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.videocam,
+                                            size: 60,
+                                            color: Color(0xFFCEB007),
+                                          ),
+                                          Positioned(
+                                            bottom: 8,
+                                            right: 8,
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 4,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: const Text(
+                                                'VIDEO',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : CachedNetworkImage(
+                                      imageUrl: document.fullImageUrl,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        color: Colors.grey[200],
+                                        child: const Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                            color: Colors.grey[200],
+                                            child: const Icon(
+                                              Icons.picture_as_pdf,
+                                              size: 50,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                    ),
                             ),
                           ),
                           Padding(
@@ -213,66 +264,39 @@ class GalleryView extends StatelessWidget {
     );
   }
 
-  void _showFullImage(BuildContext context, String imageUrl, String title) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
+  Future<void> _openImageInBrowser(String fileUrl, BuildContext context) async {
+    final Uri url = Uri.parse(fileUrl);
+    final isVideo = _isVideoFile(fileUrl);
+
+    try {
+      // Use externalApplication mode to force opening in an external app
+      final launched = await launchUrl(
+        url,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isVideo
+                  ? 'Could not open video. No compatible app found.'
+                  : 'Could not open image. No compatible app found.',
             ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: InteractiveViewer(
-                child: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.contain,
-                  placeholder: (context, url) => Container(
-                    padding: const EdgeInsets.all(32),
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    padding: const EdgeInsets.all(32),
-                    color: Colors.grey[200],
-                    child: const Icon(
-                      Icons.broken_image,
-                      size: 100,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFCEB007),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Close'),
-            ),
-          ],
-        ),
-      ),
-    );
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to open file: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

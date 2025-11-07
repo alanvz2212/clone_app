@@ -42,8 +42,19 @@ class ApiEndpoints {
   //Gallery
   static const String gallery = '$baseUrl/api/GalleryType/GetAll';
   static String galleryDocuments(int id) =>
-      '$baseUrl/api/Gallery/GetGalleryDocuments/$id';
+      '$baseUrl/api/Gallery/GetByType/$id';
 
   //specifier
   static const String specifiercreateEndpoint = '$baseUrl/api/Specification';
+
+  //mobilelog
+  static const String mobilelogs = '$baseUrl/General/MobileLog/NewMobileLogs';
+
+  //Scheme dealer
+  static String schemeDealerWithId(int userId) =>
+      '$baseUrl/General/Scheme/GetCustomerScheme?userId=$userId';
+
+  // //Scheme specifier
+  static String schemeSpecifierWithId(int userId) =>
+      '$baseUrl/General/Scheme/GetSpecifierScheme?userId=$userId';
 }

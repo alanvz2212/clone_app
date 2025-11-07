@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:clone/constants/api_endpoints.dart';
 import 'package:clone/constants/string_constants.dart';
-import 'package:clone/features/Specifier/Cards/Specifier_Create/model/specifier_create_model.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/model/specifier_create_model.dart';
 import 'package:http/http.dart' as http;
 
 class SpecifierCreateService {

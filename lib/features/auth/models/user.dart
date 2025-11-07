@@ -9,6 +9,7 @@ class User {
   final bool isActive;
   final DateTime createdAt;
   final DateTime? lastLoginAt;
+  final bool isSpecifier;
   const User({
     required this.userId,
     required this.mobileNumber,
@@ -19,6 +20,7 @@ class User {
     this.isActive = true,
     required this.createdAt,
     this.lastLoginAt,
+    this.isSpecifier = false,
   });
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -36,6 +38,7 @@ class User {
       lastLoginAt: json['last_login_at'] != null
           ? DateTime.parse(json['last_login_at'] as String)
           : null,
+      isSpecifier: json['is_specifier'] as bool? ?? false,
     );
   }
   Map<String, dynamic> toJson() {
@@ -49,6 +52,7 @@ class User {
       'is_active': isActive,
       'created_at': createdAt.toIso8601String(),
       'last_login_at': lastLoginAt?.toIso8601String(),
+      'is_specifier': isSpecifier,
     };
   }
 }

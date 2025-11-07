@@ -353,51 +353,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                         ),
                         child: Row(
                           children: [
-                            // Expanded(
-                            //   child: Column(
-                            //     crossAxisAlignment: CrossAxisAlignment.start,
-                            //     children: [
-                            //       Text(
-                            //         item.name ?? 'Unknown Item',
-                            //         style: const TextStyle(
-                            //           fontSize: 14,
-                            //           color: Colors.black,
-                            //         ),
-                            //       ),
-                            //       const SizedBox(height: 4),
-                            //       if (item.currentSalesPrice != null &&
-                            //           item.currentSalesPrice! > 0)
-                            //         Text(
-                            //           '₹ ${item.currentSalesPrice!.toStringAsFixed(2)}',
-                            //           style: TextStyle(
-                            //             color: Colors.black,
-                            //             fontSize: 14,
-                            //           ),
-                            //         ),
-                            //       if (currentQuantity > 0 &&
-                            //           item.currentSalesPrice != null)
-                            //         Padding(
-                            //           padding: const EdgeInsets.only(top: 4),
-                            //           child:
-                            //               isUAEUser && item.tax?.percent != null
-                            //               ? Text(
-                            //                   'Total + Tax: ₹${((item.currentSalesPrice! * currentQuantity) + (item.currentSalesPrice! * currentQuantity * (item.tax!.percent! / 100))).toStringAsFixed(2)}',
-                            //                   style: TextStyle(
-                            //                     color: Colors.black,
-                            //                     fontSize: 13,
-                            //                   ),
-                            //                 )
-                            //               : Text(
-                            //                   'Total: ₹${(item.currentSalesPrice! * currentQuantity).toStringAsFixed(2)}',
-                            //                   style: TextStyle(
-                            //                     color: Colors.black,
-                            //                     fontSize: 12,
-                            //                   ),
-                            //                 ),
-                            //         ),
-                            //     ],
-                            //   ),
-                            // ),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

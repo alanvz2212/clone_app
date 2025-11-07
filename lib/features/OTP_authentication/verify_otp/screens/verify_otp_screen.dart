@@ -1,5 +1,5 @@
 import 'package:clone/features/Dashboard/Dealer/Screens/dashboard_dealer_screen.dart';
-import 'package:clone/features/Specifier/Screens/specifier_dashboard_screen.dart';
+import 'package:clone/features/Dashboard/Specifier/Screens/specifier_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -95,31 +95,13 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                 );
                 // Check if user is a specifier
                 if (state.userData?.isSpecifier == true) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SpecifierDashboardScreen(),
-                    ),
-                  );
+                  context.go('/specifier-dashboard');
                 } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const DashboardDealerScreen(),
-                    ),
-                  );
+                  context.go('/dealer-dashboard');
                 }
               } else {
                 context.go('/transporter-dashboard');
               }
-              // else {
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => const DashboardDealerScreen(),
-              //     ),
-              //   );
-              // }
             } else if (state.error != null) {
               Helpers.showErrorSnackBar(context, state.error!);
             }

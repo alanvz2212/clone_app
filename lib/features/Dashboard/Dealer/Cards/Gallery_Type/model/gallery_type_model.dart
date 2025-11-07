@@ -15,7 +15,8 @@ class GalleryTypeResponse {
     return GalleryTypeResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      data: (json['data'] as List<dynamic>?)
+      data:
+          (json['data'] as List<dynamic>?)
               ?.map((item) => GalleryType.fromJson(item))
               .toList() ??
           [],
@@ -69,7 +70,9 @@ class GalleryType {
       referenceId: json['referenceId'],
       referenceType: json['referenceType'],
       companyId: json['companyId'] ?? 0,
-      company: json['company'] != null ? Company.fromJson(json['company']) : null,
+      company: json['company'] != null
+          ? Company.fromJson(json['company'])
+          : null,
       id: json['id'] ?? 0,
       mainId: json['mainId'] ?? '',
       isDeleted: json['isDeleted'] ?? false,

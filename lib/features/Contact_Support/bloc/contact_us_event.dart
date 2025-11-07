@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:equatable/equatable.dart';
 
 abstract class ContactUsEvent extends Equatable {
@@ -13,7 +14,7 @@ class SubmitContactUsEvent extends ContactUsEvent {
   final String companyName;
   final String companyAddress;
   final String companyGST;
-  final String gstCertificate;
+  final File gstCertificateFile;
 
   const SubmitContactUsEvent({
     required this.whatsappNumber,
@@ -21,7 +22,7 @@ class SubmitContactUsEvent extends ContactUsEvent {
     required this.companyName,
     required this.companyAddress,
     required this.companyGST,
-    required this.gstCertificate, 
+    required this.gstCertificateFile, 
   });
 
   @override
@@ -31,6 +32,6 @@ class SubmitContactUsEvent extends ContactUsEvent {
     companyName,
     companyAddress,
     companyGST,
-    gstCertificate,
+    gstCertificateFile,
   ];
 }

@@ -27,7 +27,10 @@ class _CartScreenState extends State<CartScreen> {
     _userService = getIt<UserService>();
   }
 
-  Future<void> _proceedToCheckout(CartProvider cartProvider) async {
+  Future<void> _proceedToCheckout(
+    CartProvider cartProvider,
+    String notes,
+  ) async {
     if (_isProcessingCheckout) return;
     setState(() {
       _isProcessingCheckout = true;
@@ -58,7 +61,7 @@ class _CartScreenState extends State<CartScreen> {
         "invoice": "string",
         "customerId": customerId,
         "mobileOrderStatusId": 1,
-        "notes": "Notes",
+        "notes": notes.isEmpty ? "No notes" : notes,
         "mobileOrderItem": mobileOrderItems,
       };
       final response = await http.post(
@@ -129,6 +132,58 @@ class _CartScreenState extends State<CartScreen> {
         });
       }
     }
+  }
+
+  void _showNotesDialog(CartProvider cartProvider) {
+    final TextEditingController notesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Notes'),
+          content: TextField(
+            controller: notesController,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: 'Enter any notes for your order...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(
+                  color: Color(0xFFCEB007),
+                  width: 2,
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _proceedToCheckout(cartProvider, '');
+              },
+              child: const Text('Skip', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _proceedToCheckout(cartProvider, notesController.text.trim());
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFCEB007),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+      notesController.dispose();
+    });
   }
 
   void _updateQuantity(
@@ -622,7 +677,7 @@ class _CartScreenState extends State<CartScreen> {
                           child: ElevatedButton(
                             onPressed: _isProcessingCheckout
                                 ? null
-                                : () => _proceedToCheckout(cartProvider),
+                                : () => _showNotesDialog(cartProvider),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _isProcessingCheckout
                                   ? Colors.grey

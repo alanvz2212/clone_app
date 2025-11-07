@@ -15,6 +15,18 @@ import 'features/auth/dealer/bloc/dealer_auth_event.dart';
 import 'features/auth/transporter/bloc/transporter_auth_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/bloc/search_item_bloc.dart';
 import 'features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
+import 'package:workmanager/workmanager.dart';
+
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    print("WorkManager background task executed: $task");
+    if (task == "simplePeriodicTask") {
+      print("Running periodic task...");
+    }
+    return Future.value(true);
+  });
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +37,12 @@ void main() async {
   await CartHiveService.init();
   await DealerAuthHiveService.init();
   await setupDependencyInjection();
+  Workmanager().initialize(callbackDispatcher);
+  Workmanager().registerPeriodicTask(
+    "uniqueName",
+    "simplePeriodicTask",
+    frequency: Duration(minutes: 15),
+  );
   runApp(const MyApp());
 }
 

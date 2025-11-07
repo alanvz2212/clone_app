@@ -5,6 +5,7 @@ import '../../services/user_service.dart';
 import '../../services/storage_service.dart';
 import '../../services/cache_service.dart';
 import '../../services/network_service.dart';
+import '../../services/mobile_log_service.dart';
 import '../../features/auth/dealer/repositories/dealer_auth_repository.dart';
 import '../../features/auth/transporter/repositories/transporter_auth_repository.dart';
 import '../../features/auth/dealer/bloc/dealer_auth_bloc.dart';
@@ -55,6 +56,10 @@ Future<void> setupDependencyInjection() async {
     () => VerifyOtpService(),
   );
 
+  getIt.registerLazySingleton<MobileLogService>(
+    () => MobileLogService(),
+  );
+
   getIt.registerLazySingleton<GalleryService>(
     () => GalleryService(getIt<ApiService>()),
   );
@@ -84,6 +89,7 @@ Future<void> setupDependencyInjection() async {
     () => VerifyOtpBloc(
       verifyOtpService: getIt<VerifyOtpService>(),
       authService: getIt<AuthService>(),
+      mobileLogService: getIt<MobileLogService>(),
     ),
   );
 

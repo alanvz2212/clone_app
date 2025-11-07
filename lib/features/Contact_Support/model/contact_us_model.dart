@@ -8,7 +8,6 @@ class ContactUsRequest {
   final String companyName;
   final String companyAddress;
   final String companyGST;
-  final String gstCertificate;
 
   ContactUsRequest({
     this.id = 0,
@@ -20,7 +19,6 @@ class ContactUsRequest {
     this.companyName = "string",
     this.companyAddress = "string",
     this.companyGST = "string",
-    this.gstCertificate = "string",
   });
 
   Map<String, dynamic> toJson() {
@@ -34,7 +32,6 @@ class ContactUsRequest {
       'companyName': companyName,
       'companyAddress': companyAddress,
       'companyGST': companyGST,
-      'gstCertificate': gstCertificate,
     };
   }
 }

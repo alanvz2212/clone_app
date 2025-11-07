@@ -5,12 +5,14 @@ import '../../features/auth/screens/auth_screen.dart';
 import '../../features/Dashboard/Dealer/Screens/dashboard_dealer_screen.dart';
 import '../../features/Dashboard/Transporter/Screens/dashboard_transporter_screen.dart';
 import '../../features/OTP_authentication/verify_otp/screens/verify_otp_screen.dart';
+import '../../features/Dashboard/Specifier/Screens/specifier_dashboard_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
   static const String auth = '/auth';
   static const String dealerDashboard = '/dealer-dashboard';
   static const String transporterDashboard = '/transporter-dashboard';
+  static const String specifierDashboard = '/specifier-dashboard';
   static const String verifyOtp = '/verify-otp';
   static final GoRouter router = GoRouter(
     initialLocation: splash,
@@ -42,6 +44,11 @@ class AppRouter {
           final phoneNumber = state.uri.queryParameters['phone'] ?? '';
           return VerifyOtpScreen(phoneNumber: phoneNumber);
         },
+      ),
+      GoRoute(
+        path: specifierDashboard,
+        name: 'specifier-dashboard',
+        builder: (context, state) => const SpecifierDashboardScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

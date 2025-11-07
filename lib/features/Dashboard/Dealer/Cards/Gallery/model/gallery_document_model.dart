@@ -27,26 +27,26 @@ class GalleryDocumentResponse {
 
 class GalleryDocument {
   final String title;
-  final String filePath;
+  final String fileName;
 
   GalleryDocument({
     required this.title,
-    required this.filePath,
+    required this.fileName,
   });
 
   factory GalleryDocument.fromJson(Map<String, dynamic> json) {
     return GalleryDocument(
       title: json['title'] ?? '',
-      filePath: json['filePath'] ?? '',
+      fileName: json['fileName'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'title': title,
-      'filePath': filePath,
+      'fileName': fileName,
     };
   }
 
-  String get fullImageUrl => 'https://tmsapi.abm4trades.com$filePath';
+  String get fullImageUrl => 'https://tmsapi.abm4trades.com/$fileName';
 }

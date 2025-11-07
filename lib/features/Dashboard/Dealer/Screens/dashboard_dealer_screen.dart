@@ -4,6 +4,7 @@ import 'package:clone/features/Dashboard/Dealer/Cards/My%20Cart/screens/my_order
 import 'package:clone/features/Dashboard/Dealer/Cards/New_MyOrders/screens/my_orders_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Feedback/screens/feedback_screen.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Pending_invoices/screens/pending_invoices_screen.dart';
+import 'package:clone/features/Dashboard/Dealer/Cards/Scheme_dealer/screen/scheme_dealer.dart';
 import 'package:clone/features/Dashboard/Dealer/Cards/Stocks/screens/stock_screen.dart';
 import 'package:clone/core/di/injection.dart';
 import 'package:clone/services/user_service.dart';
@@ -71,6 +72,12 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const GalleryTypeScreen()));
+  }
+
+  void _navigateToDealerScheme(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const SchemeDealer()));
   }
 
   // void _navigateToContactus(BuildContext context) {
@@ -277,6 +284,12 @@ class _DashboardDealerScreenState extends State<DashboardDealerScreen> {
                         imagePath: 'assets/dashboard/gallery.png',
                         onTap: () => _navigateToGallery(context),
                       ),
+                      QuickAccessTile(
+                        title: 'Scheme',
+                        imagePath: 'assets/dashboard/gallery.png',
+                        onTap: () => _navigateToDealerScheme(context),
+                      ),
+
                       // QuickAccessTile(
                       //   title: 'Contact Us',
                       //   imagePath: 'assets/dashboard/contact_us.png',

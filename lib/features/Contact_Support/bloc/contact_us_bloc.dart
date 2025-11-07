@@ -21,10 +21,12 @@ class ContactUsBloc extends Bloc<ContactUsEvent, ContactUsState> {
         companyName: event.companyName,
         companyAddress: event.companyAddress,
         companyGST: event.companyGST,
-        gstCertificate: event.gstCertificate,
       );
 
-      final response = await ContactUsService.submitContactUs(request);
+      final response = await ContactUsService.submitContactUs(
+        request,
+        event.gstCertificateFile,
+      );
 
       if (response.success) {
         emit(ContactUsSuccess(message: 'Thank you for contacting us!'));

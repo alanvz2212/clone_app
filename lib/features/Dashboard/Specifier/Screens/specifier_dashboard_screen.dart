@@ -1,6 +1,7 @@
 import 'package:clone/constants/string_constants.dart';
 import 'package:clone/core/router/router_extensions.dart';
-import 'package:clone/features/Specifier/Cards/Specifier_Create/screens/specifier_create_screen.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Scheme_specifier/screen/scheme_specifier.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/screens/specifier_create_screen.dart';
 import 'package:clone/features/auth/dealer/bloc/dealer_auth_bloc.dart';
 import 'package:clone/features/auth/dealer/bloc/dealer_auth_event.dart';
 import 'package:clone/features/auth/dealer/bloc/dealer_auth_state.dart';
@@ -49,6 +50,12 @@ class _SpecifierDashboardScreenState extends State<SpecifierDashboardScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const SpecifierCreateScreen()),
     );
+  }
+
+  void _navigateToSpecifierScheme(BuildContext context) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const SchemeSpecifier()));
   }
 
   Widget build(BuildContext context) {
@@ -202,6 +209,11 @@ class _SpecifierDashboardScreenState extends State<SpecifierDashboardScreen> {
                         title: 'Create Specification',
                         imagePath: 'assets/dashboard/my_cart.png',
                         onTap: () => _navigateToSpecification(context),
+                      ),
+                      QuickAccessTile(
+                        title: 'Scheme',
+                        imagePath: 'assets/dashboard/my_cart.png',
+                        onTap: () => _navigateToSpecifierScheme(context),
                       ),
                     ],
                   ),

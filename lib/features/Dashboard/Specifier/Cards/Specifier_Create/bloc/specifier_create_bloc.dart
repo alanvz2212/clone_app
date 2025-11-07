@@ -1,7 +1,7 @@
-import 'package:clone/features/Specifier/Cards/Specifier_Create/bloc/specifier_create_event.dart';
-import 'package:clone/features/Specifier/Cards/Specifier_Create/bloc/specifier_create_state.dart';
-import 'package:clone/features/Specifier/Cards/Specifier_Create/model/specifier_create_model.dart';
-import 'package:clone/features/Specifier/Cards/Specifier_Create/services/specifier_create_service.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_event.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_state.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/model/specifier_create_model.dart';
+import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/services/specifier_create_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SpecifierCreateBloc

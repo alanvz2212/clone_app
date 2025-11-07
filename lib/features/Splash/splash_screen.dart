@@ -38,7 +38,12 @@ class _SplashScreenState extends State<SplashScreen>
           final currentUser = await authService.getCurrentUser();
           if (currentUser != null) {
             if (currentUser.userType == UserType.dealer) {
-              context.go(AppRouter.dealerDashboard);
+              // Check if user is a specifier
+              if (currentUser.isSpecifier) {
+                context.go('/specifier-dashboard');
+              } else {
+                context.go(AppRouter.dealerDashboard);
+              }
             } else if (currentUser.userType == UserType.transporter) {
               context.go(AppRouter.transporterDashboard);
             } else {

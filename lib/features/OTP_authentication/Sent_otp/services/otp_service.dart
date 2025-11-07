@@ -7,6 +7,10 @@ import '../../../../../../constants/string_constants.dart';
 class OtpService {
   Future<OtpResponseModel> sendOtp(String phoneNumber) async {
     try {
+      if (phoneNumber.isEmpty || phoneNumber.length != 10) {
+        throw Exception('Invalid phone number');
+      }
+
       final url = Uri.parse(ApiEndpoints.sendOtp(phoneNumber));
       final response = await http.post(
         url,
@@ -24,8 +28,7 @@ class OtpService {
         throw Exception('Failed to send OTP: ${response.statusCode}');
       }
     } catch (e) {
-      throw Exception('Error sending OTP: $e');
+      throw Exception('Invalid phone number');
     }
   }
 }
-

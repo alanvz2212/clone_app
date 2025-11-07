@@ -1,20 +1,20 @@
 class SchemeDealerModel {
   final int schemeId;
   final String name;
-  final String fileName;
   final String startDate;
   final String endDate;
   final int userType;
   final int point;
+  final String fileName;
 
   SchemeDealerModel({
     required this.schemeId,
     required this.name,
-    required this.fileName,
     required this.startDate,
     required this.endDate,
     required this.userType,
     required this.point,
+    required this.fileName,
   });
 
   factory SchemeDealerModel.fromJson(Map<String, dynamic> json) {
@@ -22,11 +22,11 @@ class SchemeDealerModel {
       return SchemeDealerModel(
         schemeId: json['schemeId'] ?? 0,
         name: json['name'] ?? 'Unknown Scheme',
-        fileName: json['fileName'] ?? '',
         startDate: json['startDate'] ?? '',
         endDate: json['endDate'] ?? '',
         userType: json['userType'] ?? 0,
         point: json['point'] ?? 0,
+        fileName: json['fileName'] ?? '',
       );
     } catch (e) {
       print('Error parsing SchemeDealerModel: $e');
@@ -39,13 +39,15 @@ class SchemeDealerModel {
     return {
       'schemeId': schemeId,
       'name': name,
-      'fileName': fileName,
       'startDate': startDate,
       'endDate': endDate,
       'userType': userType,
       'point': point,
+      'fileName': fileName,
     };
   }
+
+  String get fullImageUrl => 'https://tmsapi.abm4trades.com/$fileName';
 }
 
 class SchemeDealerResponse {

@@ -1,3 +1,4 @@
+import 'package:clone/constants/string_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/scheme_dealer_bloc.dart';
@@ -5,6 +6,7 @@ import '../bloc/scheme_event_bloc.dart';
 import '../bloc/scheme_state_bloc.dart';
 import '../models/scheme_dealer_model.dart';
 import '../../../../../auth/dealer/bloc/dealer_auth_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SchemeDealer extends StatelessWidget {
   const SchemeDealer({super.key});
@@ -95,6 +97,27 @@ class SchemeDealer extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            top: 8,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'App Version - ${StringConstant.version}',
+                style: TextStyle(
+                  color: Color.fromARGB(255, 95, 91, 91),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Image.asset('assets/33.png', width: 100, height: 100),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -105,12 +128,12 @@ class SchemeDealer extends StatelessWidget {
       itemCount: schemes.length,
       itemBuilder: (context, index) {
         final scheme = schemes[index];
-        return _buildSchemeCard(scheme);
+        return _buildSchemeCard(context, scheme);
       },
     );
   }
 
-  Widget _buildSchemeCard(SchemeDealerModel scheme) {
+  Widget _buildSchemeCard(BuildContext context, SchemeDealerModel scheme) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 3,
@@ -129,7 +152,65 @@ class SchemeDealer extends StatelessWidget {
                 scheme.name,
                 style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
+
+              if (scheme.fileName != null && scheme.fileName.isNotEmpty)
+                GestureDetector(
+                  onTap: () =>
+                      _showFullScreenImage(context, scheme.fullImageUrl),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      scheme.fullImageUrl,
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                  : null,
+                              color: const Color(0xFFCEB007),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 160,
+                          width: double.infinity,
+                          color: Colors.grey[200],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.image_not_supported,
+                                color: Colors.grey,
+                                size: 40,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Image not available',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,17 +256,213 @@ class SchemeDealer extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-
-              // Text(
-              //   'User Type: ${scheme.userType}',
-              //   style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-              // ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _showFullScreenImage(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black87,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.zero,
+          child: Stack(
+            children: [
+              // Fullscreen image with zoom capability
+              GestureDetector(
+                onTap: () => Navigator.pop(dialogContext),
+                child: Container(
+                  color: Colors.black,
+                  child: Center(
+                    child: InteractiveViewer(
+                      panEnabled: true,
+                      minScale: 0.5,
+                      maxScale: 4.0,
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                      : null,
+                                  color: const Color(0xFFCEB007),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Loading image...',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  color: Colors.red,
+                                  size: 50,
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Failed to load image',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                ElevatedButton.icon(
+                                  onPressed: () =>
+                                      _openImageInBrowser(context, imageUrl),
+                                  icon: const Icon(Icons.open_in_browser),
+                                  label: const Text('Open in Browser'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFCEB007),
+                                    foregroundColor: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Close button
+              Positioned(
+                top: 40,
+                right: 20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                  ),
+                ),
+              ),
+              // Open in browser button
+              Positioned(
+                top: 40,
+                left: 20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.open_in_browser,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      _openImageInBrowser(context, imageUrl);
+                    },
+                  ),
+                ),
+              ),
+              // Pinch to zoom hint
+              Positioned(
+                bottom: 40,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Pinch to zoom • Tap to close',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openImageInBrowser(BuildContext context, String url) async {
+    try {
+      final Uri uri = Uri.parse(url);
+
+      // Try to launch the URL
+      final bool launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        // If launch failed, show error message
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Unable to open image in browser'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+              action: SnackBarAction(
+                label: 'Copy URL',
+                textColor: Colors.white,
+                onPressed: () {
+                  // You can implement clipboard copy here if needed
+                  // Clipboard.setData(ClipboardData(text: url));
+                },
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print('Error launching URL: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error opening image: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   String _formatDate(String? dateString) {
@@ -203,6 +480,7 @@ class SchemeDealer extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Icon(Icons.description_outlined, size: 80, color: Colors.grey[400]),
           const SizedBox(height: 16),
           Text(
             'No Schemes Available',
@@ -245,6 +523,7 @@ class SchemeDealer extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Icon(Icons.error_outline, size: 80, color: Colors.red[300]),
             const SizedBox(height: 16),
             Text(
               'Error Loading Schemes',
@@ -267,6 +546,7 @@ class SchemeDealer extends StatelessWidget {
                   RetryLoadSchemes(userId: userId),
                 );
               },
+              icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFCEB007),

@@ -37,6 +37,8 @@ class _CartScreenState extends State<CartScreen> {
     });
     try {
       final customerId = await _userService.getCurrentCustomerIdWithFallback();
+      final mobileUser = await _userService.getMobileUser();
+      final phoneNumber = await _userService.getPhoneNumber();
       List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((
         item,
       ) {
@@ -61,6 +63,8 @@ class _CartScreenState extends State<CartScreen> {
         "invoice": "string",
         "customerId": customerId,
         "mobileOrderStatusId": 1,
+        "mobileUserId": mobileUser.isNotEmpty ? mobileUser[0] : null,
+        "phoneNumber": phoneNumber ?? "string",
         "notes": notes.isEmpty ? "No notes" : notes,
         "mobileOrderItem": mobileOrderItems,
       };

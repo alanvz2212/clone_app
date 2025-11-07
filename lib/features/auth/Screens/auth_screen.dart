@@ -29,10 +29,6 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  static const String hardcodedDealerId = "9021345655";
-  static const String hardcodedDealerPassword = "Anu@1234";
-  static const String hardcodedTransporterId = "";
-  static const String hardcodedTransporterPassword = "";
   final TextEditingController _dealerMobileController = TextEditingController();
   final TextEditingController _dealerPasswordController =
       TextEditingController();
@@ -41,10 +37,6 @@ class _AuthScreenState extends State<AuthScreen>
   final TextEditingController _transporterPasswordController =
       TextEditingController();
   late final OtpBloc _otpBloc;
-  bool _isDealerPasswordVisible = false;
-  bool _isTransporterPasswordVisible = false;
-  bool _dealerStayLoggedIn = true;
-  bool _transporterStayLoggedIn = true;
   @override
   void initState() {
     super.initState();
@@ -142,9 +134,7 @@ class _AuthScreenState extends State<AuthScreen>
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 30),
                       Image.asset('assets/logo1.png', width: 150),
-                      const SizedBox(height: 15),
                       Text(
                         'Welcome Back',
                         style: TextStyle(
@@ -153,7 +143,7 @@ class _AuthScreenState extends State<AuthScreen>
                           color: Colors.grey.shade800,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       Text(
                         'Sign in to your account',
                         style: TextStyle(
@@ -164,7 +154,7 @@ class _AuthScreenState extends State<AuthScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 5),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
@@ -290,8 +280,13 @@ class _AuthScreenState extends State<AuthScreen>
         final isLoading = state.isLoading;
         final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
         final isKeyboardVisible = keyboardHeight > 0;
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+        return Padding(
+          padding: const EdgeInsets.only(
+            top: 0,
+            left: 25.0,
+            right: 25.0,
+            bottom: 65.0,
+          ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: isKeyboardVisible
@@ -328,7 +323,7 @@ class _AuthScreenState extends State<AuthScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: isLoading
                       ? null
@@ -378,8 +373,13 @@ class _AuthScreenState extends State<AuthScreen>
         final isLoading = state.isLoading;
         final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
         final isKeyboardVisible = keyboardHeight > 0;
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+        return Padding(
+          padding: const EdgeInsets.only(
+            top: 0,
+            left: 25.0,
+            right: 25.0,
+            bottom: 65.0,
+          ),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               minHeight: isKeyboardVisible
@@ -460,136 +460,11 @@ class _AuthScreenState extends State<AuthScreen>
     );
   }
 
-  void _handleDealerLogin() async {
-    final mobileOrId = _dealerMobileController.text.trim();
-    final password = _dealerPasswordController.text.trim();
-    if (mobileOrId == hardcodedDealerId &&
-        password == hardcodedDealerPassword) {
-      await _storeHardcodedDealerAuth(mobileOrId);
-      await _saveDealerCredentials(mobileOrId, password);
-      Helpers.showSuccessSnackBar(context, 'Login successful! ');
-      context.go(AppRouter.dealerDashboard);
-      return;
-    }
-    final mobileError = Validators.validateMobileOrId(mobileOrId);
-    final passwordError = Validators.validatePassword(password);
-    if (mobileError != null) {
-      Helpers.showErrorSnackBar(context, mobileError);
-      return;
-    }
-    if (passwordError != null) {
-      Helpers.showErrorSnackBar(context, passwordError);
-      return;
-    }
-    await _saveDealerCredentials(mobileOrId, password);
-    context.read<DealerAuthBloc>().add(
-      DealerLoginRequested(
-        mobileNumberOrId: mobileOrId,
-        password: password,
-        stayLoggedIn: _dealerStayLoggedIn,
-      ),
-    );
-  }
-
-  void _handleTransporterLogin() async {
-    final mobileOrId = _transporterMobileController.text.trim();
-    final password = _transporterPasswordController.text.trim();
-    if (mobileOrId == hardcodedTransporterId &&
-        password == hardcodedTransporterPassword) {
-      await _storeHardcodedTransporterAuth(mobileOrId);
-      await _saveTransporterCredentials(mobileOrId, password);
-      Helpers.showSuccessSnackBar(context, 'Login successful! ');
-      context.go(AppRouter.transporterDashboard);
-      return;
-    }
-    final mobileError = Validators.validateMobileOrId(mobileOrId);
-    final passwordError = Validators.validatePassword(password);
-    if (mobileError != null) {
-      Helpers.showErrorSnackBar(context, mobileError);
-      return;
-    }
-    if (passwordError != null) {
-      Helpers.showErrorSnackBar(context, passwordError);
-      return;
-    }
-    await _saveTransporterCredentials(mobileOrId, password);
-    context.read<TransporterAuthBloc>().add(
-      TransporterLoginRequested(
-        mobileNumberOrId: mobileOrId,
-        password: password,
-      ),
-    );
-  }
-
-  Future<void> _saveDealerCredentials(String id, String password) async {
-    try {
-      final storageService = getIt<StorageService>();
-      await storageService.saveDealerCredentials(id, password);
-      await storageService.setStayLoggedIn(true);
-    } catch (e) {
-      print('Error saving dealer credentials: $e');
-    }
-  }
-
-  Future<void> _saveTransporterCredentials(String id, String password) async {
-    try {
-      final storageService = getIt<StorageService>();
-      await storageService.saveTransporterCredentials(id, password);
-      await storageService.setStayLoggedIn(true);
-    } catch (e) {
-      print('Error saving transporter credentials: $e');
-    }
-  }
-
   void _showContactSupport(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ContactUsScreen()),
     );
-  }
-
-  Future<void> _storeHardcodedDealerAuth(String mobileOrId) async {
-    try {
-      final authService = getIt<AuthService>();
-      final storageService = getIt<StorageService>();
-      final user = User(
-        userId: mobileOrId,
-        name: 'Demo Dealer',
-        email: 'dealer@demo.com',
-        mobileNumber: mobileOrId,
-        userType: UserType.dealer,
-        id: int.tryParse(mobileOrId) ?? mobileOrId.hashCode,
-        isActive: true,
-        createdAt: DateTime.now(),
-      );
-      await storageService.setUser(user);
-      await storageService.setToken('hardcoded_dealer_token');
-      authService.useHardcodedToken();
-    } catch (e) {
-      print('Error storing hardcoded dealer auth: $e');
-    }
-  }
-
-  Future<void> _storeHardcodedTransporterAuth(String mobileOrId) async {
-    try {
-      final authService = getIt<AuthService>();
-      final storageService = getIt<StorageService>();
-      final user = User(
-        userId: mobileOrId,
-        name: 'Demo Transporter',
-        email: 'transporter@demo.com',
-        mobileNumber: mobileOrId,
-        userType: UserType.transporter,
-        id: int.tryParse(mobileOrId) ?? mobileOrId.hashCode,
-        isActive: true,
-        createdAt: DateTime.now(),
-      );
-      await storageService.setUser(user);
-      await storageService.setToken('hardcoded_transporter_token');
-      authService.useHardcodedToken();
-    } catch (e) {
-      print('Error storing hardcoded transporter auth: $e');
-    }
   }
 
   void _sendOTPForDealer() {

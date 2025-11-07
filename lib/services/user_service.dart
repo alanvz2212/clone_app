@@ -3,10 +3,12 @@ import '../features/auth/dealer/models/dealer.dart';
 import '../features/auth/dealer/bloc/dealer_auth_bloc.dart';
 import '../features/auth/dealer/bloc/dealer_auth_state.dart';
 import 'auth_service.dart';
+import 'storage_service.dart';
 class UserService {
   final AuthService _authService;
   final DealerAuthBloc? _dealerAuthBloc;
-  UserService(this._authService, [this._dealerAuthBloc]);
+  final StorageService _storageService;
+  UserService(this._authService, this._storageService, [this._dealerAuthBloc]);
   Future<User?> getCurrentUser() async {
     return await _authService.getCurrentUser();
   }
@@ -58,6 +60,16 @@ class UserService {
   Future<UserType?> getCurrentUserType() async {
     final user = await getCurrentUser();
     return user?.userType;
+  }
+  Future<List<dynamic>> getMobileUser() async {
+    return await _storageService.getMobileUser();
+  }
+  Future<String?> getPhoneNumber() async {
+    return await _storageService.getPhoneNumber();
+  }
+  Future<void> setMobileUserAndPhoneNumber(List<dynamic> mobileUser, String phoneNumber) async {
+    await _storageService.setMobileUser(mobileUser);
+    await _storageService.setPhoneNumber(phoneNumber);
   }
 }
 

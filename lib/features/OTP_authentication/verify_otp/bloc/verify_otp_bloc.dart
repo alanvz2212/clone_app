@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/verify_otp_service.dart';
 import '../../../../services/auth_service.dart';
 import '../../../../services/mobile_log_service.dart';
+import '../../../../services/user_service.dart';
 import '../../../../features/auth/models/user.dart';
 import '../../../../features/auth/dealer/models/dealer.dart';
 import '../../../../features/auth/dealer/services/dealer_auth_hive_service.dart';
@@ -12,11 +13,13 @@ class VerifyOtpBloc extends Bloc<VerifyOtpEvent, VerifyOtpState> {
   final VerifyOtpService verifyOtpService;
   final AuthService authService;
   final MobileLogService mobileLogService;
+  final UserService userService;
 
   VerifyOtpBloc({
     required this.verifyOtpService,
     required this.authService,
     required this.mobileLogService,
+    required this.userService,
   }) : super(VerifyOtpState()) {
     on<VerifyOtpRequested>(_onVerifyOtpRequested);
   }
@@ -114,6 +117,12 @@ class VerifyOtpBloc extends Bloc<VerifyOtpEvent, VerifyOtpState> {
           userId: userData.id,
           userType: userType,
           token: token,
+        );
+
+        // Store mobile user and phone number for order placement
+        await userService.setMobileUserAndPhoneNumber(
+          response.data!.mobileUser,
+          response.data!.phoneNumber,
         );
 
         emit(

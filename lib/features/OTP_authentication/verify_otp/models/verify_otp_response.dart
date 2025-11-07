@@ -26,10 +26,14 @@ class VerifyOtpResponse {
   }
 }
 class VerifyOtpData {
+  final List<dynamic> mobileUser;
+  final String phoneNumber;
   final UserData data;
   final String token;
   final String refresh;
   VerifyOtpData({
+    required this.mobileUser,
+    required this.phoneNumber,
     required this.data,
     required this.token,
     required this.refresh,
@@ -39,6 +43,8 @@ class VerifyOtpData {
     print('JSON: $json');
     try {
       return VerifyOtpData(
+        mobileUser: json['mobileUser'] ?? [],
+        phoneNumber: json['phoneNumber'] ?? '',
         data: UserData.fromJson(json['data']),
         token: json['token'] ?? '',
         refresh: json['refresh'] ?? '',
@@ -54,6 +60,7 @@ class UserData {
   final String email;
   final String password;
   final String mobile;
+  final String whatsappNumber;
   final String salt;
   final String? contactPerson;
   final String? contactNumber;
@@ -114,6 +121,7 @@ class UserData {
     required this.email,
     required this.password,
     required this.mobile,
+    required this.whatsappNumber,
     required this.salt,
     this.contactPerson,
     this.contactNumber,
@@ -188,6 +196,7 @@ class UserData {
       email: json['email'] ?? '',
       password: json['password'] ?? '',
       mobile: json['mobile'] ?? '',
+      whatsappNumber: json['whatsappNumber'] ?? '',
       salt: json['salt'] ?? '',
       contactPerson: json['contactPerson'],
       contactNumber: json['contactNumber'],

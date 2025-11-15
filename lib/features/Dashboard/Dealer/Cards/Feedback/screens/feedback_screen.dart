@@ -1,6 +1,6 @@
-import 'package:clone/constants/string_constants.dart';
-import 'package:clone/core/di/injection.dart';
-import 'package:clone/services/user_service.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
+import 'package:abm4customerapp/core/di/injection.dart';
+import 'package:abm4customerapp/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/feedback_bloc.dart';

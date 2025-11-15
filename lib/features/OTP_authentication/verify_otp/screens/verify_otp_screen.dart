@@ -1,5 +1,5 @@
-import 'package:clone/features/Dashboard/Dealer/Screens/dashboard_dealer_screen.dart';
-import 'package:clone/features/Dashboard/Specifier/Screens/specifier_dashboard_screen.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Screens/dashboard_dealer_screen.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Screens/specifier_dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

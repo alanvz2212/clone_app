@@ -1,6 +1,6 @@
-import 'package:clone/features/Dashboard/Specifier/Cards/Scheme_specifier/bloc/scheme_event.bloc.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Scheme_specifier/bloc/scheme_state_bloc.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Scheme_specifier/services/scheme_specifier_service.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Scheme_specifier/bloc/scheme_event.bloc.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Scheme_specifier/bloc/scheme_state_bloc.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Scheme_specifier/services/scheme_specifier_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 

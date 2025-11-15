@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:clone/main.dart';
+import 'package:abm4customerapp/main.dart';
+
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
@@ -12,4 +13,3 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 }
-

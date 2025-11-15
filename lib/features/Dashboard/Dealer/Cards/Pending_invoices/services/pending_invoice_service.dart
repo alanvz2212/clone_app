@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/pending_invoice_model.dart';
-import 'package:clone/core/di/injection.dart';
-import 'package:clone/services/user_service.dart';
-import 'package:clone/services/auth_service.dart';
+import 'package:abm4customerapp/core/di/injection.dart';
+import 'package:abm4customerapp/services/user_service.dart';
+import 'package:abm4customerapp/services/auth_service.dart';
 
 class PendingInvoiceService {
   static const String apiUrl =

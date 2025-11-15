@@ -6,7 +6,7 @@ import '../bloc/pending_invoice_event.dart';
 import '../bloc/pending_invoice_state.dart';
 import '../models/pending_invoice_model.dart';
 import '../services/pending_invoice_service.dart';
-import 'package:clone/constants/string_constants.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
 
 class PendingInvoicesScreen extends StatelessWidget {
   const PendingInvoicesScreen({super.key});

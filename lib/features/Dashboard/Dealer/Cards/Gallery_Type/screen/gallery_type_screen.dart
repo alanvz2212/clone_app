@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:clone/constants/string_constants.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
 import '../bloc/gallery_type_bloc.dart';
 import '../bloc/gallery_type_event.dart';
 import '../bloc/gallery_type_state.dart';

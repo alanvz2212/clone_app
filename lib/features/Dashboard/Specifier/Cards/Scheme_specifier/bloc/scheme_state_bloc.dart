@@ -1,4 +1,4 @@
-import 'package:clone/features/Dashboard/Specifier/Cards/Scheme_specifier/model/scheme_specifier_model.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Scheme_specifier/model/scheme_specifier_model.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class SchemeSpecifierState extends Equatable {

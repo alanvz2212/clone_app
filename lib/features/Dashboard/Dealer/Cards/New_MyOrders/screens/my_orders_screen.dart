@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/sales_order_model.dart';
 import '../services/sales_order_service.dart';
-import 'package:clone/constants/string_constants.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
 
 class NewMyOrdersScreen extends StatefulWidget {
   final int customerId;

@@ -21,6 +21,7 @@ import '../../features/Dashboard/Dealer/Cards/Gallery_Type/bloc/gallery_type_blo
 import '../../features/Dashboard/Dealer/Cards/Gallery/services/gallery_service.dart';
 import '../../features/Dashboard/Dealer/Cards/Gallery/bloc/gallery_bloc.dart';
 import '../../constants/api_endpoints.dart';
+
 final GetIt getIt = GetIt.instance;
 Future<void> setupDependencyInjection() async {
   final storageService = StorageService();
@@ -38,7 +39,7 @@ Future<void> setupDependencyInjection() async {
   await authService.initializeAuth();
   getIt.registerSingleton<AuthService>(authService);
   getIt.registerLazySingleton<UserService>(
-    () => UserService(getIt<AuthService>()),
+    () => UserService(getIt<AuthService>(), getIt<StorageService>()),
   );
   getIt.registerLazySingleton<DealerAuthRepository>(
     () => DealerAuthRepository(baseUrl: ApiEndpoints.baseUrl),
@@ -49,16 +50,10 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<SearchItemRepository>(
     () => SearchItemRepository(),
   );
-  getIt.registerLazySingleton<OtpService>(
-    () => OtpService(),
-  );
-  getIt.registerLazySingleton<VerifyOtpService>(
-    () => VerifyOtpService(),
-  );
+  getIt.registerLazySingleton<OtpService>(() => OtpService());
+  getIt.registerLazySingleton<VerifyOtpService>(() => VerifyOtpService());
 
-  getIt.registerLazySingleton<MobileLogService>(
-    () => MobileLogService(),
-  );
+  getIt.registerLazySingleton<MobileLogService>(() => MobileLogService());
 
   getIt.registerLazySingleton<GalleryService>(
     () => GalleryService(getIt<ApiService>()),
@@ -90,6 +85,7 @@ Future<void> setupDependencyInjection() async {
       verifyOtpService: getIt<VerifyOtpService>(),
       authService: getIt<AuthService>(),
       mobileLogService: getIt<MobileLogService>(),
+      userService: getIt<UserService>(),
     ),
   );
 
@@ -98,9 +94,12 @@ Future<void> setupDependencyInjection() async {
   );
 
   getIt.registerFactory<GalleryDocumentBloc>(
-    () => GalleryDocumentBloc(galleryDocumentService: getIt<GalleryDocumentService>()),
+    () => GalleryDocumentBloc(
+      galleryDocumentService: getIt<GalleryDocumentService>(),
+    ),
   );
 }
+
 ApiService get apiService => getIt<ApiService>();
 AuthService get authService => getIt<AuthService>();
 UserService get userService => getIt<UserService>();
@@ -108,4 +107,3 @@ StorageService get storageService => getIt<StorageService>();
 DealerAuthRepository get dealerAuthRepository => getIt<DealerAuthRepository>();
 TransporterAuthRepository get transporterAuthRepository =>
     getIt<TransporterAuthRepository>();
-

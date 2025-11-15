@@ -1,8 +1,8 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Services/cart_hive_service.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/models/cart_item_hive.dart';
-import 'package:clone/features/auth/dealer/models/dealer_hive.dart';
-import 'package:clone/features/auth/dealer/models/auth_data_hive.dart';
-import 'package:clone/features/auth/dealer/services/dealer_auth_hive_service.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Place_Order/Services/cart_hive_service.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Place_Order/models/cart_item_hive.dart';
+import 'package:abm4customerapp/features/auth/dealer/models/dealer_hive.dart';
+import 'package:abm4customerapp/features/auth/dealer/models/auth_data_hive.dart';
+import 'package:abm4customerapp/features/auth/dealer/services/dealer_auth_hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
@@ -39,9 +39,9 @@ void main() async {
   await setupDependencyInjection();
   Workmanager().initialize(callbackDispatcher);
   Workmanager().registerPeriodicTask(
-    "uniqueName",
-    "simplePeriodicTask",
-    frequency: Duration(minutes: 15),
+    "uniqueName", 
+    "simplePeriodicTask", 
+    frequency: Duration(minutes: 15), 
   );
   runApp(const MyApp());
 }
@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: 'clone',
+          title: 'abm4customerapp',
           routerConfig: AppRouter.router,
         ),
       ),

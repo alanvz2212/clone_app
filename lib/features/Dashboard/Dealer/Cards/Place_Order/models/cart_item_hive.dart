@@ -1,4 +1,4 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/models/cart_model.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Place_Order/models/cart_model.dart';
 import 'package:hive/hive.dart';
 part 'cart_item_hive.g.dart';
 

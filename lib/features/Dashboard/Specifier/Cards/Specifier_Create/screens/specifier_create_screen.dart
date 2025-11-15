@@ -1,7 +1,7 @@
-import 'package:clone/constants/string_constants.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_bloc.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_event.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_state.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_bloc.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_event.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Specifier_Create/bloc/specifier_create_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

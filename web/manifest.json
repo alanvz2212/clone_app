@@ -1,6 +1,6 @@
 {
-    "name": "clone",
-    "short_name": "clone",
+    "name": "abm4customerapp",
+    "short_name": "abm4customerapp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,5 +1,5 @@
-import 'package:clone/constants/string_constants.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/Screen/cart_screen.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Place_Order/Screen/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -366,7 +366,9 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
                                           color: Colors.black,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(
+                                        width: 8,
+                                      ), 
                                       if (item.currentSalesPrice != null &&
                                           item.currentSalesPrice! > 0)
                                         Text(

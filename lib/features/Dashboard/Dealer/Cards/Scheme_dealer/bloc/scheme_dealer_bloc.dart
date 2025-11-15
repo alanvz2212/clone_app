@@ -1,7 +1,7 @@
-import 'package:clone/features/Dashboard/Dealer/Cards/Scheme_dealer/bloc/scheme_event_bloc.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Scheme_dealer/bloc/scheme_state_bloc.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Scheme_dealer/models/scheme_dealer_model.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Scheme_dealer/service/scheme_dealer_service.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Scheme_dealer/bloc/scheme_event_bloc.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Scheme_dealer/bloc/scheme_state_bloc.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Scheme_dealer/models/scheme_dealer_model.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Scheme_dealer/service/scheme_dealer_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 

@@ -1,8 +1,8 @@
-import 'package:clone/constants/string_constants.dart';
-import 'package:clone/constants/api_endpoints.dart';
-import 'package:clone/features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
-import 'package:clone/core/di/injection.dart';
-import 'package:clone/services/user_service.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
+import 'package:abm4customerapp/constants/api_endpoints.dart';
+import 'package:abm4customerapp/features/Dashboard/Dealer/Cards/Place_Order/providers/cart_provider.dart';
+import 'package:abm4customerapp/core/di/injection.dart';
+import 'package:abm4customerapp/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +37,8 @@ class _CartScreenState extends State<CartScreen> {
     });
     try {
       final customerId = await _userService.getCurrentCustomerIdWithFallback();
+      final mobileUser = await _userService.getMobileUser();
+      final phoneNumber = await _userService.getPhoneNumber();
       List<Map<String, dynamic>> mobileOrderItems = cartProvider.items.map((
         item,
       ) {
@@ -63,6 +65,8 @@ class _CartScreenState extends State<CartScreen> {
         "mobileOrderStatusId": 1,
         "notes": notes.isEmpty ? "No notes" : notes,
         "mobileOrderItem": mobileOrderItems,
+        "mobileUserId": mobileUser.isNotEmpty ? mobileUser[0] : null,
+        "phoneNumber": phoneNumber ?? "string",
       };
       final response = await http.post(
         Uri.parse(ApiEndpoints.newMobileOrder),

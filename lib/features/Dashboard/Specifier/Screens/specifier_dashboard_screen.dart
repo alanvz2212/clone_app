@@ -1,10 +1,10 @@
-import 'package:clone/constants/string_constants.dart';
-import 'package:clone/core/router/router_extensions.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Scheme_specifier/screen/scheme_specifier.dart';
-import 'package:clone/features/Dashboard/Specifier/Cards/Specifier_Create/screens/specifier_create_screen.dart';
-import 'package:clone/features/auth/dealer/bloc/dealer_auth_bloc.dart';
-import 'package:clone/features/auth/dealer/bloc/dealer_auth_event.dart';
-import 'package:clone/features/auth/dealer/bloc/dealer_auth_state.dart';
+import 'package:abm4customerapp/constants/string_constants.dart';
+import 'package:abm4customerapp/core/router/router_extensions.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Scheme_specifier/screen/scheme_specifier.dart';
+import 'package:abm4customerapp/features/Dashboard/Specifier/Cards/Specifier_Create/screens/specifier_create_screen.dart';
+import 'package:abm4customerapp/features/auth/dealer/bloc/dealer_auth_bloc.dart';
+import 'package:abm4customerapp/features/auth/dealer/bloc/dealer_auth_event.dart';
+import 'package:abm4customerapp/features/auth/dealer/bloc/dealer_auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
